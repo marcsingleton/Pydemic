@@ -1,12 +1,13 @@
 """A text-based implementation of the board game Pandemic."""
 
+from random import shuffle
+from time import sleep
+
 import cards
 import layouts
 import pieces
 import roles
 import shared
-from random import shuffle
-from time import sleep
 
 
 # FUNCTIONS
