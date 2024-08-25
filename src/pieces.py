@@ -1,3 +1,5 @@
+"""Definitions of game pieces."""
+
 import exceptions
 import shared
 

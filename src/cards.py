@@ -1,3 +1,5 @@
+"""Definitions of card and deck objects."""
+
 import exceptions
 import shared
 from random import shuffle

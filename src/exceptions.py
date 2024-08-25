@@ -1,3 +1,5 @@
+"""Pydemic-specific exceptions."""
+
 class GameOver(Exception):
     pass
 

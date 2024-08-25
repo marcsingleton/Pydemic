@@ -1,3 +1,5 @@
+"""A text-based implementation of the board game Pandemic."""
+
 import cards
 import layouts
 import pieces

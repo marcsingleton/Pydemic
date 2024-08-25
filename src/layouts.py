@@ -1,3 +1,5 @@
+"""Definitions of layouts."""
+
 from collections import namedtuple
 
 default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],

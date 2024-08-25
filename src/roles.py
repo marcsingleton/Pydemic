@@ -1,3 +1,5 @@
+"""Definitions of player roles."""
+
 import exceptions
 import shared
 

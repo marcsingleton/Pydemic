@@ -1,3 +1,5 @@
+"""Objects maintaining global shared state."""
+
 cities = {}
 diseases = {}
 players = {}
