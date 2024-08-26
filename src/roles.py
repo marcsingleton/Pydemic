@@ -278,7 +278,7 @@ class Player:
 
 class ContingencyPlanner(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'contingency planner')
+        super().__init__(name, 'contingency planner')
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_card = None
 
@@ -301,7 +301,7 @@ class ContingencyPlanner(Player):
 
 class Dispatcher(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'dispatcher')
+        super().__init__(name, 'dispatcher')
         self.actions = {**self.actions, 'airlift': self.airlift,
                         'ground': self.make_parse('ground'), 'direct': self.make_parse('direct'),
                         'charter': self.make_parse('charter'), 'shuttle': self.make_parse('shuttle')}
@@ -398,9 +398,13 @@ class Dispatcher(Player):
 
 class Medic(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'medic')
+        super().__init__(name, 'medic')
 
-    @Player.city.setter
+    @property
+    def city(self):  # Needed to redefine for subclassing the setter
+        return super().city
+
+    @city.setter
     def city(self, dest):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
             shared.cities[self.city].players.remove(self.name)
@@ -444,12 +448,12 @@ class Medic(Player):
 
 class OperationsExpert(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'operations expert')
+        super().__init__(name, 'operations expert')
         self.actions = {**self.actions, 'opex_shuttle': self.opex_shuttle, 'station': self.station}
         self.shuttle = False
 
     def reset(self):
-        Player.reset(self)
+        super().reset()
         self.shuttle = False
 
     def opex_shuttle(self, args):
@@ -505,7 +509,7 @@ class OperationsExpert(Player):
 
 class QuarantineSpecialist(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'quarantine specialist')
+        super().__init__(name, 'quarantine specialist')
 
     def immunity(self, city, color):
         if city == self.city or city in shared.cities[self.city].neighbors:
@@ -516,7 +520,7 @@ class QuarantineSpecialist(Player):
 
 class Researcher(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'researcher')
+        super().__init__(name, 'researcher')
         self.actions = {**self.actions, 'share': self.share}
 
     def share(self, args):
@@ -561,7 +565,7 @@ class Researcher(Player):
 
 class Scientist(Player):
     def __init__(self, name):
-        Player.__init__(self, name, 'scientist')
+        super().__init__(name, 'scientist')
         self.cure_num = 4
 
 

@@ -1,5 +1,6 @@
 """Definitions of card and deck objects."""
 
+import abc
 from random import shuffle
 
 import exceptions
@@ -14,7 +15,7 @@ class Card:
 
 class CityCard(Card):
     def __init__(self, city, color, population):
-        Card.__init__(self, 'city')
+        super().__init__('city')
         self.color = color
         self.name = city
         self.population = population
@@ -25,7 +26,7 @@ class CityCard(Card):
 
 class EventCard(Card):
     def __init__(self, event_name, event_func):
-        Card.__init__(self, 'event')
+        super().__init__('event')
         self.event = event_func
         self.name = event_name
 
@@ -35,7 +36,7 @@ class EventCard(Card):
 
 class InfectionCard(Card):
     def __init__(self, city, color):
-        Card.__init__(self, 'infection')
+        super().__init__('infection')
         self.color = color
         self.name = city
 
@@ -43,13 +44,14 @@ class InfectionCard(Card):
         return as_color(self.name, self.color)
 
 
-class Deck:
+class Deck(abc.ABC):
     def __init__(self, cards):
         self.discard_pile = []
         self.draw_pile = cards
 
         shuffle(self.draw_pile)
 
+    @abc.abstractmethod
     def draw(self):
         pass
 
