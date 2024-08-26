@@ -512,7 +512,7 @@ class QuarantineSpecialist(Player):
         super().__init__(name, 'quarantine specialist')
 
     def immunity(self, city, color):
-        if city == self.city or city in shared.cities[self.city].neighbors:
+        if self.city and (city == self.city or city in shared.cities[self.city].neighbors):  # Check city is set to avoid KeyError during initialization
             return True
         else:
             return False
