@@ -57,10 +57,10 @@ class City:
     def add_station(self):
         if self.station:
             raise exceptions.StationAddError(f'{self.name} has a research station.')
-        elif City.stations < 1:
+        elif type(self).stations < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
-            City.stations -= 1
+            type(self).stations -= 1
             self.station = True
 
     def remove_station(self):
@@ -68,7 +68,7 @@ class City:
             raise exceptions.StationRemoveError(f'{self.name} does not have a research station.')
         else:
             self.station = False
-            City.stations += 1
+            type(self).stations += 1
 
     def immunity(self, color):
         for player in shared.players.values():
