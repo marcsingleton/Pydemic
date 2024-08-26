@@ -4,6 +4,7 @@ from enum import Enum, auto
 
 import exceptions
 import shared
+from colors import as_color
 
 
 class City:
@@ -18,6 +19,9 @@ class City:
         self.players = set()
         self.station = False
 
+    def __repr__(self):
+        return as_color(self.name, self.color)
+
     def add_disease(self, color, n=1, verbose=True):
         if self.immunity(color):
             raise exceptions.PropertyError(f'{self.name} is immune.')
@@ -26,13 +30,13 @@ class City:
         shared.diseases[color].remove(delta)
         self.cubes[color] += delta
         if verbose:
-            print(f'{self.name} was infected with {color}.')
+            print(f'{self} was infected with {as_color(color, color)}.')
         if n > delta:
             self.outbreak(color)
 
     def outbreak(self, color):
         if (self.name, color) not in shared.outbreak_track.resolved:
-            print(f'{self.name} outbroke!')
+            print(f'{self} outbroke!')
             shared.outbreak_track.resolved.add((self.name, color))  # Append to resolve first to prevent infinite loop between adjacent cities
             shared.outbreak_track.increment()
             for neighbor in self.neighbors:

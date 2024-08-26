@@ -8,6 +8,7 @@ import maps
 import pieces
 import roles
 import shared
+from colors import as_color
 
 
 # FUNCTIONS
@@ -48,17 +49,17 @@ def print_neighbors(*args):
 def print_status(*args):
     """Display all game state information except player deck discard and contingency card."""
     print()
-    print(f'TURN {turn_count}')
+    print(f'-------------------- TURN {turn_count} --------------------')
 
     for disease in shared.diseases.values():
-        print(disease.color.upper())
-        print('\tStatus:', disease.status)
+        print(as_color(disease.color.upper(), disease.color))
+        print('\tStatus:', disease.status.name.lower())
         print('\tCubes remaining:', disease.cubes)
     print()
 
     for player in shared.players.values():
         print(player.name.upper(), f'({player.role.upper()})')
-        print('\tLocation:', player.city)
+        print('\tLocation:', as_color(player.city, shared.cities[player.city].color))
         print('\tHand:', list(player.hand.values()))
     print()
 
@@ -67,12 +68,12 @@ def print_status(*args):
         for color, cubes in city.cubes.items():
             if cubes > 0:
                 if not header:  # Add header
-                    print(city.name.upper())
+                    print(as_color(city.name.upper(), city.color))
                     header = True
-                print(f'\t{color}:', cubes)
+                print(f'\t{as_color(color, color)}:', cubes)
         if city.station:
             if not header:
-                print(city.name.upper())
+                print(as_color(city.name.upper(), city.color))
                 header = True
             print('\tResearch station: True')
     print()
@@ -100,17 +101,17 @@ def interface(actions, prompt):
 
 def turn_order(player_names):
     max_pop = 0
-    max_name = ''
+    max_card = ''
     max_player = ''
     for name in player_names:
         player = shared.players[name]
         for card in player.hand.values():
             if isinstance(card, cards.CityCard) and card.population > max_pop:
                 max_pop = card.population
-                max_name = card.name
+                max_card = card
                 max_player = player.name
     idx = player_names.index(max_player)
-    print(f'{max_player} has the card with the highest population: {max_name} ({max_pop})')
+    print(f'{max_player} has the card with the highest population: {max_card} ({max_pop})')
     return player_names[idx:] + player_names[:idx]
 
 
@@ -211,16 +212,19 @@ if __name__ == '__main__':
         print_status()
 
         # Player actions
+        print()
         while current_player.action_count > 0:
             interface({**current_player.actions, 'neighbors': print_neighbors,
                        'event': play_event, 'status': print_status}, 'Enter your next action: ')
 
         # Draw cards
+        print()
         while shared.draw_count > 0:
             interface({'draw': draw_player, 'event': play_event, 'status': print_status}, 'Draw or play event card: ')
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Infect cities
+        print()
         while shared.infect_count > 0:
             interface({'infect': draw_infect, 'event': play_event, 'status': print_status}, 'Infect or play event card: ')
             shared.outbreak_track.reset()  # Reset outbreak after each draw

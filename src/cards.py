@@ -1,26 +1,15 @@
 """Definitions of card and deck objects."""
 
-import exceptions
-import shared
 from random import shuffle
 
+import exceptions
+import shared
+from colors import as_color
 
 class Card:
-    color_codes = {'red': '31',
-                   'blue': '34',
-                   'yellow': '33',
-                   'black': '37',
-                   'white': '30'}
-
     def __init__(self, type):
         self.type = type
         self.color = None
-
-    @classmethod
-    def str(cls, text, color):
-        color_code = cls.color_codes[color]
-        string = f'\033[1;{color_code}m{text}\033[0;m'
-        return string
 
 
 class CityCard(Card):
@@ -31,7 +20,7 @@ class CityCard(Card):
         self.population = population
 
     def __repr__(self):
-        return Card.str(self.name, self.color)
+        return as_color(self.name, self.color)
 
 
 class EventCard(Card):
@@ -41,7 +30,7 @@ class EventCard(Card):
         self.name = event_name
 
     def __repr__(self):
-        return Card.str(self.name, 'white')
+        return as_color(self.name, 'white')
 
 
 class InfectionCard(Card):
@@ -51,7 +40,7 @@ class InfectionCard(Card):
         self.name = city
 
     def __repr__(self):
-        return Card.str(self.name, self.color)
+        return as_color(self.name, self.color)
 
 
 class Deck:
@@ -72,7 +61,7 @@ class InfectionDeck(Deck):
         try:
             city.add_disease(card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
-            print(f'{card.name} was not infected with {card.color}:', error)
+            print(f'{card} was not infected with {as_color(card.color, card.color)}:', error)
         self.discard_pile.append(card)
 
     def infect(self):
