@@ -4,7 +4,7 @@ from random import shuffle
 from time import sleep
 
 import cards
-import layouts
+import maps
 import pieces
 import roles
 import shared
@@ -139,7 +139,7 @@ player_names = ['marc', 'ben', 'joseph']  # Cannot exceed 4 names
 epidemic_num = 5  # Cannot exceed 6
 
 # Advanced Game Settings
-layout = layouts.default
+map = maps.default
 start_city = 'atlanta'
 outbreak_max = 8
 infection_seq = [2, 2, 2, 3, 3, 4, 4]
@@ -153,7 +153,7 @@ if __name__ == '__main__':
     start_hand_num = 6 - player_num
 
     # Count unique disease colors
-    colors = set([attrs.color for attrs in layout.values()])
+    colors = set([attrs.color for attrs in map.values()])
 
     # Instantiate diseases
     for color in colors:
@@ -167,7 +167,7 @@ if __name__ == '__main__':
     city_cards = []
     infection_cards = []
     pieces.City.stations = station_num
-    for city, attrs in layout.items():
+    for city, attrs in map.items():
         shared.cities[city] = pieces.City(city, attrs.neighbors, attrs.color, colors)
         city_cards.append(cards.CityCard(city, attrs.color, attrs.population))
         infection_cards.append(cards.InfectionCard(city, attrs.color))
