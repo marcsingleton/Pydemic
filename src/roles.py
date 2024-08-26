@@ -36,7 +36,7 @@ class Player:
     def add_card(self, card):
         self.hand[card.name] = card
         while len(self.hand) > self.hand_max:
-            args = input(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card.').split()
+            args = input(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card: ').split()
             if len(args) == 1:
                 try:
                     self.discard(args[0])
