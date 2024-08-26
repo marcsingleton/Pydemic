@@ -2,7 +2,9 @@
 
 from collections import namedtuple
 
-default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
+CityAttrs = namedtuple('CityAttr', ['neighbors', 'color', 'population'])
+
+_default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
            'san_francisco': [['chicago', 'los_angeles', 'manila', 'tokyo'], 'blue', 5864000],
            'chicago': [['atlanta', 'los_angeles', 'mexico_city', 'montreal', 'san_francisco'], 'blue', 9121000],
            'montreal': [['chicago', 'new_york', 'washington'], 'blue', 3429000],
@@ -51,6 +53,6 @@ default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
            'johannesburg': [['khartoum', 'kinshasa'], 'yellow', 3888000],
            'khartoum': [['cairo', 'johannesburg', 'kinshasa', 'lagos'], 'yellow', 4887000]}
 
-CityAttrs = namedtuple('CityAttr', ['neighbors', 'color', 'population'])
-for city, attrs in default.items():
+default = {}
+for city, attrs in _default.items():
     default[city] = CityAttrs(*attrs)
