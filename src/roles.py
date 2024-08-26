@@ -409,14 +409,14 @@ class Medic(Player):
         if dest is not None:  # Do not attempt to set parameters while instantiating players
             shared.cities[dest].players.add(self.name)
             for disease in shared.diseases.values():
-                if disease.status != 'active':
+                if not disease.is_active():
                     try:
                         shared.cities[dest].remove_disease(disease.color)
                     except exceptions.PropertyError:
                         pass
 
     def immunity(self, city, color):
-        if city == self.city and shared.diseases[color].status != 'active':
+        if city == self.city and not shared.diseases[color].is_active():
             return True
         else:
             return False

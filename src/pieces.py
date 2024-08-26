@@ -1,5 +1,7 @@
 """Definitions of game pieces."""
 
+from enum import Enum, auto
+
 import exceptions
 import shared
 
@@ -31,7 +33,7 @@ class City:
     def outbreak(self, color):
         if (self.name, color) not in shared.outbreak_track.resolved:
             print(f'{self.name} outbroke!')
-            shared.outbreak_track.resolved.add((self.name, color))  # Append to resolved first to prevent infinite loop between adjacent cities
+            shared.outbreak_track.resolved.add((self.name, color))  # Append to resolve first to prevent infinite loop between adjacent cities
             shared.outbreak_track.increment()
             for neighbor in self.neighbors:
                 neighbor = shared.cities[neighbor]
@@ -44,7 +46,7 @@ class City:
         if self.cubes[color] == 0:
             raise exceptions.PropertyError(f'{self.name} is not infected with {color}.')
 
-        if shared.diseases[color].status == 'cured':
+        if shared.diseases[color].is_cured():
             n = self.cubes[color]
             self.cubes[color] -= n
             shared.diseases[color].add(n)
@@ -75,20 +77,26 @@ class City:
         return False
 
 
+class DiseaseState(Enum):
+    ACTIVE = auto()
+    CURED = auto()
+    ERADICATED = auto()
+
+
 class Disease:
     def __init__(self, color, cube_num=24):
         self.color = color
         self.cubes = cube_num
-        self.status = 'active'  # active, cured, or eradicated
+        self.status = DiseaseState.ACTIVE
         self.cube_num = cube_num
 
     def add(self, n=1):
         self.cubes += n
-        if self.status == 'cured' and self.cubes == self.cube_num:
-            self.status = 'eradicated'
+        if self.is_cured() and self.cubes == self.cube_num:
+            self.status = DiseaseState.ERADICATED
 
     def remove(self, n=1):
-        if self.status == 'eradicated':
+        if self.status == DiseaseState.ERADICATED:
             raise exceptions.PropertyError(f'{self.color} is eradicated.')
 
         if self.cubes >= n:
@@ -97,13 +105,22 @@ class Disease:
             raise exceptions.GameOver(f'Depleted {self.color} disease cubes.')
 
     def set_cured(self):
-        if self.status != 'active':
+        if not self.is_active():
             raise exceptions.PropertyError(f'{self.color} already cured.')
 
         if self.cubes == self.cube_num:
-            self.status = 'eradicated'
+            self.status = DiseaseState.ERADICATED
         else:
-            self.status = 'cured'
+            self.status = DiseaseState.CURED
+    
+    def is_active(self):
+        return self.status is DiseaseState.ACTIVE
+    
+    def is_cured(self):
+        return self.status is DiseaseState.CURED
+    
+    def is_eradicated(self):
+        return self.status is DiseaseState.ERADICATED
 
 
 class OutbreakTrack:
