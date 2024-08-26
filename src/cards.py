@@ -6,19 +6,21 @@ from random import shuffle
 
 
 class Card:
+    color_codes = {'red': '31',
+                   'blue': '34',
+                   'yellow': '33',
+                   'black': '37',
+                   'white': '30'}
+
     def __init__(self, type):
-        self.type = type  # infection, city, epidemic, event
+        self.type = type
         self.color = None
 
-    @staticmethod
-    def str(text, color):
-        colors = {'red': f'\033[1;31m{text}\033[0;m',
-                  'blue': f'\033[1;34m{text}\033[0;m',
-                  'yellow': f'\033[1;33m{text}\033[0;m',
-                  'black': f'\033[1;37m{text}\033[0;m',
-                  'white': f'\033[1;30m{text}\033[0;m'}
-
-        return colors[color]
+    @classmethod
+    def str(cls, text, color):
+        color_code = cls.color_codes[color]
+        string = f'\033[1;{color_code}m{text}\033[0;m'
+        return string
 
 
 class CityCard(Card):
