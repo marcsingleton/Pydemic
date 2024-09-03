@@ -125,7 +125,8 @@ def epidemic():
 
     # Play Resilient Population event if available
     for player in shared.players.values():
-        if 'resilient_population' in player.hand:  # TODO: Check contingency planner card
+        in_hand = 'resilient_population' in player.hand
+        if in_hand:  # TODO: Check contingency planner card
             text = input('Resilient Population event card detected in hand. Play now? (y/n) ').lower()
             if text == 'y' or text == 'yes':
                 player.hand['resilient_population'].event()
@@ -261,4 +262,3 @@ if __name__ == '__main__':
         # Turn cleanup
         current_player.reset()
         turn_count += 1
-        sleep(1)

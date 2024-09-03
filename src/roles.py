@@ -273,7 +273,7 @@ class ContingencyPlanner(Player):
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_card = None
 
-    def contingency(self, args):
+    def contingency(self, args):  # TODO: Add behavior for playing card
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
