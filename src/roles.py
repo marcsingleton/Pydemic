@@ -47,6 +47,13 @@ class Player:
             else:
                 print('Discard failed: Incorrect number or form of arguments.')
 
+    def can_share(self, card):
+        if card not in self.hand:
+            return False, 'Action failed: Player does not have the specified card.'
+        if card != self.city:
+            return False, "Action failed: Specified card does not match player's current city."
+        return True, 'Action succeeded!'
+
     def discard(self, card):
         try:
             shared.player_deck.discard(self.hand.pop(card))
@@ -179,47 +186,31 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def share(self, args):  # TODO: Make researcher independent
-        def check_args(args0):
-            if args0 not in shared.players:
-                print('Action failed: Nonexistent player specified.')
-                return False
-            if shared.players[args0].city != self.city:
-                print('Action failed: Target player not in same city.')
-                return False
-            return True
-
-        if len(args) == 1:
-            if not check_args(args[0]):
-                return
-            target = shared.players[args[0]]
-            if self.city in self.hand:  # Breaks try-except format in other actions with discard to prevent nested try clauses
-                target.add_card(self.hand.pop(self.city))
-                self.action_count -= 1
-                print('Action succeeded!')
-            elif self.city in target.hand:
-                self.add_card(target.hand.pop(self.city))
-                self.action_count -= 1
-                print('Action succeeded!')
-            else:
-                print('Action failed: Neither player has card of current city in hand.')
-                return
-        elif len(args) == 2:
-            if not check_args(args[0]):
-                return
-            target = shared.players[args[0]]
-            card = args[1]
-            if target.role != 'researcher':
-                print('Action failed: Target player is not researcher.')
-                return
-            if card not in target.hand:
-                print('Action failed: Target player does not have specified card.')
-                return
-            self.add_card(target.hand.pop(card))
-            self.action_count -= 1
-            print('Action succeeded!')
-        else:
+    def share(self, args):
+        if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
+            return
+        if args[0] not in shared.players:
+            print('Action failed: Nonexistent player specified.')
+            return
+        if shared.players[args[0]].city != self.city:
+            print('Action failed: Target player not in same city.')
+            return
+        target = shared.players[args[0]]
+        card = args[1]
+        if card in self.hand:
+            giver, receiver = self, target
+        elif card in target.hand:
+            giver, receiver = target, self
+        else:
+            print('Action failed: Neither player has the specified card.')
+        can_share, msg = giver.can_share(card)
+        if can_share:
+            receiver.add_card(giver.hand.pop(card))
+            self.action_count -= 1
+            print(msg)
+        else:
+            print(msg)
 
     def cure(self, args):
         if len(args) != 1:
@@ -521,46 +512,11 @@ class QuarantineSpecialist(Player):
 class Researcher(Player):
     def __init__(self, name):
         super().__init__(name, 'researcher')
-        self.actions = {**self.actions, 'share': self.share}
-
-    def share(self, args):
-        def check_args(args0):
-            if args0 not in shared.players:
-                print('Action failed: Nonexistent player specified.')
-                return False
-            if shared.players[args0].city != self.city:
-                print('Action failed: Target player not in same city.')
-                return False
-            return True
-
-        if len(args) == 1:
-            if not check_args(args[0]):
-                return
-            target = shared.players[args[0]]
-            if self.city in self.hand:  # Breaks try-except format in other actions with discard to prevent nested try clauses
-                target.add_card(self.hand.pop(self.city))
-                self.action_count -= 1
-                print('Action succeeded!')
-            elif self.city in target.hand:
-                self.add_card(target.hand.pop(self.city))
-                self.action_count -= 1
-                print('Action succeeded!')
-            else:
-                print('Action failed: Neither player has card of current city in hand.')
-                return
-        elif len(args) == 2:
-            if not self.check_args(args[0]):
-                return
-            target = shared.players[args[0]]
-            card = args[1]
-            if card not in self.hand:
-                print('Action failed: Specified card not in hand.')
-                return
-            target.add_card(self.hand.pop(card))
-            self.action_count -= 1
-            print('Action succeeded!')
-        else:
-            print('Action failed: Incorrect number of arguments.')
+    
+    def can_share(self, card):
+        if card not in self.hand:
+            return False, 'Action failed: Player does not have the specified card.'
+        return True, 'Action succeeded!'
 
 
 class Scientist(Player):
