@@ -111,7 +111,8 @@ def turn_order(player_names):
                 max_card = card
                 max_player = player.name
     idx = player_names.index(max_player)
-    print(f'{max_player} has the card with the highest population: {max_card} ({max_pop})')
+    print(f'{max_player} has the card with the highest population: {max_card} ({max_pop:,})')
+    print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]
 
 
@@ -232,6 +233,7 @@ if __name__ == '__main__':
     # PLAY
     while True:
         # Turn setup
+        sleep(1)
         turn = turn_count % player_num
         current_player = shared.players[player_names[turn]]
         shared.draw_count = 2
