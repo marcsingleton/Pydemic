@@ -135,11 +135,7 @@ def epidemic():
 
 
 # SETTINGS
-# Basic Game Settings
-player_names = ['marc', 'ben', 'joseph']  # Cannot exceed 4 names
-epidemic_num = 5  # Cannot exceed 6
-
-# Advanced Game Settings
+# Advanced game settings
 map = maps.default
 start_city = 'atlanta'
 outbreak_max = 8
@@ -149,9 +145,40 @@ station_num = 6
 
 if __name__ == '__main__':
     # INITIALIZATION
-    # Computed Game Settings
-    player_num = len(player_names)
+    # Get player settings
+    player_num = None
+    while not player_num:
+        text = input('Enter a number between two and four for the number of players: ')
+        try:
+            value = int(text)
+        except ValueError:
+            print(f'{text} is not a valid number. Please try again.')
+            continue
+        if value < 2 or value > 4:
+            print('The number of players must be between two and four. Please try again.')
+            continue
+        player_num = value
+    player_names = []
+    for i in range(1, player_num+1):
+        text = input(f"Enter player {i}'s name: ")
+        player_names.append(text)
     start_hand_num = 6 - player_num
+    print()
+
+    # Get epidemic settings
+    epidemic_num = None
+    while not epidemic_num:
+        text = input('Enter a number between four and six for the number of epidemics in play: ')
+        try:
+            value = int(text)
+        except ValueError:
+            print(f'{text} is not a valid number. Please try again.')
+            continue
+        if value < 2 or value > 4:
+            print('The number of epidemics must be between four and six. Please try again.')
+            continue
+        epidemic_num = value
+    print()
 
     # Count unique disease colors
     colors = set([attrs.color for attrs in map.values()])
