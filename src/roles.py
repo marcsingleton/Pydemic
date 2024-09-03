@@ -286,7 +286,7 @@ class ContingencyPlanner(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if self.contingency_card is None:
+        if self.contingency_card is not None:
             print('Action failed: Contingency card is occupied.')
             return
 
