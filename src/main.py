@@ -48,19 +48,20 @@ def print_neighbors(*args):
 
 def print_status(*args):
     """Display all game state information except player deck discard and contingency card."""
+    indent = 4 * ' '
     print()
     print(f'-------------------- TURN {turn_count} --------------------')
 
     for disease in shared.diseases.values():
         print(as_color(disease.color.upper(), disease.color))
-        print('\tStatus:', disease.status.name.lower())
-        print('\tCubes remaining:', disease.cubes)
+        print(f'{indent}Status:', disease.status.name.lower())
+        print(f'{indent}Cubes remaining:', disease.cubes)
     print()
 
     for player in shared.players.values():
         print(player.name.upper(), f'({player.role.upper()})')
-        print('\tLocation:', as_color(player.city, shared.cities[player.city].color))
-        print('\tHand:', list(player.hand.values()))
+        print(f'{indent}Location:', as_color(player.city, shared.cities[player.city].color))
+        print(f'{indent}Hand:', list(player.hand.values()))
     print()
 
     for city in shared.cities.values():
@@ -70,12 +71,12 @@ def print_status(*args):
                 if not header:  # Add header
                     print(as_color(city.name.upper(), city.color))
                     header = True
-                print(f'\t{as_color(color, color)}:', cubes)
+                print(f'{indent}{as_color(color, color)}:', cubes)
         if city.station:
             if not header:
                 print(as_color(city.name.upper(), city.color))
                 header = True
-            print('\tResearch station: True')
+            print(f'{indent}Research station: True')
     print()
 
     print('Infection rate:', shared.infection_track.rate)
