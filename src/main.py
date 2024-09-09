@@ -42,8 +42,20 @@ def play_event(args):
 
 
 def print_neighbors(*args):
-    for city in shared.cities[current_player.city].neighbors:
-        print(city)
+    if len(args) == 0:
+        city = shared.cities[current_player.city]
+    elif len(args) == 1:
+        try:
+            city = shared.cities[args[0]]
+        except KeyError:
+            print('Action failed: Nonexistent city specified.')
+    else:
+        print('Action failed: Incorrect number of arguments.')
+    
+    print(f'The neighbors of {as_color(city.name, city.color)} are:')
+    for city in city.neighbors:
+        city = shared.cities[city]
+        print(f'{indent}{as_color(city, city.color)}')
 
 
 def print_status(*args):
