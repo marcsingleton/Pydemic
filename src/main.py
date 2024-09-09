@@ -100,22 +100,22 @@ def print_status(*args):
 
 
 # Flow control
-def interface(cmds, prompt):
-    text = input(prompt).lower().split()
-    if len(text) == 0:
+def interface(commands, prompt):
+    args = input(prompt).lower().split()
+    if len(args) == 0:
         return
-    cmd = text[0]
-    if cmd == 'help':
+    command = args[0]
+    if command == 'help':
         print(f'The available commands are: ')
-        for cmd in cmds:
-            print(f'{indent}{cmd}')
+        for command in commands:
+            print(f'{indent}{command}')
         return
     try:
-        cmd = cmds[cmd]
+        cmd = commands[command]
     except KeyError:
         print('No valid command exists with that name. Try again.')
         return
-        args = text[1:]
+    args = args[1:]
     cmd(*args)
 
 
@@ -265,22 +265,37 @@ if __name__ == '__main__':
         # Player actions
         print()
         while current_player.action_count > 0:
+            commands = {
+                **current_player.actions,
+                'neighbors': print_neighbors,
+                'event': play_event,
+                'status': print_status,
+            }
             prompt = f'Enter your next command ({current_player.action_count} action(s) remaining): '
-            interface({**current_player.actions, 'neighbors': print_neighbors,
-                       'event': play_event, 'status': print_status}, prompt)
+            interface(commands, prompt)
 
         # Draw cards
         print()
         while shared.draw_count > 0:
+            commands = {
+                'draw': draw_player,
+                'event': play_event,
+                'status': print_status,
+            }
             prompt = f'Draw or play event card ({shared.draw_count} draw(s) remaining): '
-            interface({'draw': draw_player, 'event': play_event, 'status': print_status}, prompt)
+            interface(commands, prompt)
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Infect cities
         print()
         while shared.infect_count > 0:
+            commands = {
+                'infect': draw_infect,
+                'event': play_event,
+                'status': print_status,
+            }
             prompt = f'Infect or play event card ({shared.infect_count} infect(s) remaining): '
-            interface({'infect': draw_infect, 'event': play_event, 'status': print_status}, prompt)
+            interface(commands, prompt)
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Turn cleanup
