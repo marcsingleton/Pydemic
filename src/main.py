@@ -30,7 +30,7 @@ def draw_player(*args):
         current_player.add_card(card)
 
 
-def play_event(args):
+def play_event(*args):
     if len(args) != 2:
         print('Event failed: Incorrect number of arguments')
         return

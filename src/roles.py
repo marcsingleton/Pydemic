@@ -67,7 +67,7 @@ class Player:
         self.action_count = self.action_num
 
     # Player actions
-    def ground(self, args):
+    def ground(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -82,7 +82,7 @@ class Player:
         self.action_count -= 1
         print('Action succeeded!')
 
-    def direct(self, args):
+    def direct(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -99,7 +99,7 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def charter(self, args):
+    def charter(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -116,7 +116,7 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def shuttle(self, args):
+    def shuttle(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -133,7 +133,7 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def station(self, args):
+    def station(self, *args):
         if len(args) == 0:
             try:
                 self.discard(self.city)
@@ -169,7 +169,7 @@ class Player:
         else:
             print('Action failed: Incorrect number of arguments.')
 
-    def treat(self, args):
+    def treat(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -186,7 +186,7 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def share(self, args):
+    def share(self, *args):
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -212,7 +212,7 @@ class Player:
         else:
             print(msg)
 
-    def cure(self, args):
+    def cure(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -246,7 +246,7 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def event(self, args):
+    def event(self, *args):
         if len(args) != 1:
             print('Event failed: Incorrect number of arguments.')
             return
@@ -262,7 +262,7 @@ class Player:
             self.discard(args[0])
             print('Event succeeded!')
 
-    def no_action(self, args):
+    def no_action(self, *args):
         self.action_count -= 1
         print('Action succeeded!')
 
@@ -273,7 +273,7 @@ class ContingencyPlanner(Player):
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_card = None
 
-    def contingency(self, args):  # TODO: Add behavior for playing card
+    def contingency(self, *args):  # TODO: Add behavior for playing card
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -416,7 +416,7 @@ class Medic(Player):
         else:
             return False
 
-    def treat(self, args):
+    def treat(self, *args):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -447,7 +447,7 @@ class OperationsExpert(Player):
         super().reset()
         self.shuttle = False
 
-    def opex_shuttle(self, args):
+    def opex_shuttle(self, *args):
         if self.shuttle:
             print('Action failed: Special move already used this turn.')
             return
@@ -470,7 +470,7 @@ class OperationsExpert(Player):
             self.shuttle = True
             print('Action succeeded!')
 
-    def station(self, args):
+    def station(self, *args):
         if len(args) == 0:
             try:
                 shared.cities[self.city].add_station()
