@@ -100,26 +100,23 @@ def print_status(*args):
 
 
 # Flow control
-def interface(actions, prompt):
+def interface(cmds, prompt):
     text = input(prompt).lower().split()
     if len(text) == 0:
         return
     cmd = text[0]
     if cmd == 'help':
-        print(f'The available actions are: ')
-        for action in actions:
-            print(f'{indent}{action}')
+        print(f'The available commands are: ')
+        for cmd in cmds:
+            print(f'{indent}{cmd}')
         return
     try:
-        action = actions[cmd]
+        cmd = cmds[cmd]
     except KeyError:
-        print('No valid action exists with that name. Try again.')
+        print('No valid command exists with that name. Try again.')
         return
         args = text[1:]
-    except (IndexError, KeyError):
-        print('Action rejected.')
-    else:
-        action(args)
+    cmd(*args)
 
 
 def turn_order(player_names):
