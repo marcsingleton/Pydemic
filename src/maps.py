@@ -1,4 +1,4 @@
-"""Definitions of layouts."""
+"""Definitions of maps."""
 
 from collections import namedtuple
 
