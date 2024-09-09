@@ -48,7 +48,6 @@ def print_neighbors(*args):
 
 def print_status(*args):
     """Display all game state information except player deck discard and contingency card."""
-    indent = 4 * ' '
     print()
     print(f'-------------------- TURN {turn_count} --------------------')
 
@@ -145,6 +144,7 @@ outbreak_max = 8
 infection_seq = [2, 2, 2, 3, 3, 4, 4]
 cube_num = 24
 station_num = 6
+indent = 4 * ' '
 
 if __name__ == '__main__':
     # INITIALIZATION
