@@ -90,8 +90,19 @@ def print_status(*args):
 # Flow control
 def interface(actions, prompt):
     text = input(prompt).lower().split()
+    if len(text) == 0:
+        return
+    cmd = text[0]
+    if cmd == 'help':
+        print(f'The available actions are: ')
+        for action in actions:
+            print(f'{indent}{action}')
+        return
     try:
-        action = actions[text[0]]
+        action = actions[cmd]
+    except KeyError:
+        print('No valid action exists with that name. Try again.')
+        return
         args = text[1:]
     except (IndexError, KeyError):
         print('Action rejected.')
