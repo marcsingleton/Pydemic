@@ -3,7 +3,7 @@
 import exceptions
 import shared
 
-from colors import as_underline
+from format import as_underline, indent
 
 
 class Player:
@@ -38,7 +38,6 @@ class Player:
     def add_card(self, card):
         self.hand[card.name] = card
         if len(self.hand) > self.hand_max:
-            indent = 4 * ' '
             underlined_card = as_underline('card')
             print()
             print(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card.')

@@ -5,7 +5,7 @@ from random import shuffle
 
 import exceptions
 import shared
-from colors import as_color
+from format import as_color
 
 class Card:
     def __init__(self, type):

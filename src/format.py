@@ -5,6 +5,7 @@ color_codes = {'red': '31',
                 'yellow': '33',
                 'black': '30',
                 'white': '37'}
+indent = 4 * ' '
 
 def as_color(text, color, bold=False):
     color_code = color_codes[color]

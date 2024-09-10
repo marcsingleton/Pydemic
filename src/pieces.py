@@ -4,7 +4,7 @@ from enum import Enum, auto
 
 import exceptions
 import shared
-from colors import as_color
+from format import as_color
 
 
 class City:

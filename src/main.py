@@ -8,7 +8,20 @@ import maps
 import pieces
 import roles
 import shared
-from colors import as_color
+from format import as_color
+
+
+def slow_print(*args, sep=' ', end='\n'):
+    import sys
+    for arg in args:
+        arg = str(arg)
+        for char in arg:
+            sys.stdout.write(char)
+            sys.stdout.flush()
+            sleep(0.01)
+        sys.stdout.write(sep)
+    sleep(0.15)
+    sys.stdout.write(end)
 
 
 # FUNCTIONS
@@ -164,7 +177,6 @@ outbreak_max = 8
 infection_seq = [2, 2, 2, 3, 3, 4, 4]
 cube_num = 24
 station_num = 6
-indent = 4 * ' '
 
 if __name__ == '__main__':
     # INITIALIZATION
