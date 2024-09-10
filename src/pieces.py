@@ -19,24 +19,22 @@ class City:
         self.players = set()
         self.station = False
 
-    def __repr__(self):
-        return as_color(self.name, self.color)
 
     def add_disease(self, color, n=1, verbose=True):
         if self.immunity(color):
-            raise exceptions.PropertyError(f'{self.name} is immune.')
+            raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is immune.')
 
         delta = min(n, self.cube_max - self.cubes[color])
         shared.diseases[color].remove(delta)
         self.cubes[color] += delta
         if verbose:
-            print(f'{self} was infected with {as_color(color, color)}.')
+            print(f'{as_color(self.name, self.color)} was infected with {as_color(color, color)}.')
         if n > delta:
             self.outbreak(color)
 
     def outbreak(self, color):
         if (self.name, color) not in shared.outbreak_track.resolved:
-            print(f'{self} outbroke!')
+            print(f'{as_color(self.name, self.color)} outbroke!')
             shared.outbreak_track.resolved.add((self.name, color))  # Append to resolve first to prevent infinite loop between adjacent cities
             shared.outbreak_track.increment()
             for neighbor in self.neighbors:
@@ -48,7 +46,7 @@ class City:
 
     def remove_disease(self, color):
         if self.cubes[color] == 0:
-            raise exceptions.PropertyError(f'{self.name} is not infected with {color}.')
+            raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is not infected with {as_color(color, color)}.')
 
         if shared.diseases[color].is_cured():
             n = self.cubes[color]
@@ -60,7 +58,7 @@ class City:
 
     def add_station(self):
         if self.station:
-            raise exceptions.StationAddError(f'{self.name} has a research station.')
+            raise exceptions.StationAddError(f'{as_color(self.name, self.color)} has a research station.')
         elif type(self).stations < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
@@ -69,7 +67,7 @@ class City:
 
     def remove_station(self):
         if not self.station:
-            raise exceptions.StationRemoveError(f'{self.name} does not have a research station.')
+            raise exceptions.StationRemoveError(f'{as_color(self.name, self.color)} does not have a research station.')
         else:
             self.station = False
             type(self).stations += 1
@@ -101,16 +99,16 @@ class Disease:
 
     def remove(self, n=1):
         if self.status == DiseaseState.ERADICATED:
-            raise exceptions.PropertyError(f'{self.color} is eradicated.')
+            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')
 
         if self.cubes >= n:
             self.cubes -= n
         else:
-            raise exceptions.GameOver(f'Depleted {self.color} disease cubes.')
+            raise exceptions.GameOver(f'Depleted {as_color(self.color, self.color)} disease cubes.')
 
     def set_cured(self):
         if not self.is_active():
-            raise exceptions.PropertyError(f'{self.color} already cured.')
+            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} already cured.')
 
         if self.cubes == self.cube_num:
             self.status = DiseaseState.ERADICATED

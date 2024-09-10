@@ -8,7 +8,7 @@ import maps
 import pieces
 import roles
 import shared
-from format import as_color
+from format import as_color, cards_to_string, indent
 
 
 def slow_print(*args, sep=' ', end='\n'):
@@ -39,7 +39,7 @@ def draw_player(*args):
         epidemic()
         shared.player_deck.discard(card)
     else:
-        print(f'{card} was drawn.')
+        print(f'{as_color(card.name, card.color)} was drawn.')
         current_player.add_card(card)
 
 
@@ -68,7 +68,7 @@ def print_neighbors(*args):
     print(f'The neighbors of {as_color(city.name, city.color)} are:')
     for city in city.neighbors:
         city = shared.cities[city]
-        print(f'{indent}{as_color(city, city.color)}')
+        print(f'{indent}{as_color(city.name, city.color)}')
 
 
 def print_status(*args):
@@ -85,7 +85,7 @@ def print_status(*args):
     for player in shared.players.values():
         print(player.name.upper(), f'({player.role.upper()})')
         print(f'{indent}Location:', as_color(player.city, shared.cities[player.city].color))
-        print(f'{indent}Hand:', list(player.hand.values()))
+        print(f'{indent}Hand:', cards_to_string(player.hand.values()))
     print()
 
     for city in shared.cities.values():
@@ -106,7 +106,7 @@ def print_status(*args):
     print('Infection rate:', shared.infection_track.rate)
     print('Outbreaks:', shared.outbreak_track.count)
     print('Cards remaining:', len(shared.player_deck.draw_pile))
-    print('Infection discard:', shared.infection_deck.discard_pile)
+    print('Infection discard:', cards_to_string(shared.infection_deck.discard_pile))
     print()
 
     print(f'Turn: {current_player.name}')
@@ -144,7 +144,7 @@ def turn_order(player_names):
                 max_card = card
                 max_player = player.name
     idx = player_names.index(max_player)
-    print(f'{max_player} has the card with the highest population: {max_card} ({max_pop:,})')
+    print(f'{max_player} has the card with the highest population: {as_color(max_card.name, max_card.color)} ({max_pop:,})')
     print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]
 

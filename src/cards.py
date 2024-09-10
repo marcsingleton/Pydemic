@@ -5,7 +5,7 @@ from random import shuffle
 
 import exceptions
 import shared
-from format import as_color
+from format import as_color, cards_to_string
 
 class Card:
     def __init__(self, type):
@@ -20,9 +20,6 @@ class CityCard(Card):
         self.name = city
         self.population = population
 
-    def __repr__(self):
-        return as_color(self.name, self.color)
-
 
 class EventCard(Card):
     def __init__(self, event_name, event_func):
@@ -30,18 +27,12 @@ class EventCard(Card):
         self.event = event_func
         self.name = event_name
 
-    def __repr__(self):
-        return as_color(self.name, 'white')
-
 
 class InfectionCard(Card):
     def __init__(self, city, color):
         super().__init__('infection')
         self.color = color
         self.name = city
-
-    def __repr__(self):
-        return as_color(self.name, self.color)
 
 
 class Deck(abc.ABC):
@@ -63,7 +54,7 @@ class InfectionDeck(Deck):
         try:
             city.add_disease(card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
-            print(f'{card} was not infected with {as_color(card.color, card.color)}:', error)
+            print(f'{as_color(city.name, city.color)} was not infected with {as_color(card.color, card.color)}:', error)
         self.discard_pile.append(card)
 
     def infect(self):
@@ -131,7 +122,7 @@ def forecast():
     top = shared.infection_deck.draw_pile[:-7:-1]  # Reverse so pop order reads left to right
     bottom = shared.infection_deck.draw_pile[:-6]
 
-    print(top)
+    print(cards_to_string(top))
     args = input('Enter the re-ordered indices of the above cards, e.g. "135042" from top to bottom: ')
     if len(args) != 6:
         raise exceptions.EventError('Incorrect number of arguments.')
