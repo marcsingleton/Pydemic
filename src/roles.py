@@ -3,6 +3,8 @@
 import exceptions
 import shared
 
+from colors import as_underline
+
 
 class Player:
     def __init__(self, name, role, hand_max=7):
@@ -35,17 +37,27 @@ class Player:
     # Utility functions
     def add_card(self, card):
         self.hand[card.name] = card
+        if len(self.hand) > self.hand_max:
+            indent = 4 * ' '
+            underlined_card = as_underline('card')
+            print()
+            print(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card.')
+            print(f'{indent}To discard a card, use "discard {underlined_card}".')
+            print(f'{indent}To play an event card, use "event {underlined_card}".')
         while len(self.hand) > self.hand_max:
-            args = input(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card: ').split()
-            if len(args) == 1:
+            args = input('Enter your command: ').split()
+            if len(args) == 2 and args[0] == 'discard':
                 try:
-                    self.discard(args[0])
-                except exceptions.PropertyError as error:
+                    self.discard(args[1])
+                except exceptions.DiscardError as error:
                     print('Discard failed:', error)
             elif len(args) == 2 and args[0] == 'event':
-                self.event(args[1])
+                try:
+                    self.event(args[1])
+                except exceptions.EventError as error:
+                    print('Event failed:', error)
             else:
-                print('Discard failed: Incorrect number or form of arguments.')
+                print('Command failed: Incorrect number or form of arguments.')
 
     def can_share(self, card):
         if card not in self.hand:
