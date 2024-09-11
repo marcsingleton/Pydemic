@@ -19,7 +19,6 @@ class City:
         self.players = set()
         self.station = False
 
-
     def add_disease(self, color, n=1, verbose=True):
         if self.immunity(color):
             raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is immune.')
@@ -35,7 +34,9 @@ class City:
     def outbreak(self, color):
         if (self.name, color) not in shared.outbreak_track.resolved:
             print(f'{as_color(self.name, self.color)} outbroke!')
-            shared.outbreak_track.resolved.add((self.name, color))  # Append to resolve first to prevent infinite loop between adjacent cities
+            shared.outbreak_track.resolved.add(
+                (self.name, color)
+            )  # Append to resolve first to prevent infinite loop between adjacent cities
             shared.outbreak_track.increment()
             for neighbor in self.neighbors:
                 neighbor = shared.cities[neighbor]
@@ -46,7 +47,9 @@ class City:
 
     def remove_disease(self, color):
         if self.cubes[color] == 0:
-            raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is not infected with {as_color(color, color)}.')
+            raise exceptions.PropertyError(
+                f'{as_color(self.name, self.color)} is not infected with {as_color(color, color)}.'
+            )
 
         if shared.diseases[color].is_cured():
             n = self.cubes[color]
@@ -58,7 +61,9 @@ class City:
 
     def add_station(self):
         if self.station:
-            raise exceptions.StationAddError(f'{as_color(self.name, self.color)} has a research station.')
+            raise exceptions.StationAddError(
+                f'{as_color(self.name, self.color)} has a research station.'
+            )
         elif type(self).stations < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
@@ -67,7 +72,9 @@ class City:
 
     def remove_station(self):
         if not self.station:
-            raise exceptions.StationRemoveError(f'{as_color(self.name, self.color)} does not have a research station.')
+            raise exceptions.StationRemoveError(
+                f'{as_color(self.name, self.color)} does not have a research station.'
+            )
         else:
             self.station = False
             type(self).stations += 1
@@ -114,13 +121,13 @@ class Disease:
             self.status = DiseaseState.ERADICATED
         else:
             self.status = DiseaseState.CURED
-    
+
     def is_active(self):
         return self.status is DiseaseState.ACTIVE
-    
+
     def is_cured(self):
         return self.status is DiseaseState.CURED
-    
+
     def is_eradicated(self):
         return self.status is DiseaseState.ERADICATED
 

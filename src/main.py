@@ -13,6 +13,7 @@ from format import as_color, cards_to_string, indent
 
 def slow_print(*args, sep=' ', end='\n'):
     import sys
+
     for arg in args:
         arg = str(arg)
         for char in arg:
@@ -64,7 +65,7 @@ def print_neighbors(*args):
             print('Action failed: Nonexistent city specified.')
     else:
         print('Action failed: Incorrect number of arguments.')
-    
+
     print(f'The neighbors of {as_color(city.name, city.color)} are:')
     for city in city.neighbors:
         city = shared.cities[city]
@@ -144,7 +145,10 @@ def turn_order(player_names):
                 max_card = card
                 max_player = player.name
     idx = player_names.index(max_player)
-    print(f'{max_player} has the card with the highest population: {as_color(max_card.name, max_card.color)} ({max_pop:,})')
+    print(
+        f'{max_player} has the card with the highest population: '
+        f'{as_color(max_card.name, max_card.color)} ({max_pop:,})'
+    )
     print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]
 
@@ -160,7 +164,9 @@ def epidemic():
     for player in shared.players.values():
         in_hand = 'resilient_population' in player.hand
         if in_hand:  # TODO: Check contingency planner card
-            text = input('Resilient Population event card detected in hand. Play now? (y/n) ').lower()
+            text = input(
+                'Resilient Population event card detected in hand. Play now? (y/n) '
+            ).lower()
             if text == 'y' or text == 'yes':
                 player.hand['resilient_population'].event()
                 player.discard('resilient_population')
@@ -194,7 +200,7 @@ if __name__ == '__main__':
             continue
         player_num = value
     player_names = []
-    for i in range(1, player_num+1):
+    for i in range(1, player_num + 1):
         text = input(f"Enter player {i}'s name: ")
         player_names.append(text)
     start_hand_num = 6 - player_num
@@ -283,7 +289,9 @@ if __name__ == '__main__':
                 'event': play_event,
                 'status': print_status,
             }
-            prompt = f'Enter your next command ({current_player.action_count} action(s) remaining): '
+            prompt = (
+                f'Enter your next command ({current_player.action_count} action(s) remaining): '
+            )
             interface(commands, prompt)
 
         # Draw cards

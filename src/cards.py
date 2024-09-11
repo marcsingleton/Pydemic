@@ -7,6 +7,7 @@ import exceptions
 import shared
 from format import as_color, cards_to_string
 
+
 class Card:
     def __init__(self, type):
         self.type = type
@@ -54,7 +55,11 @@ class InfectionDeck(Deck):
         try:
             city.add_disease(card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
-            print(f'{as_color(city.name, city.color)} was not infected with {as_color(card.color, card.color)}:', error)
+            print(
+                f'{as_color(city.name, city.color)} was not infected with '
+                f'{as_color(card.color, card.color)}:',
+                error,
+            )
         self.discard_pile.append(card)
 
     def infect(self):
@@ -123,7 +128,9 @@ def forecast():
     bottom = shared.infection_deck.draw_pile[:-6]
 
     print(cards_to_string(top))
-    args = input('Enter the re-ordered indices of the above cards, e.g. "135042" from top to bottom: ')
+    args = input(
+        'Enter the re-ordered indices of the above cards, e.g. "135042" from top to bottom: '
+    )
     if len(args) != 6:
         raise exceptions.EventError('Incorrect number of arguments.')
     if set([sym for sym in args]) != set(['0', '1', '2', '3', '4', '5']):
@@ -137,7 +144,9 @@ def forecast():
 
 
 def government_grant():
-    args = input('Enter one or two cities to place or transfer a research station, respectively: ').split()
+    args = input(
+        'Enter one or two cities to place or transfer a research station, respectively: '
+    ).split()
     if len(args) == 1:
         if args[0] not in shared.cities:
             raise exceptions.EventError('Nonexistent city specified.')
@@ -177,9 +186,11 @@ def resilient_population():
         raise exceptions.EventError(error)
 
 
-events = {'air_lift': air_lift,
-          'forecast': forecast,
-          'government_grant': government_grant,
-          'one_quiet_night': one_quiet_night,
-          'resilient_population': resilient_population}
+events = {
+    'air_lift': air_lift,
+    'forecast': forecast,
+    'government_grant': government_grant,
+    'one_quiet_night': one_quiet_night,
+    'resilient_population': resilient_population,
+}
 event_cards = [EventCard(name, event) for name, event in events.items()]

@@ -4,6 +4,7 @@ from collections import namedtuple
 
 CityAttrs = namedtuple('CityAttr', ['neighbors', 'color', 'population'])
 
+# fmt: off
 _default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
            'san_francisco': [['chicago', 'los_angeles', 'manila', 'tokyo'], 'blue', 5864000],
            'chicago': [['atlanta', 'los_angeles', 'mexico_city', 'montreal', 'san_francisco'], 'blue', 9121000],
@@ -52,6 +53,7 @@ _default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
            'kinshasa': [['johannesburg', 'khartoum', 'lagos'], 'yellow', 9046000],
            'johannesburg': [['khartoum', 'kinshasa'], 'yellow', 3888000],
            'khartoum': [['cairo', 'johannesburg', 'kinshasa', 'lagos'], 'yellow', 4887000]}
+# fmt: on
 
 default = {}
 for city, attrs in _default.items():

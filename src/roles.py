@@ -8,9 +8,17 @@ from format import as_underline, indent
 
 class Player:
     def __init__(self, name, role, hand_max=7):
-        self.actions = {'ground': self.ground, 'direct': self.direct, 'charter': self.charter, 'shuttle': self.shuttle,
-                        'station': self.station, 'treat': self.treat, 'share': self.share, 'cure': self.cure,
-                        'pass': self.no_action}
+        self.actions = {
+            'ground': self.ground,
+            'direct': self.direct,
+            'charter': self.charter,
+            'shuttle': self.shuttle,
+            'station': self.station,
+            'treat': self.treat,
+            'share': self.share,
+            'cure': self.cure,
+            'pass': self.no_action,
+        }
         self.action_num = 4
         self.action_count = self.action_num
         self._city = None
@@ -27,7 +35,9 @@ class Player:
 
     @city.setter
     def city(self, dest):
-        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+        if (
+            self._city is not None
+        ):  # Do not attempt to set parameters for newly instantiated players
             shared.cities[self.city].players.remove(self.name)  # TODO: Mediator
 
         self._city = dest
@@ -40,7 +50,10 @@ class Player:
         if len(self.hand) > self.hand_max:
             underlined_card = as_underline('card')
             print()
-            print(f'{self.name} has exceeded the hand limit. Please discard a card or play an event card.')
+            print(
+                f'{self.name} has exceeded the hand limit. '
+                f'Please discard a card or play an event card.'
+            )
             print(f'{indent}To discard a card, use "discard {underlined_card}".')
             print(f'{indent}To play an event card, use "event {underlined_card}".')
         while len(self.hand) > self.hand_max:
@@ -239,8 +252,11 @@ class Player:
             print('Action failed: Insufficient cards.')
             return
         while len(cards) > self.cure_num:
-            items = input(f'Extra {args[0]} cards detected. Please select {len(cards) - self.cure_num} cards to keep.'
-                          f'(Separate items with a space.)').split()
+            items = input(
+                f'Extra {args[0]} cards detected. '
+                f'Please select {len(cards) - self.cure_num} cards to keep.'
+                f'(Separate items with a space.)'
+            ).split()
             for item in items:
                 try:
                     cards.remove(item)
@@ -304,9 +320,14 @@ class ContingencyPlanner(Player):
 class Dispatcher(Player):
     def __init__(self, name):
         super().__init__(name, 'dispatcher')
-        self.actions = {**self.actions, 'airlift': self.airlift,
-                        'ground': self.make_parse('ground'), 'direct': self.make_parse('direct'),
-                        'charter': self.make_parse('charter'), 'shuttle': self.make_parse('shuttle')}
+        self.actions = {
+            **self.actions,
+            'airlift': self.airlift,
+            'ground': self.make_parse('ground'),
+            'direct': self.make_parse('direct'),
+            'charter': self.make_parse('charter'),
+            'shuttle': self.make_parse('shuttle'),
+        }
 
     def airlift(self, args):
         if len(args) != 2:
@@ -387,6 +408,7 @@ class Dispatcher(Player):
     def make_parse(self, action):
         def f(args):
             return self.parse(args, action)
+
         return f
 
     def parse(self, args, action):
@@ -408,7 +430,8 @@ class Medic(Player):
 
     @city.setter
     def city(self, dest):
-        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+        # Do not attempt to set parameters for newly instantiated players
+        if self._city is not None:
             shared.cities[self.city].players.remove(self.name)
 
         self._city = dest
@@ -451,7 +474,11 @@ class Medic(Player):
 class OperationsExpert(Player):
     def __init__(self, name):
         super().__init__(name, 'operations expert')
-        self.actions = {**self.actions, 'opex_shuttle': self.opex_shuttle, 'station': self.station}
+        self.actions = {
+            **self.actions,
+            'opex_shuttle': self.opex_shuttle,
+            'station': self.station,
+        }
         self.shuttle = False
 
     def reset(self):
@@ -514,7 +541,9 @@ class QuarantineSpecialist(Player):
         super().__init__(name, 'quarantine specialist')
 
     def immunity(self, city, color):
-        if self.city and (city == self.city or city in shared.cities[self.city].neighbors):  # Check city is set to avoid KeyError during initialization
+        # Check city is set to avoid KeyError during initialization
+        in_radius = city == self.city or city in shared.cities[self.city].neighbors
+        if self.city and in_radius:
             return True
         else:
             return False
@@ -523,7 +552,7 @@ class QuarantineSpecialist(Player):
 class Researcher(Player):
     def __init__(self, name):
         super().__init__(name, 'researcher')
-    
+
     def can_share(self, card):
         if card not in self.hand:
             return False, 'Action failed: Player does not have the specified card.'
@@ -536,10 +565,12 @@ class Scientist(Player):
         self.cure_num = 4
 
 
-roles = {'contingency planner': ContingencyPlanner,
-         'dispatcher': Dispatcher,
-         'medic': Medic,
-         'operations expert': OperationsExpert,
-         'quarantine specialist': QuarantineSpecialist,
-         'researcher': Researcher,
-         'scientist': Scientist}
+roles = {
+    'contingency planner': ContingencyPlanner,
+    'dispatcher': Dispatcher,
+    'medic': Medic,
+    'operations expert': OperationsExpert,
+    'quarantine specialist': QuarantineSpecialist,
+    'researcher': Researcher,
+    'scientist': Scientist,
+}
