@@ -114,77 +114,7 @@ def print_status(*args):
 
 
 # Flow control
-def interface(commands, prompt):
-    args = input(prompt).lower().split()
-    if len(args) == 0:
-        return
-    command = args[0]
-    if command == 'help':
-        print(f'The available commands are: ')
-        for command in commands:
-            print(f'{indent}{command}')
-        return
-    try:
-        cmd = commands[command]
-    except KeyError:
-        print('No valid command exists with that name. Try again.')
-        return
-    args = args[1:]
-    cmd(*args)
-
-
-def turn_order(player_names):
-    max_pop = 0
-    max_card = ''
-    max_player = ''
-    for name in player_names:
-        player = shared.players[name]
-        for card in player.hand.values():
-            if isinstance(card, cards.CityCard) and card.population > max_pop:
-                max_pop = card.population
-                max_card = card
-                max_player = player.name
-    idx = player_names.index(max_player)
-    print(
-        f'{max_player} has the card with the highest population: '
-        f'{as_color(max_card.name, max_card.color)} ({max_pop:,})'
-    )
-    print(f'{max_player} will start the turn order.')
-    return player_names[idx:] + player_names[:idx]
-
-
-def epidemic():
-    # Increase
-    shared.infection_track.increment()
-
-    # Infect
-    shared.infection_deck.infect()
-
-    # Play Resilient Population event if available
-    for player in shared.players.values():
-        in_hand = 'resilient_population' in player.hand
-        if in_hand:  # TODO: Check contingency planner card
-            text = input(
-                'Resilient Population event card detected in hand. Play now? (y/n) '
-            ).lower()
-            if text == 'y' or text == 'yes':
-                player.hand['resilient_population'].event()
-                player.discard('resilient_population')
-
-    # Intensify
-    shared.infection_deck.intensify()
-
-
-# SETTINGS
-# Advanced game settings
-map = maps.default
-start_city = 'atlanta'
-outbreak_max = 8
-infection_seq = [2, 2, 2, 3, 3, 4, 4]
-cube_num = 24
-station_num = 6
-
-if __name__ == '__main__':
+def main():
     # INITIALIZATION
     # Get player settings
     player_num = None
@@ -321,3 +251,74 @@ if __name__ == '__main__':
         # Turn cleanup
         current_player.reset()
         turn_count += 1
+
+
+def interface(commands, prompt):
+    args = input(prompt).lower().split()
+    if len(args) == 0:
+        return
+    command = args[0]
+    if command == 'help':
+        print(f'The available commands are: ')
+        for command in commands:
+            print(f'{indent}{command}')
+        return
+    try:
+        cmd = commands[command]
+    except KeyError:
+        print('No valid command exists with that name. Try again.')
+        return
+    args = args[1:]
+    cmd(*args)
+
+
+def turn_order(player_names):
+    max_pop = 0
+    max_card = ''
+    max_player = ''
+    for name in player_names:
+        player = shared.players[name]
+        for card in player.hand.values():
+            if isinstance(card, cards.CityCard) and card.population > max_pop:
+                max_pop = card.population
+                max_card = card
+                max_player = player.name
+    idx = player_names.index(max_player)
+    print(
+        f'{max_player} has the card with the highest population: '
+        f'{as_color(max_card.name, max_card.color)} ({max_pop:,})'
+    )
+    print(f'{max_player} will start the turn order.')
+    return player_names[idx:] + player_names[:idx]
+
+
+def epidemic():
+    # Increase
+    shared.infection_track.increment()
+
+    # Infect
+    shared.infection_deck.infect()
+
+    # Play Resilient Population event if available
+    for player in shared.players.values():
+        in_hand = 'resilient_population' in player.hand
+        if in_hand:  # TODO: Check contingency planner card
+            text = input(
+                'Resilient Population event card detected in hand. Play now? (y/n) '
+            ).lower()
+            if text == 'y' or text == 'yes':
+                player.hand['resilient_population'].event()
+                player.discard('resilient_population')
+
+    # Intensify
+    shared.infection_deck.intensify()
+
+
+# SETTINGS
+# Advanced game settings
+map = maps.default
+start_city = 'atlanta'
+outbreak_max = 8
+infection_seq = [2, 2, 2, 3, 3, 4, 4]
+cube_num = 24
+station_num = 6
