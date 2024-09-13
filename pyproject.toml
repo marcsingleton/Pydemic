@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pydemic"
+authors = [
+    {name = "Marc Singleton", email = "marcsingleton@berkeley.edu"}
+]
+description = "A text-based implementation of the cooperative board game, Pandemic."
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["pandemic", "game"]
+license = {text = "CC BY-NC 4.0"}
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/marcsingleton/pydemic"
+
+[tool.setuptools.dynamic]
+version = {attr = "pydemic.__version__"}
