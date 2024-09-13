@@ -9,6 +9,7 @@ import pydemic.pieces as pieces
 import pydemic.roles as roles
 import pydemic.shared as shared
 from pydemic.format import as_color, cards_to_string, indent
+from pydemic.version import __version__
 
 
 def slow_print(*args, sep=' ', end='\n'):
@@ -116,6 +117,10 @@ def print_status(*args):
 # Flow control
 def main():
     # INITIALIZATION
+    # Print greeting
+    print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
+    print()
+
     # Get player settings
     player_num = None
     while not player_num:

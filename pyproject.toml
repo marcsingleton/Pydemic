@@ -18,4 +18,4 @@ dynamic = ["version"]
 Homepage = "https://github.com/marcsingleton/pydemic"
 
 [tool.setuptools.dynamic]
-version = {attr = "pydemic.__version__"}
+version = {attr = "pydemic.version.__version__"}
