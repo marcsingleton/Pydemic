@@ -3,12 +3,12 @@
 from random import shuffle
 from time import sleep
 
-import cards
-import maps
-import pieces
-import roles
-import shared
-from format import as_color, cards_to_string, indent
+import pydemic.cards as cards
+import pydemic.maps as maps
+import pydemic.pieces as pieces
+import pydemic.roles as roles
+import pydemic.shared as shared
+from pydemic.format import as_color, cards_to_string, indent
 
 
 def slow_print(*args, sep=' ', end='\n'):

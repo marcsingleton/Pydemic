@@ -3,9 +3,9 @@
 import abc
 from random import shuffle
 
-import exceptions
-import shared
-from format import as_color, cards_to_string
+import pydemic.exceptions as exceptions
+import pydemic.shared as shared
+from pydemic.format import as_color, cards_to_string
 
 
 class Card:

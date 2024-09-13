@@ -2,9 +2,9 @@
 
 from enum import Enum, auto
 
-import exceptions
-import shared
-from format import as_color
+import pydemic.exceptions as exceptions
+import pydemic.shared as shared
+from pydemic.format import as_color
 
 
 class City:

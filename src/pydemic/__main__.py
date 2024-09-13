@@ -1,3 +1,3 @@
-from main import main
+from pydemic.main import main
 
 main()

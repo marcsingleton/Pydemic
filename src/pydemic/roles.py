@@ -1,9 +1,8 @@
 """Definitions of player roles."""
 
-import exceptions
-import shared
-
-from format import as_underline, indent
+import pydemic.exceptions as exceptions
+import pydemic.shared as shared
+from pydemic.format import as_underline, indent
 
 
 class Player:
