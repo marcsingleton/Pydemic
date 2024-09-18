@@ -215,11 +215,11 @@ def main():
     # PLAY
     while True:
         # Turn setup
-        sleep(1)
         turn = turn_count % player_num
         current_player = shared.players[player_names[turn]]
         shared.draw_count = 2
         shared.infect_count = shared.infection_track.rate
+        sleep(1)
         print_status()
 
         # Player actions
