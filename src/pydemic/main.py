@@ -29,11 +29,19 @@ def slow_print(*args, sep=' ', end='\n'):
 # FUNCTIONS
 # Generic actions
 def draw_infect(*args):
+    """Draw a card from the infection deck.
+
+    syntax: draw
+    """
     shared.infection_deck.draw()
     shared.infect_count -= 1
 
 
 def draw_player(*args):
+    """Draw a card from the player deck.
+    
+    syntax: draw
+    """
     card = shared.player_deck.draw()
     shared.draw_count -= 1
     if card.type == 'epidemic':
@@ -46,6 +54,10 @@ def draw_player(*args):
 
 
 def play_event(*args):
+    """Play an event card.
+    
+    syntax: event PLAYER EVENT_CARD
+    """
     if len(args) != 2:
         print('Event failed: Incorrect number of arguments')
         return
@@ -57,6 +69,12 @@ def play_event(*args):
 
 
 def print_neighbors(*args):
+    """Display the neighbors of a given city.
+    
+    If the CITY argument is omitted, the city of the current player is used.
+    
+    syntax: neighbors [CITY]
+    """
     if len(args) == 0:
         city = shared.cities[current_player.city]
     elif len(args) == 1:
@@ -74,7 +92,10 @@ def print_neighbors(*args):
 
 
 def print_status(*args):
-    """Display all game state information except player deck discard and contingency card."""
+    """Display the current state of the game.
+    
+    syntax: status
+    """
     print()
     print(f'-------------------- TURN {turn_count} --------------------')
 

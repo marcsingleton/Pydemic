@@ -91,6 +91,10 @@ class Player:
 
     # Player actions
     def ground(self, *args):
+        """Move to a neighbor of the current city.
+        
+        syntax: ground CITY
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -98,7 +102,7 @@ class Player:
             print('Action failed: Nonexistent city specified.')
             return
         if args[0] not in shared.cities[self.city].neighbors:
-            print('Action failed: Destination not within one move.')
+            print('Action failed: Destination not a neighbor of the current city.')
             return
 
         self.city = args[0]
@@ -106,6 +110,10 @@ class Player:
         print('Action succeeded!')
 
     def direct(self, *args):
+        """Move directly to a city by discarding its city card.
+        
+        syntax: direct CITY_CARD
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -123,6 +131,10 @@ class Player:
             print('Action succeeded!')
 
     def charter(self, *args):
+        """Move directly to a city by discarding the city card of the current city.
+        
+        syntax: charter CITY
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -140,6 +152,10 @@ class Player:
             print('Action succeeded!')
 
     def shuttle(self, *args):
+        """Move between two cities with research stations.
+        
+        syntax: shuttle CITY
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -156,7 +172,11 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def station(self, *args):
+    def station(self, *args):  # TODO: Change to make removal of station a second dialog
+        """Place a research station in the current city by discarding its city card.
+        
+        syntax: station
+        """
         if len(args) == 0:
             try:
                 self.discard(self.city)
@@ -193,6 +213,12 @@ class Player:
             print('Action failed: Incorrect number of arguments.')
 
     def treat(self, *args):
+        """Remove one disease cube of the specified color from the current city.
+        
+        If the disease is cured, all disease cubes are removed.
+
+        syntax: treat DISEASE_COLOR
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -209,7 +235,11 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def share(self, *args):
+    def share(self, *args):  # TODO: Check if has to be city card
+        """Exchange a specified city card between two players.
+        
+        syntax: share GIVER_NAME RECEIVER_NAME
+        """
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -236,6 +266,10 @@ class Player:
             print(msg)
 
     def cure(self, *args):
+        """Find a cure for the disease of the specified color.
+        
+        syntax: cure DISEASE_COLOR
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -273,6 +307,10 @@ class Player:
             print('Action succeeded!')
 
     def event(self, *args):
+        """Play an event card.
+        
+        syntax: event EVENT_CARD
+        """
         if len(args) != 1:
             print('Event failed: Incorrect number of arguments.')
             return
@@ -289,6 +327,10 @@ class Player:
             print('Event succeeded!')
 
     def no_action(self, *args):
+        """Do nothing but use an action.
+        
+        syntax: pass
+        """
         self.action_count -= 1
         print('Action succeeded!')
 
@@ -300,6 +342,10 @@ class ContingencyPlanner(Player):
         self.contingency_card = None
 
     def contingency(self, *args):  # TODO: Add behavior for playing card
+        """Add a discarded event card to the player's contingency slot.
+        
+        syntax: contingency [EVENT_CARD]
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -450,6 +496,10 @@ class Medic(Player):
             return False
 
     def treat(self, *args):
+        """Remove all disease cubes of the specified color from the current city.
+        
+        syntax: treat DISEASE_COLOR
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
