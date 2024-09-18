@@ -92,7 +92,7 @@ class Player:
     # Player actions
     def ground(self, *args):
         """Move to a neighbor of the current city.
-        
+
         syntax: ground CITY
         """
         if len(args) != 1:
@@ -111,7 +111,7 @@ class Player:
 
     def direct(self, *args):
         """Move directly to a city by discarding its city card.
-        
+
         syntax: direct CITY_CARD
         """
         if len(args) != 1:
@@ -132,7 +132,7 @@ class Player:
 
     def charter(self, *args):
         """Move directly to a city by discarding the city card of the current city.
-        
+
         syntax: charter CITY
         """
         if len(args) != 1:
@@ -153,7 +153,7 @@ class Player:
 
     def shuttle(self, *args):
         """Move between two cities with research stations.
-        
+
         syntax: shuttle CITY
         """
         if len(args) != 1:
@@ -174,7 +174,7 @@ class Player:
 
     def station(self, *args):  # TODO: Change to make removal of station a second dialog
         """Place a research station in the current city by discarding its city card.
-        
+
         syntax: station
         """
         if len(args) == 0:
@@ -214,7 +214,7 @@ class Player:
 
     def treat(self, *args):
         """Remove one disease cube of the specified color from the current city.
-        
+
         If the disease is cured, all disease cubes are removed.
 
         syntax: treat DISEASE_COLOR
@@ -237,7 +237,7 @@ class Player:
 
     def share(self, *args):  # TODO: Check if has to be city card
         """Exchange a specified city card between two players.
-        
+
         syntax: share GIVER_NAME RECEIVER_NAME
         """
         if len(args) != 2:
@@ -267,7 +267,7 @@ class Player:
 
     def cure(self, *args):
         """Find a cure for the disease of the specified color.
-        
+
         syntax: cure DISEASE_COLOR
         """
         if len(args) != 1:
@@ -286,6 +286,7 @@ class Player:
             return
         while len(cards) > self.cure_num:
             items = input(
+                f'{prompt_prefix}'
                 f'Extra {args[0]} cards detected. '
                 f'Please select {len(cards) - self.cure_num} cards to keep.'
                 f'(Separate items with a space.)'
@@ -308,7 +309,7 @@ class Player:
 
     def event(self, *args):
         """Play an event card.
-        
+
         syntax: event EVENT_CARD
         """
         if len(args) != 1:
@@ -328,7 +329,7 @@ class Player:
 
     def no_action(self, *args):
         """Do nothing but use an action.
-        
+
         syntax: pass
         """
         self.action_count -= 1
@@ -343,7 +344,7 @@ class ContingencyPlanner(Player):
 
     def contingency(self, *args):  # TODO: Add behavior for playing card
         """Add a discarded event card to the player's contingency slot.
-        
+
         syntax: contingency [EVENT_CARD]
         """
         if len(args) != 1:
@@ -497,7 +498,7 @@ class Medic(Player):
 
     def treat(self, *args):
         """Remove all disease cubes of the specified color from the current city.
-        
+
         syntax: treat DISEASE_COLOR
         """
         if len(args) != 1:

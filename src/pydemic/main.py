@@ -26,7 +26,7 @@ def draw_infect(*args):
 
 def draw_player(*args):
     """Draw a card from the player deck.
-    
+
     syntax: draw
     """
     card = shared.player_deck.draw()
@@ -42,7 +42,7 @@ def draw_player(*args):
 
 def play_event(*args):
     """Play an event card.
-    
+
     syntax: event PLAYER EVENT_CARD
     """
     if len(args) != 2:
@@ -57,9 +57,9 @@ def play_event(*args):
 
 def print_neighbors(*args):
     """Display the neighbors of a given city.
-    
+
     If the CITY argument is omitted, the city of the current player is used.
-    
+
     syntax: neighbors [CITY]
     """
     if len(args) == 0:
@@ -80,7 +80,7 @@ def print_neighbors(*args):
 
 def print_status(*args):
     """Display the current state of the game.
-    
+
     syntax: status
     """
     print()
@@ -271,7 +271,7 @@ def interface(commands, prompt):
     command = args[0]
     if command == 'help':
         if len(args) == 1:
-        print(f'The available commands are: ')
+            print(f'The available commands are: ')
             for command, cmd in commands.items():
                 docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
                 docstring = cleandoc(docstring)
@@ -294,7 +294,7 @@ def interface(commands, prompt):
                 'Use "help" for an overview of all currently available commands '
                 'or "help COMMAND" for more information on a specific command.'
             )
-        return
+            return
     try:
         cmd = commands[command]
     except KeyError:
