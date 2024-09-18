@@ -36,7 +36,7 @@ def draw_player(*args):
         shared.player_deck.discard(card)
     else:
         print(f'{as_color(card.name, card.color)} was drawn.')
-        current_player.add_card(card)
+        shared.current_player.add_card(card)
 
 
 def play_event(*args):
@@ -62,7 +62,7 @@ def print_neighbors(*args):
     syntax: neighbors [CITY]
     """
     if len(args) == 0:
-        city = shared.cities[current_player.city]
+        city = shared.cities[shared.current_player.city]
     elif len(args) == 1:
         try:
             city = shared.cities[args[0]]
@@ -83,7 +83,7 @@ def print_status(*args):
     syntax: status
     """
     print()
-    print(f'-------------------- TURN {turn_count} --------------------')
+    print(f'-------------------- TURN {shared.turn_count} --------------------')
 
     for disease in shared.diseases.values():
         print(as_color(disease.color.upper(), disease.color))
@@ -118,7 +118,7 @@ def print_status(*args):
     print('Infection discard:', cards_to_string(shared.infection_deck.discard_pile))
     print()
 
-    print(f'Turn: {current_player.name}')
+    print(f'Turn: {shared.current_player.name}')
 
 
 # Flow control
@@ -207,7 +207,7 @@ def main():
     shared.player_deck.add_epidemics(epidemic_num)
 
     # Set turns and initial positions
-    turn_count = 0
+    shared.turn_count = 0
     player_names = turn_order(player_names)
     for player in shared.players.values():
         player.city = start_city  # Set separately from instantiation so special abilities do not interfere with setup
@@ -215,8 +215,8 @@ def main():
     # PLAY
     while True:
         # Turn setup
-        turn = turn_count % player_num
-        current_player = shared.players[player_names[turn]]
+        turn = shared.turn_count % player_num
+        shared.current_player = shared.players[player_names[turn]]
         shared.draw_count = 2
         shared.infect_count = shared.infection_track.rate
         sleep(1)
@@ -224,16 +224,14 @@ def main():
 
         # Player actions
         print()
-        while current_player.action_count > 0:
+        while shared.current_player.action_count > 0:
             commands = {
-                **current_player.actions,
+                **shared.current_player.actions,
                 'neighbors': print_neighbors,
                 'event': play_event,
                 'status': print_status,
             }
-            prompt = (
-                f'Enter your next command ({current_player.action_count} action(s) remaining): '
-            )
+            prompt = f'Enter your next command ({shared.current_player.action_count} action(s) remaining): '
             interface(commands, prompt)
 
         # Draw cards
@@ -261,8 +259,8 @@ def main():
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Turn cleanup
-        current_player.reset()
-        turn_count += 1
+        shared.current_player.reset()
+        shared.turn_count += 1
 
 
 def interface(commands, prompt):
