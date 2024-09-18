@@ -59,6 +59,7 @@ class Player:
             if len(args) == 2 and args[0] == 'discard':
                 try:
                     self.discard(args[1])
+                    print('Action succeeded!')
                 except exceptions.DiscardError as error:
                     print('Discard failed:', error)
             elif len(args) == 2 and args[0] == 'event':
