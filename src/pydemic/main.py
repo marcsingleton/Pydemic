@@ -12,20 +12,6 @@ from pydemic.format import as_color, cards_to_string, indent
 from pydemic.version import __version__
 
 
-def slow_print(*args, sep=' ', end='\n'):
-    import sys
-
-    for arg in args:
-        arg = str(arg)
-        for char in arg:
-            sys.stdout.write(char)
-            sys.stdout.flush()
-            sleep(0.01)
-        sys.stdout.write(sep)
-    sleep(0.15)
-    sys.stdout.write(end)
-
-
 # FUNCTIONS
 # Generic actions
 def draw_infect(*args):
