@@ -1,5 +1,6 @@
 """A text-based implementation of the board game Pandemic."""
 
+from inspect import cleandoc
 from random import shuffle
 from time import sleep
 
@@ -269,9 +270,30 @@ def interface(commands, prompt):
         return
     command = args[0]
     if command == 'help':
+        if len(args) == 1:
         print(f'The available commands are: ')
-        for command in commands:
-            print(f'{indent}{command}')
+            for command, cmd in commands.items():
+                docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
+                docstring = cleandoc(docstring)
+                summary = docstring.split('\n')[0]
+                print(f'{indent}{command}: {summary}')
+            return
+        elif len(args) == 2:
+            command = args[1]
+            try:
+                cmd = commands[command]
+            except KeyError:
+                print(f'{command} is not a currently available command.')
+                return
+            docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
+            docstring = cleandoc(docstring)
+            print(docstring)
+            return
+        else:
+            print(
+                'Use "help" for an overview of all currently available commands '
+                'or "help COMMAND" for more information on a specific command.'
+            )
         return
     try:
         cmd = commands[command]
