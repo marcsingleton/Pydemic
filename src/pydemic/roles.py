@@ -47,16 +47,15 @@ class Player:
     def add_card(self, card):
         self.hand[card.name] = card
         if len(self.hand) > self.hand_max:
-            underlined_card = as_underline('card')
             print()
             print(
                 f'{self.name} has exceeded the hand limit. '
                 f'Please discard a card or play an event card.'
             )
-            print(f'{indent}To discard a card, use "discard {underlined_card}".')
-            print(f'{indent}To play an event card, use "event {underlined_card}".')
+            print(f'{indent}To discard a card, use "discard CARD".')
+            print(f'{indent}To play an event card, use "event EVENT_CARD".')
         while len(self.hand) > self.hand_max:
-            args = input(f'{prompt_prefix}Enter your command: ').split()
+            args = input(f'{prompt_prefix}Enter a command to reduce your hand: ').split()
             if len(args) == 2 and args[0] == 'discard':
                 try:
                     self.discard(args[1])

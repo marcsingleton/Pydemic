@@ -18,7 +18,7 @@ from pydemic.version import __version__
 def draw_infect(*args):
     """Draw a card from the infection deck.
 
-    syntax: draw
+    syntax: infect
     """
     shared.infection_deck.draw()
     shared.infect_count -= 1
@@ -312,7 +312,7 @@ def interface(commands, prompt):
     try:
         cmd = commands[command]
     except KeyError:
-        print('No valid command exists with that name. Try again.')
+        print('No currently available command exists with that name. Try again.')
         return
     args = args[1:]
     cmd(*args)
