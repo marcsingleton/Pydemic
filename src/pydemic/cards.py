@@ -5,7 +5,7 @@ from random import shuffle
 
 import pydemic.exceptions as exceptions
 import pydemic.shared as shared
-from pydemic.format import as_color, cards_to_string
+from pydemic.format import as_color, cards_to_string, prompt_prefix
 
 
 class Card:
@@ -112,7 +112,7 @@ class PlayerDeck(Deck):
 
 
 def air_lift():
-    args = input('Enter a player and a destination city: ').split()
+    args = input(f'{prompt_prefix}Enter a player and a destination city: ').split()
     if len(args) != 2:
         raise exceptions.EventError('Incorrect number of arguments.')
     if args[0] not in shared.players:
@@ -129,6 +129,7 @@ def forecast():
 
     print(cards_to_string(top))
     args = input(
+        f'{prompt_prefix}'
         'Enter the re-ordered indices of the above cards, e.g. "135042" from top to bottom: '
     )
     if len(args) != 6:
@@ -145,6 +146,7 @@ def forecast():
 
 def government_grant():
     args = input(
+        f'{prompt_prefix}'
         'Enter one or two cities to place or transfer a research station, respectively: '
     ).split()
     if len(args) == 1:
@@ -174,7 +176,9 @@ def one_quiet_night():
 
 
 def resilient_population():
-    args = input('Enter a city to remove from the infection deck discard pile: ').split()
+    args = input(
+        f'{prompt_prefix}Enter a city to remove from the infection deck discard pile: '
+    ).split()
     if len(args) != 1:
         raise exceptions.EventError('Incorrect number of arguments.')
     if args[0] not in shared.cities:

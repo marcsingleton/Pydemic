@@ -12,6 +12,7 @@ color_codes = {
     None: '',
 }
 indent = 4 * ' '
+prompt_prefix = '>>> '
 
 
 def as_color(text, color, bold=False):

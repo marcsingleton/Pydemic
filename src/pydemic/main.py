@@ -9,7 +9,7 @@ import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
 import pydemic.shared as shared
-from pydemic.format import as_color, cards_to_string, indent
+from pydemic.format import as_color, cards_to_string, indent, prompt_prefix
 from pydemic.version import __version__
 
 
@@ -132,7 +132,9 @@ def main():
     # Get player settings
     player_num = None
     while not player_num:
-        text = input('Enter a number between two and four for the number of players: ')
+        text = input(
+            f'{prompt_prefix}Enter a number between two and four for the number of players: '
+        )
         try:
             value = int(text)
         except ValueError:
@@ -144,7 +146,7 @@ def main():
         player_num = value
     player_names = []
     for i in range(1, player_num + 1):
-        text = input(f"Enter player {i}'s name: ")
+        text = input(f"{prompt_prefix}Enter player {i}'s name: ")
         player_names.append(text)
     start_hand_num = 6 - player_num
     print()
@@ -152,7 +154,10 @@ def main():
     # Get epidemic settings
     epidemic_num = None
     while not epidemic_num:
-        text = input('Enter a number between four and six for the number of epidemics in play: ')
+        text = input(
+            f'{prompt_prefix}'
+            'Enter a number between four and six for the number of epidemics in play: '
+        )
         try:
             value = int(text)
         except ValueError:
@@ -232,7 +237,10 @@ def main():
                 'event': play_event,
                 'status': print_status,
             }
-            prompt = f'Enter your next command ({shared.current_player.action_count} action(s) remaining): '
+            prompt = (
+                f'{prompt_prefix}Enter your next command '
+                f'({shared.current_player.action_count} action(s) remaining): '
+            )
             interface(commands, prompt)
 
         # Draw cards
@@ -243,7 +251,10 @@ def main():
                 'event': play_event,
                 'status': print_status,
             }
-            prompt = f'Draw or play event card ({shared.draw_count} draw(s) remaining): '
+            prompt = (
+                f'{prompt_prefix}Draw or play event card '
+                f'({shared.draw_count} draw(s) remaining): '
+            )
             interface(commands, prompt)
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
@@ -255,7 +266,10 @@ def main():
                 'event': play_event,
                 'status': print_status,
             }
-            prompt = f'Infect or play event card ({shared.infect_count} infect(s) remaining): '
+            prompt = (
+                f'{prompt_prefix}Infect or play event card '
+                f'({shared.infect_count} infect(s) remaining): '
+            )
             interface(commands, prompt)
             shared.outbreak_track.reset()  # Reset outbreak after each draw
 
@@ -336,7 +350,8 @@ def epidemic():
         in_hand = 'resilient_population' in player.hand
         if in_hand:  # TODO: Check contingency planner card
             text = input(
-                'Resilient Population event card detected in hand. Play now? (y/n) '
+                f'{prompt_prefix}Resilient Population event card detected in hand. '
+                f'Play now? (y/n) '
             ).lower()
             if text == 'y' or text == 'yes':
                 player.hand['resilient_population'].event()

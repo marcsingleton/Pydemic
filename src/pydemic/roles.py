@@ -2,7 +2,7 @@
 
 import pydemic.exceptions as exceptions
 import pydemic.shared as shared
-from pydemic.format import as_underline, indent
+from pydemic.format import as_underline, indent, prompt_prefix
 
 
 class Player:
@@ -56,7 +56,7 @@ class Player:
             print(f'{indent}To discard a card, use "discard {underlined_card}".')
             print(f'{indent}To play an event card, use "event {underlined_card}".')
         while len(self.hand) > self.hand_max:
-            args = input('Enter your command: ').split()
+            args = input(f'{prompt_prefix}Enter your command: ').split()
             if len(args) == 2 and args[0] == 'discard':
                 try:
                     self.discard(args[1])
