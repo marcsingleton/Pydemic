@@ -291,7 +291,6 @@ def interface(commands, prompt):
                 docstring = cleandoc(docstring)
                 summary = docstring.split('\n')[0]
                 print(f'{indent}{command}: {summary}')
-            return
         elif len(args) == 2:
             command = args[1]
             try:
@@ -302,20 +301,19 @@ def interface(commands, prompt):
             docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
             docstring = cleandoc(docstring)
             print(docstring)
-            return
         else:
             print(
                 'Use "help" for an overview of all currently available commands '
                 'or "help COMMAND" for more information on a specific command.'
             )
+    else:
+        try:
+            cmd = commands[command]
+        except KeyError:
+            print('No currently available command exists with that name. Try again.')
             return
-    try:
-        cmd = commands[command]
-    except KeyError:
-        print('No currently available command exists with that name. Try again.')
-        return
-    args = args[1:]
-    cmd(*args)
+        args = args[1:]
+        cmd(*args)
 
 
 def turn_order(player_names):
