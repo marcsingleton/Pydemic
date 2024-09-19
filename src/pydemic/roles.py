@@ -182,7 +182,7 @@ class Player:
             return
         
         city = None
-        if shared.cities.stations == 0:
+        if shared.station_count == 0:
             text = input(
                 f'{prompt_prefix}No research stations are available. '
                 f'Do you want to remove a research station from a city? (y/n) '
@@ -197,14 +197,18 @@ class Player:
                     print('Action failed: Nonexistent city specified.')
                     return
                 city = shared.cities[remove_args[0]]
-                city.remove_station()
+                try:
+                    city.remove_station()
+                except exceptions.StationRemoveError as error:
+                    print('Action failed:', error)
+                    return
                 
         try:
             self.discard(self.city)
             shared.cities[self.city].add_station()
         except (exceptions.DiscardError, exceptions.StationAddError) as error:
             if isinstance(error, exceptions.StationAddError):
-                self.add_card(shared.player_deck.discard.pop())
+                self.add_card(shared.player_deck.discard_pile.pop())
             if city is not None:  # Return "borrowed station"
                 city.add_station()
             print('Action failed:', error)

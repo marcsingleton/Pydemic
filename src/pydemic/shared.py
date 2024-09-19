@@ -3,6 +3,7 @@
 cities = {}
 diseases = {}
 players = {}
+station_count = 0
 draw_count = 0
 infect_count = 0
 player_deck = None

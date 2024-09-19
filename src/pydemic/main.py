@@ -183,7 +183,7 @@ def main():
     # Instantiate cities and associated cards
     city_cards = []
     infection_cards = []
-    pieces.City.stations = station_num
+    shared.station_count = station_num
     for city, attrs in map.items():
         shared.cities[city] = pieces.City(city, attrs.neighbors, attrs.color, colors)
         city_cards.append(cards.CityCard(city, attrs.color, attrs.population))
@@ -310,7 +310,7 @@ def interface(commands, prompt):
         try:
             cmd = commands[command]
         except KeyError:
-            print('No currently available command exists with that name. Try again.')
+            print('No currently available command exists with that name. Please try again.')
             return
         args = args[1:]
         cmd(*args)

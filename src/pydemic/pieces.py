@@ -8,8 +8,6 @@ from pydemic.format import as_color
 
 
 class City:
-    stations = None
-
     def __init__(self, name, neighbors, color, colors, cube_max=3):
         self.color = color
         self.cubes = {color: 0 for color in colors}
@@ -64,10 +62,10 @@ class City:
             raise exceptions.StationAddError(
                 f'{as_color(self.name, self.color)} has a research station.'
             )
-        elif type(self).stations < 1:
+        elif shared.station_count < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
-            type(self).stations -= 1
+            shared.station_count -= 1
             self.station = True
 
     def remove_station(self):
@@ -77,7 +75,7 @@ class City:
             )
         else:
             self.station = False
-            type(self).stations += 1
+            shared.station_count += 1
 
     def immunity(self, color):
         for player in shared.players.values():
