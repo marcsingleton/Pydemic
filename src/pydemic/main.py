@@ -174,7 +174,7 @@ def main():
         except ValueError:
             print(f'{text} is not a valid number. Please try again.')
             continue
-        if value < 2 or value > 4:
+        if value < 4 or value > 6:
             print('The number of epidemics must be between four and six. Please try again.')
             continue
         epidemic_num = value
