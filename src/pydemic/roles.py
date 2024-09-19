@@ -567,31 +567,45 @@ class OperationsExpert(Player):
             print('Action succeeded!')
 
     def station(self, *args):
-        if len(args) == 0:
-            try:
-                shared.cities[self.city].add_station()
-            except exceptions.StationAddError as error:
-                print('Action failed:', error)
-            else:
-                self.action_count -= 1
-                print('Action succeeded!')
-        elif len(args) == 1:
-            if args[0] not in shared.cities:
-                print('Action failed: Nonexistent city specified.')
-                return
-            try:
-                shared.cities[args[0]].remove_station()
-                shared.cities[self.city].add_station()
-            except exceptions.StationRemoveError as error:
-                print('Action failed:', error)
-            except exceptions.StationAddError as error:
-                shared.cities[args[0]].add_station()
-                print('Action failed:', error)
-            else:
-                self.action_count -= 1
-                print('Action succeeded!')
-        else:
+        """Place a research station in the current city without discarding its city card.
+
+        syntax: station
+        """
+        if len(args) != 0:
             print('Action failed: Incorrect number of arguments.')
+            return
+        
+        city = None
+        if shared.station_count == 0:
+            text = input(
+                f'{prompt_prefix}No research stations are available. '
+                f'Do you want to remove a research station from a city? (y/n) '
+            ).lower()
+            
+            if text == 'y' or text == 'yes':
+                remove_args = input(f'{prompt_prefix}Enter a city to remove a research station from: ').split()
+                if len(remove_args) != 1:
+                    print('Action failed: Incorrect number of arguments')
+                    return
+                if remove_args[0] not in shared.cities:
+                    print('Action failed: Nonexistent city specified.')
+                    return
+                city = shared.cities[remove_args[0]]
+                try:
+                    city.remove_station()
+                except exceptions.StationRemoveError as error:
+                    print('Action failed:', error)
+                    return
+                
+        try:
+            shared.cities[self.city].add_station()
+        except exceptions.StationAddError as error:
+            if city is not None:  # Return "borrowed station"
+                city.add_station()
+            print('Action failed:', error)
+        else:
+            self.action_count -= 1
+            print('Action succeeded!')
 
 
 class QuarantineSpecialist(Player):
