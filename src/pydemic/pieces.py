@@ -25,7 +25,7 @@ class City:
         shared.diseases[color].remove(delta)
         self.cubes[color] += delta
         if verbose:
-            print(f'{as_color(self.name, self.color)} was infected with {as_color(color, color)}.')
+            print(f'{as_color(self.name, self.color)} was infected with {delta} {as_color(color, color)}.')
         if n > delta:
             self.outbreak(color)
 
