@@ -544,6 +544,9 @@ class Dispatcher(Player):
     def make_parse(self, action):
         def f(args):
             return self.parse(args, action)
+        key = action + '_dispatch'
+        docstring = self.__getattribute__(key).__doc__
+        f.__doc__ = docstring
 
         return f
 
