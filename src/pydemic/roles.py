@@ -383,17 +383,30 @@ class Dispatcher(Player):
             'shuttle': self.make_parse('shuttle'),
         }
 
-    def airlift(self, args):
+    def airlift(self, *args):
+        """Move any player to the city of any other player.
+
+        syntax: airlift TARGET_PLAYER DESTINATION_PLAYER
+        """
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
         if args[0] not in shared.players or args[1] not in shared.players:
             print('Action failed: Nonexistent player specified.')
             return
+        if args[0] == args[1]:
+            print('Action failed: Target and destination players cannot be the same.')
+            return
 
         shared.players[args[0]].city = shared.players[args[1]].city
 
     def ground_dispatch(self, args, target):
+        """Move to a neighbor of the current city.
+
+        Including a player as an optional second argument will move that player.
+
+        syntax: ground_dispatch CITY [PLAYER]
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -409,6 +422,13 @@ class Dispatcher(Player):
         print('Action succeeded!')
 
     def direct_dispatch(self, args, target):
+        """Move directly to a city by discarding its city card.
+
+        Including a player as an optional second argument will move that player.
+        The city card will, however, be discarded from your hand.
+
+        syntax: direct_dispatch CITY_CARD [PLAYER]
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -426,6 +446,13 @@ class Dispatcher(Player):
             print('Action succeeded!')
 
     def charter_dispatch(self, args, target):
+        """Move directly to a city by discarding the city card of the current city.
+
+        Including a player as an optional second argument will move that player.
+        The city card will, however, be discarded from your hand.
+
+        syntax: charter_dispatch CITY [PLAYER]
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -443,6 +470,12 @@ class Dispatcher(Player):
             print('Action succeeded!')
 
     def shuttle_dispatch(self, args, target):
+        """Move between two cities with research stations.
+
+        Including a player as an optional second argument will move that player.
+
+        syntax: shuttle_dispatch CITY [PLAYER]
+        """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
@@ -544,6 +577,10 @@ class OperationsExpert(Player):
         self.shuttle = False
 
     def opex_shuttle(self, *args):
+        """Move to a city from a city with a research station by discarding any city card.
+
+        syntax: opex_shuttle CITY CITY_CARD
+        """
         if self.shuttle:
             print('Action failed: Special move already used this turn.')
             return
