@@ -236,10 +236,10 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def share(self, *args):  # TODO: Check if has to be city card
+    def share(self, *args):
         """Exchange a specified city card between two players.
 
-        syntax: share GIVER_NAME RECEIVER_NAME
+        syntax: share TARGET_PLAYER CITY_CARD
         """
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
@@ -250,6 +250,9 @@ class Player:
         if shared.players[args[0]].city != self.city:
             print('Action failed: Target player not in same city.')
             return
+        if args[1] not in shared.cities:
+            print('Action failed: Specified card is not a city card.')
+        
         target = shared.players[args[0]]
         card = args[1]
         if card in self.hand:
