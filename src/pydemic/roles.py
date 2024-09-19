@@ -172,45 +172,46 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def station(self, *args):  # TODO: Change to make removal of station a second dialog
+    def station(self, *args):
         """Place a research station in the current city by discarding its city card.
 
         syntax: station
         """
-        if len(args) == 0:
-            try:
-                self.discard(self.city)
-                shared.cities[self.city].add_station()
-            except exceptions.DiscardError as error:
-                print('Action failed:', error)
-            except exceptions.StationAddError as error:
-                self.add_card(shared.player_deck.discard.pop())
-                print('Action failed:', error)
-            else:
-                self.action_count -= 1
-                print('Action succeeded!')
-        elif len(args) == 1:
-            if args[0] not in shared.cities:
-                print('Action failed: Nonexistent city specified.')
-                return
-            try:
-                self.discard(self.city)
-                shared.cities[args[0]].remove_station()
-                shared.cities[self.city].add_station()
-            except exceptions.DiscardError as error:
-                print('Action failed:', error)
-            except exceptions.StationRemoveError as error:
-                self.add_card(shared.player_deck.discard.pop())
-                print('Action failed:', error)
-            except exceptions.StationAddError as error:
-                self.add_card(shared.player_deck.discard.pop())
-                shared.cities[args[0]].add_station()
-                print('Action failed:', error)
-            else:
-                self.action_count -= 1
-                print('Action succeeded!')
-        else:
+        if len(args) != 0:
             print('Action failed: Incorrect number of arguments.')
+            return
+        
+        city = None
+        if shared.cities.stations == 0:
+            text = input(
+                f'{prompt_prefix}No research stations are available. '
+                f'Do you want to remove a research station from a city? (y/n) '
+            ).lower()
+            
+            if text == 'y' or text == 'yes':
+                remove_args = input(f'{prompt_prefix}Enter a city to remove a research station from: ').split()
+                if len(remove_args) != 1:
+                    print('Action failed: Incorrect number of arguments')
+                    return
+                if remove_args[0] not in shared.cities:
+                    print('Action failed: Nonexistent city specified.')
+                    return
+                city = shared.cities[remove_args[0]]
+                city.remove_station()
+                
+        try:
+            self.discard(self.city)
+            shared.cities[self.city].add_station()
+        except (exceptions.DiscardError, exceptions.StationAddError) as error:
+            if isinstance(error, exceptions.StationAddError):
+                self.add_card(shared.player_deck.discard.pop())
+            if city is not None:  # Return "borrowed station"
+                city.add_station()
+            print('Action failed:', error)
+        else:
+            self.action_count -= 1
+            print('Action succeeded!')
+
 
     def treat(self, *args):
         """Remove one disease cube of the specified color from the current city.
