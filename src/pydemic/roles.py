@@ -184,16 +184,18 @@ class Player:
         if len(args) != 0:
             print('Action failed: Incorrect number of arguments.')
             return
-        
+
         city = None
         if shared.station_count == 0:
             text = input(
                 f'{prompt_prefix}No research stations are available. '
                 f'Do you want to remove a research station from a city? (y/n) '
             ).lower()
-            
+
             if text == 'y' or text == 'yes':
-                remove_args = input(f'{prompt_prefix}Enter a city to remove a research station from: ').split()
+                remove_args = input(
+                    f'{prompt_prefix}Enter a city to remove a research station from: '
+                ).split()
                 if len(remove_args) != 1:
                     print('Action failed: Incorrect number of arguments')
                     return
@@ -206,7 +208,7 @@ class Player:
                 except exceptions.StationRemoveError as error:
                     print('Action failed:', error)
                     return
-                
+
         try:
             self.discard(self.city)
             shared.cities[self.city].add_station()
@@ -219,7 +221,6 @@ class Player:
         else:
             self.action_count -= 1
             print('Action succeeded!')
-
 
     def treat(self, *args):
         """Remove one disease cube of the specified color from the current city.
@@ -260,7 +261,7 @@ class Player:
             return
         if args[1] not in shared.cities:
             print('Action failed: Specified card is not a city card.')
-        
+
         target = shared.players[args[0]]
         card = args[1]
         if card in self.hand:
@@ -351,10 +352,7 @@ class Player:
 class ContingencyPlanner(Player):
     def __init__(self, name):
         super().__init__(name, 'contingency planner')
-        self.actions = {
-            **self.actions,
-            'event': self.event,
-            'contingency': self.contingency}
+        self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_slot = None
 
     def print_status(self, indent):
@@ -379,7 +377,7 @@ class ContingencyPlanner(Player):
         if (not in_hand) and (not in_slot):
             print('Event failed: Player does not have specified card.')
             return
-        
+
         if in_hand:
             card = self.hand[args[0]]
             try:
@@ -544,6 +542,7 @@ class Dispatcher(Player):
     def make_parse(self, action):
         def f(args):
             return self.parse(args, action)
+
         key = action + '_dispatch'
         docstring = self.__getattribute__(key).__doc__
         f.__doc__ = docstring
@@ -663,16 +662,18 @@ class OperationsExpert(Player):
         if len(args) != 0:
             print('Action failed: Incorrect number of arguments.')
             return
-        
+
         city = None
         if shared.station_count == 0:
             text = input(
                 f'{prompt_prefix}No research stations are available. '
                 f'Do you want to remove a research station from a city? (y/n) '
             ).lower()
-            
+
             if text == 'y' or text == 'yes':
-                remove_args = input(f'{prompt_prefix}Enter a city to remove a research station from: ').split()
+                remove_args = input(
+                    f'{prompt_prefix}Enter a city to remove a research station from: '
+                ).split()
                 if len(remove_args) != 1:
                     print('Action failed: Incorrect number of arguments')
                     return
@@ -685,7 +686,7 @@ class OperationsExpert(Player):
                 except exceptions.StationRemoveError as error:
                     print('Action failed:', error)
                     return
-                
+
         try:
             shared.cities[self.city].add_station()
         except exceptions.StationAddError as error:

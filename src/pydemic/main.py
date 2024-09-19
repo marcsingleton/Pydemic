@@ -58,7 +58,7 @@ def play_event(*args):
 
 def quit(*args):
     """Quit the game.
-    
+
     syntax: quit
     """
     text = input(f'{prompt_prefix}Are you sure you want to quit? (y/n) ').lower()
