@@ -1,5 +1,6 @@
 docs/
-.DS_Store
 __pycache__/
-.env
-*.egg-info
+.env/
+.vscode/
+*.egg-info/
+.DS_Store
