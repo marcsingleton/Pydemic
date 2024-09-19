@@ -2,7 +2,7 @@
 
 import pydemic.exceptions as exceptions
 import pydemic.shared as shared
-from pydemic.format import as_underline, indent, prompt_prefix
+from pydemic.format import indent, prompt_prefix
 
 
 class Player:
