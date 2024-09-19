@@ -94,8 +94,7 @@ def print_status(*args):
 
     for player in shared.players.values():
         print(player.name.upper(), f'({player.role.upper()})')
-        print(f'{indent}Location:', as_color(player.city, shared.cities[player.city].color))
-        print(f'{indent}Hand:', cards_to_string(player.hand.values()))
+        player.print_status(indent)
     print()
 
     for city in shared.cities.values():

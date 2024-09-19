@@ -2,7 +2,7 @@
 
 import pydemic.exceptions as exceptions
 import pydemic.shared as shared
-from pydemic.format import indent, prompt_prefix
+from pydemic.format import indent, prompt_prefix, as_color, cards_to_string
 
 
 class Player:
@@ -89,7 +89,9 @@ class Player:
     def reset(self):
         self.action_count = self.action_num
 
-    def
+    def print_status(self, indent):
+        print(f'{indent}Location:', as_color(self.city, shared.cities[self.city].color))
+        print(f'{indent}Hand:', cards_to_string(self.hand.values()))
 
     # Player actions
     def ground(self, *args):
@@ -354,6 +356,13 @@ class ContingencyPlanner(Player):
             'event': self.event,
             'contingency': self.contingency}
         self.contingency_slot = None
+
+    def print_status(self, indent):
+        print(f'{indent}Location:', as_color(self.city, shared.cities[self.city].color))
+        print(f'{indent}Hand:', cards_to_string(self.hand.values()))
+        if self.contingency_slot:
+            card = self.contingency_slot
+            print(f'{indent}Contingency slot:', as_color(card.name, card.color))
 
     def event(self, *args):
         """Play an event card.
