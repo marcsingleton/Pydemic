@@ -89,6 +89,8 @@ class Player:
     def reset(self):
         self.action_count = self.action_num
 
+    def
+
     # Player actions
     def ground(self, *args):
         """Move to a neighbor of the current city.
@@ -347,23 +349,61 @@ class Player:
 class ContingencyPlanner(Player):
     def __init__(self, name):
         super().__init__(name, 'contingency planner')
-        self.actions = {**self.actions, 'contingency': self.contingency}
-        self.contingency_card = None
+        self.actions = {
+            **self.actions,
+            'event': self.event,
+            'contingency': self.contingency}
+        self.contingency_slot = None
 
-    def contingency(self, *args):  # TODO: Add behavior for playing card
+    def event(self, *args):
+        """Play an event card.
+
+        This action will automatically detect an event card in the contingency slot.
+
+        syntax: event EVENT_CARD
+        """
+        if len(args) != 1:
+            print('Event failed: Incorrect number of arguments.')
+            return
+        in_hand = args[0] in self.hand
+        in_slot = (self.contingency_slot is not None) and (args[0] == self.contingency_slot.name)
+        if (not in_hand) and (not in_slot):
+            print('Event failed: Player does not have specified card.')
+            return
+        
+        if in_hand:
+            card = self.hand[args[0]]
+            try:
+                card.event()
+            except exceptions.EventError as error:
+                print('Event failed:', error)
+            else:
+                self.discard(args[0])
+                print('Event succeeded!')
+        elif in_slot:
+            card = self.contingency_slot
+            try:
+                card.event()
+            except exceptions.EventError as error:
+                print('Event failed:', error)
+            else:
+                self.contingency_slot = None  # Setting to None w/o discard removes from game
+                print('Event succeeded!')
+
+    def contingency(self, *args):
         """Add a discarded event card to the player's contingency slot.
 
-        syntax: contingency [EVENT_CARD]
+        syntax: contingency EVENT_CARD
         """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if self.contingency_card is not None:
+        if self.contingency_slot is not None:
             print('Action failed: Contingency card is occupied.')
             return
 
         try:
-            self.contingency_card = shared.player_deck.retrieve(args[0])
+            self.contingency_slot = shared.player_deck.retrieve(args[0])
         except exceptions.PropertyError:
             print('Action failed: Event card not in discard pile.')
         else:
