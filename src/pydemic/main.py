@@ -2,6 +2,7 @@
 
 from inspect import cleandoc
 from random import shuffle
+from sys import exit
 from time import sleep
 
 import pydemic.cards as cards
@@ -53,6 +54,17 @@ def play_event(*args):
         return
     player = shared.players[args[0]]
     player.event(args[1:])  # Slice to maintain as list
+
+
+def quit(*args):
+    """Quit the game.
+    
+    syntax: quit
+    """
+    text = input(f'{prompt_prefix}Are you sure you want to quit? (y/n) ').lower()
+    if text == 'y' or text == 'yes':
+        print('Thanks for playing!')
+        exit()
 
 
 def print_neighbors(*args):
@@ -235,6 +247,7 @@ def main():
                 'neighbors': print_neighbors,
                 'event': play_event,
                 'status': print_status,
+                'quit': quit,
             }
             prompt = (
                 f'{prompt_prefix}Enter your next command '
@@ -249,6 +262,7 @@ def main():
                 'draw': draw_player,
                 'event': play_event,
                 'status': print_status,
+                'quit': quit,
             }
             prompt = (
                 f'{prompt_prefix}Draw or play event card '
@@ -264,6 +278,7 @@ def main():
                 'infect': draw_infect,
                 'event': play_event,
                 'status': print_status,
+                'quit': quit,
             }
             prompt = (
                 f'{prompt_prefix}Infect or play event card '
