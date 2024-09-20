@@ -256,11 +256,14 @@ class Player:
         if args[0] not in shared.players:
             print('Action failed: Nonexistent player specified.')
             return
+        if args[0] == self.name:
+            print('Action failed: Target player must not be self.')
         if shared.players[args[0]].city != self.city:
             print('Action failed: Target player not in same city.')
             return
         if args[1] not in shared.cities:
             print('Action failed: Specified card is not a city card.')
+            return
 
         target = shared.players[args[0]]
         card = args[1]
@@ -270,6 +273,7 @@ class Player:
             giver, receiver = target, self
         else:
             print('Action failed: Neither player has the specified card.')
+            return
         can_share, msg = giver.can_share(card)
         if can_share:
             receiver.add_card(giver.hand.pop(card))
