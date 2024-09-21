@@ -37,7 +37,9 @@ class Player:
         if dest not in shared.cities:
             raise exceptions.PropertyError('Nonexistent city specified.')
 
-        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+        if (
+            self._city is not None
+        ):  # Do not attempt to set parameters for newly instantiated players
             shared.cities[self.city].players.remove(self.name)  # TODO: Mediator
         self._city = dest
         if dest is not None:  # Do not attempt to set parameters while instantiating players

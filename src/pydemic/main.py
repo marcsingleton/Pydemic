@@ -1,5 +1,6 @@
 """A text-based implementation of the board game Pandemic."""
 
+from argparse import ArgumentParser
 from inspect import cleandoc
 from random import shuffle
 from sys import exit
@@ -135,50 +136,131 @@ def print_status(*args):
 
 # Flow control
 def main():
+    # PARSING
+    parser = ArgumentParser(
+        prog='Pydemic',
+        description='A text-based implementation of the board game Pandemic.',
+    )
+    parser.add_argument('--player_num', default=None, type=int)
+    parser.add_argument('--player_names', default=None)
+    parser.add_argument('--epidemic_num', default=None, type=int)
+    parser.add_argument('--map', default='default')
+    parser.add_argument('--start_city', default='atlanta')
+    parser.add_argument('--outbreak_max', default=8, type=int)
+    parser.add_argument('--infection_seq', default='2,2,2,3,3,4,4')
+    parser.add_argument('--cube-num', default=24, type=int)
+    parser.add_argument('--station_num', default=6, type=int)
+    args = parser.parse_args()
+
     # INITIALIZATION
     # Print greeting
     print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
-    print()
 
     # Get player settings
-    player_num = None
-    while not player_num:
-        text = input(
-            f'{prompt_prefix}Enter a number between two and four for the number of players: '
-        )
-        try:
-            value = int(text)
-        except ValueError:
-            print(f'{text} is not a valid number. Please try again.')
-            continue
-        if value < 2 or value > 4:
-            print('The number of players must be between two and four. Please try again.')
-            continue
-        player_num = value
-    player_names = []
-    for i in range(1, player_num + 1):
-        text = input(f"{prompt_prefix}Enter player {i}'s name: ")
-        player_names.append(text)
+    player_min, player_max = 2, 4
+    word_min, word_max = 'two', 'four'
+    player_num = args.player_num
+    player_names = args.player_names
+    if player_names is not None:
+        player_names = player_names.split(',')
+        if len(set(player_names)) != len(player_names):
+            print('Argument player_names are not unique. Quitting...')
+            exit(1)
+        player_num = len(player_names)
+    elif args.player_num is not None and (
+        args.player_num < player_min or args.player_num > player_max
+    ):
+        print(f'Argument player_num must be between {word_min} and {word_max}. Quitting...')
+        exit(1)
+    else:
+        player_num = args.player_num
+
+    if not player_num:
+        print()
+        while not player_num:
+            text = input(
+                f'{prompt_prefix}Enter a number between {word_min} and {word_max} '
+                f'for the number of players: '
+            )
+            try:
+                value = int(text)
+            except ValueError:
+                print(f'{text} is not a valid number. Please try again.')
+                continue
+            if value < player_min or value > player_max:
+                print(
+                    f'The number of players must be between {word_min} and {word_max}. '
+                    f'Please try again.'
+                )
+                continue
+            player_num = value
+    if player_names is None:
+        print()
+        i = 1
+        player_names = []
+        while i < player_num + 1:
+            text = input(f"{prompt_prefix}Enter player {i}'s name: ")
+            if text in player_names:
+                print('Name is not unique. Please try again.')
+            else:
+                player_names.append(text)
+                i += 1
     start_hand_num = 6 - player_num
-    print()
 
     # Get epidemic settings
-    epidemic_num = None
-    while not epidemic_num:
-        text = input(
-            f'{prompt_prefix}'
-            'Enter a number between four and six for the number of epidemics in play: '
-        )
+    epidemic_num = args.epidemic_num
+    if not epidemic_num:
+        print()
+        while not epidemic_num:
+            text = input(
+                f'{prompt_prefix}'
+                'Enter a number between four and six for the number of epidemics in play: '
+            )
+            try:
+                value = int(text)
+            except ValueError:
+                print(f'{text} is not a valid number. Please try again.')
+                continue
+            if value < 4 or value > 6:
+                print('The number of epidemics must be between four and six. Please try again.')
+                continue
+            epidemic_num = value
+
+    # Get map settings
+    if args.map not in maps.maps:
+        print(f'Argument map {args.map} is not in library. Quitting...')
+        exit(1)
+    map = maps.maps[args.map]
+    if args.start_city not in map:
+        print(f'Argument start_city {args.start_city} not in map {args.map}. Quitting...')
+        exit(1)
+    start_city = args.start_city
+
+    # Get outbreak and infection track settings
+    if args.outbreak_max < 0:
+        print(f'Argument outbreak_max must be non-negative. Quitting...')
+    outbreak_max = args.outbreak_max
+    infection_seq = []
+    for entry in args.infection_seq.split(','):
         try:
-            value = int(text)
+            value = int(entry)
         except ValueError:
-            print(f'{text} is not a valid number. Please try again.')
-            continue
-        if value < 4 or value > 6:
-            print('The number of epidemics must be between four and six. Please try again.')
-            continue
-        epidemic_num = value
-    print()
+            print(f'Could not convert "{entry}" to integer in argument infection_seq. Quitting...')
+            exit(1)
+        if value <= 0:
+            print('Non-positive entry found in argument infection_seq. Quitting...')
+            exit(1)
+        infection_seq.append(value)
+
+    # Get cube and station number settings
+    if args.cube_num < 1:
+        print('Argument cube_num must be positive. Quitting')
+        exit(1)
+    cube_num = args.cube_num
+    if args.station_num < 1:
+        print('Argument station_num must be positive. Quitting...')
+        exit(1)
+    station_num = args.station_num
 
     # Count unique disease colors
     colors = set([attrs.color for attrs in map.values()])
@@ -342,6 +424,7 @@ def turn_order(player_names):
                 max_card = card
                 max_player = player.name
     idx = player_names.index(max_player)
+    print()
     print(
         f'{max_player} has the card with the highest population: '
         f'{as_color(max_card.name, max_card.color)} ({max_pop:,})'
@@ -371,13 +454,3 @@ def epidemic():
 
     # Intensify
     shared.infection_deck.intensify()
-
-
-# SETTINGS
-# Advanced game settings
-map = maps.default
-start_city = 'atlanta'
-outbreak_max = 8
-infection_seq = [2, 2, 2, 3, 3, 4, 4]
-cube_num = 24
-station_num = 6

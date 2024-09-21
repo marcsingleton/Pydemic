@@ -58,3 +58,5 @@ _default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
 default = {}
 for city, attrs in _default.items():
     default[city] = CityAttrs(*attrs)
+
+maps = {'default': default}
