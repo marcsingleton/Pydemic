@@ -306,7 +306,7 @@ def main():
     start_hand_num = 6 - player_num
 
     # epidemic_num dialog
-    if not epidemic_num:
+    if epidemic_num is None:
         print()
         while not epidemic_num:
             text = input(
