@@ -143,6 +143,7 @@ def main():
     epidemic_min_word, epidemic_max_word = 'four', 'six'
 
     # PARSING
+    # Add arguments
     parser = ArgumentParser(
         prog='pydemic',
         description='A text-based implementation of the board game Pandemic.',
@@ -197,10 +198,7 @@ def main():
     parser.add_argument('--station_num', default=6, type=int, help='the total number of stations')
     args = parser.parse_args()
 
-    # INITIALIZATION
-    # Print greeting
-    print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
-
+    # Parameter checks
     # Get player settings
     player_num = args.player_num
     player_names = args.player_names
@@ -225,38 +223,6 @@ def main():
         )
         exit(1)
 
-    if not player_num:
-        print()
-        while not player_num:
-            text = input(
-                f'{prompt_prefix}Enter a number between {player_min_word} and {player_max_word} '
-                f'for the number of players: '
-            )
-            try:
-                value = int(text)
-            except ValueError:
-                print(f'{text} is not a valid number. Please try again.')
-                continue
-            if value < player_min or value > player_max:
-                print(
-                    f'The number of players must be between {player_min_word} and {player_max_word}. '
-                    f'Please try again.'
-                )
-                continue
-            player_num = value
-    if player_names is None:
-        print()
-        i = 1
-        player_names = []
-        while i < player_num + 1:
-            text = input(f"{prompt_prefix}Enter player {i}'s name: ")
-            if text in player_names:
-                print('Name is not unique. Please try again.')
-            else:
-                player_names.append(text)
-                i += 1
-    start_hand_num = 6 - player_num
-
     # Get epidemic settings
     epidemic_num = args.epidemic_num
     if epidemic_num is not None and (epidemic_num < epidemic_min or epidemic_num > epidemic_max):
@@ -265,26 +231,6 @@ def main():
             f'{epidemic_min_word} and {epidemic_max_word}. Quitting...'
             )
         exit(1)
-    else:
-        print()
-        while not epidemic_num:
-            text = input(
-                f'{prompt_prefix}'
-                f'Enter a number between {epidemic_min_word} and {epidemic_max_word} '
-                f'for the number of epidemics in play: '
-            )
-            try:
-                value = int(text)
-            except ValueError:
-                print(f'{text} is not a valid number. Please try again.')
-                continue
-            if value < epidemic_min or value > epidemic_max:
-                print(
-                    f'The number of epidemics must be between '
-                    f'{epidemic_min_word} and {epidemic_max_word}. Please try again.'
-                )
-                continue
-            epidemic_num = value
 
     # Get map settings
     if args.map not in maps.maps:
@@ -321,6 +267,65 @@ def main():
         print('Argument station_num must be positive. Quitting...')
         exit(1)
     station_num = args.station_num
+
+    # INITIALIZATION
+    # Print greeting
+    print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
+
+    # player_num and player_names dialog(s)
+    if player_num is None:
+        print()
+        while not player_num:
+            text = input(
+                f'{prompt_prefix}Enter a number between {player_min_word} and {player_max_word} '
+                f'for the number of players: '
+            )
+            try:
+                value = int(text)
+            except ValueError:
+                print(f'{text} is not a valid number. Please try again.')
+                continue
+            if value < player_min or value > player_max:
+                print(
+                    f'The number of players must be between {player_min_word} and {player_max_word}. '
+                    f'Please try again.'
+                )
+                continue
+            player_num = value
+    if player_names is None:
+        print()
+        i = 1
+        player_names = []
+        while i < player_num + 1:
+            text = input(f"{prompt_prefix}Enter player {i}'s name: ")
+            if text in player_names:
+                print('Name is not unique. Please try again.')
+            else:
+                player_names.append(text)
+                i += 1
+    start_hand_num = 6 - player_num
+
+    # epidemic_num dialog
+    if not epidemic_num:
+        print()
+        while not epidemic_num:
+            text = input(
+                f'{prompt_prefix}'
+                f'Enter a number between {epidemic_min_word} and {epidemic_max_word} '
+                f'for the number of epidemics in play: '
+            )
+            try:
+                value = int(text)
+            except ValueError:
+                print(f'{text} is not a valid number. Please try again.')
+                continue
+            if value < epidemic_min or value > epidemic_max:
+                print(
+                    f'The number of epidemics must be between '
+                    f'{epidemic_min_word} and {epidemic_max_word}. Please try again.'
+                )
+                continue
+            epidemic_num = value
 
     # Count unique disease colors
     colors = set([attrs.color for attrs in map.values()])
