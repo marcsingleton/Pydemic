@@ -202,29 +202,34 @@ def main():
     print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
 
     # Get player settings
-    player_min, player_max = 2, 4
-    word_min, word_max = 'two', 'four'
     player_num = args.player_num
     player_names = args.player_names
     if player_names is not None:
-        player_names = player_names.split(',')
-        if len(set(player_names)) != len(player_names):
+        player_names = player_names.strip(',').split(',')
+        player_num = len(player_names)
+        if player_num < player_min or player_num > player_max:
+            print(
+                f'The number of entries in argument player_names is not between '
+                f'{player_min_word} and {player_max_word}. Quitting...'
+            )
+            exit(1)
+        if len(set(player_names)) != player_num:
             print('Argument player_names are not unique. Quitting...')
             exit(1)
-        player_num = len(player_names)
-    elif args.player_num is not None and (
-        args.player_num < player_min or args.player_num > player_max
+    elif player_num is not None and (
+        player_num < player_min or player_num > player_max
     ):
-        print(f'Argument player_num must be between {word_min} and {word_max}. Quitting...')
+        print(
+            f'Argument player_num must be between {player_min_word} and {player_max_word}. '
+            f'Quitting...'
+        )
         exit(1)
-    else:
-        player_num = args.player_num
 
     if not player_num:
         print()
         while not player_num:
             text = input(
-                f'{prompt_prefix}Enter a number between {word_min} and {word_max} '
+                f'{prompt_prefix}Enter a number between {player_min_word} and {player_max_word} '
                 f'for the number of players: '
             )
             try:
@@ -234,7 +239,7 @@ def main():
                 continue
             if value < player_min or value > player_max:
                 print(
-                    f'The number of players must be between {word_min} and {word_max}. '
+                    f'The number of players must be between {player_min_word} and {player_max_word}. '
                     f'Please try again.'
                 )
                 continue
@@ -254,20 +259,30 @@ def main():
 
     # Get epidemic settings
     epidemic_num = args.epidemic_num
-    if not epidemic_num:
+    if epidemic_num is not None and (epidemic_num < epidemic_min or epidemic_num > epidemic_max):
+        print(
+            f'Argument epidemic_num must be between '
+            f'{epidemic_min_word} and {epidemic_max_word}. Quitting...'
+            )
+        exit(1)
+    else:
         print()
         while not epidemic_num:
             text = input(
                 f'{prompt_prefix}'
-                'Enter a number between four and six for the number of epidemics in play: '
+                f'Enter a number between {epidemic_min_word} and {epidemic_max_word} '
+                f'for the number of epidemics in play: '
             )
             try:
                 value = int(text)
             except ValueError:
                 print(f'{text} is not a valid number. Please try again.')
                 continue
-            if value < 4 or value > 6:
-                print('The number of epidemics must be between four and six. Please try again.')
+            if value < epidemic_min or value > epidemic_max:
+                print(
+                    f'The number of epidemics must be between '
+                    f'{epidemic_min_word} and {epidemic_max_word}. Please try again.'
+                )
                 continue
             epidemic_num = value
 
