@@ -1,6 +1,6 @@
 """A text-based implementation of the board game Pandemic."""
 
-from argparse import ArgumentParser
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from inspect import cleandoc
 from random import shuffle
 from sys import exit
@@ -136,20 +136,65 @@ def print_status(*args):
 
 # Flow control
 def main():
+    # CONSTANTS
+    player_min, player_max = 2, 4
+    player_min_word, player_max_word = 'two', 'four'
+    epidemic_min, epidemic_max = 4, 6
+    epidemic_min_word, epidemic_max_word = 'four', 'six'
+
     # PARSING
     parser = ArgumentParser(
-        prog='Pydemic',
+        prog='pydemic',
         description='A text-based implementation of the board game Pandemic.',
+        formatter_class=ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument('--player_num', default=None, type=int)
-    parser.add_argument('--player_names', default=None)
-    parser.add_argument('--epidemic_num', default=None, type=int)
-    parser.add_argument('--map', default='default')
-    parser.add_argument('--start_city', default='atlanta')
-    parser.add_argument('--outbreak_max', default=8, type=int)
-    parser.add_argument('--infection_seq', default='2,2,2,3,3,4,4')
-    parser.add_argument('--cube-num', default=24, type=int)
-    parser.add_argument('--station_num', default=6, type=int)
+    parser.add_argument(
+        '--player_num',
+        default=None,
+        type=int,
+        help=(
+            f'the number of players; '
+            f'must be between {player_min_word} and {player_max_word}; '
+            f'ignored when player_names is given'
+        ),
+    )
+    parser.add_argument(
+        '--player_names',
+        default=None,
+        help=(
+            'a comma-delimited list of unique player names; '
+            'leading and trailing commas are ignored; '
+            'player_num is inferred from this list'
+        ),
+    )
+    parser.add_argument(
+        '--epidemic_num',
+        default=None,
+        type=int,
+        help=(
+            f'the number of epidemics; '
+            f'must be between {epidemic_min_word} and {epidemic_max_word}'
+        ),
+    )
+    parser.add_argument('--map', default='default', help='the name of the map')
+    parser.add_argument('--start_city', default='atlanta', help='the name of the starting city')
+    parser.add_argument(
+        '--outbreak_max',
+        default=8,
+        type=int,
+        help='the maximum number of outbreaks before game over',
+    )
+    parser.add_argument(
+        '--infection_seq',
+        default='2,2,2,3,3,4,4',
+        help=(
+            'the sequence of the infection rate track; entries must be positive and increasing'
+        ),
+    )
+    parser.add_argument(
+        '--cube-num', default=24, type=int, help='the total number of cubes for each disease'
+    )
+    parser.add_argument('--station_num', default=6, type=int, help='the total number of stations')
     args = parser.parse_args()
 
     # INITIALIZATION
