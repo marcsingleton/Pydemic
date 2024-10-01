@@ -86,8 +86,10 @@ def print_neighbors(*args):
             city = shared.cities[args[0]]
         except KeyError:
             print('Action failed: Nonexistent city specified.')
+            return
     else:
         print('Action failed: Incorrect number of arguments.')
+        return
 
     print(f'The neighbors of {as_color(city.name, city.color)} are:')
     for city in city.neighbors:
