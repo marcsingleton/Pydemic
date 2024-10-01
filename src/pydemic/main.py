@@ -62,6 +62,10 @@ def quit(*args):
 
     syntax: quit
     """
+    if len(args) != 0:
+        print(f'Action failed: Incorrect number of arguments.')
+        return
+
     text = input(f'{prompt_prefix}Are you sure you want to quit? (y/n) ').lower()
     if text == 'y' or text == 'yes':
         print('Thanks for playing!')
@@ -96,6 +100,10 @@ def print_status(*args):
 
     syntax: status
     """
+    if len(args) != 0:
+        print(f'Action failed: Incorrect number of arguments.')
+        return
+
     print()
     print(f'-------------------- TURN {shared.turn_count} --------------------')
 
