@@ -11,7 +11,7 @@ import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
 from pydemic.format import as_color, cards_to_string, indent, prompt_prefix
-from pydemic.shared import GameState
+from pydemic.state import GameState
 from pydemic.version import __version__
 
 
