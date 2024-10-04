@@ -13,7 +13,7 @@ class City:
         self.cube_max = cube_max
         self.name = name
         self.neighbors = neighbors  # TODO: Make neighbors a dict
-        self.players = set()  # TODO: Make players a dict
+        self.players = {}
         self.station = False
 
     def add_disease(self, state, color, n=1, verbose=True):

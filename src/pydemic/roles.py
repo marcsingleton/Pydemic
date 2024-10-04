@@ -37,10 +37,10 @@ class Player:
 
     def set_city(self, state, target):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
-            self.city.players.remove(self.name)
+            del self.city.players[self.name]
         self._city = target
         if target is not None:  # Do not attempt to set parameters while instantiating players
-            target.players.add(self.name)
+            target.players[self.name] = self
 
     # Utility functions
     def add_card(self, card, player_deck):
@@ -569,10 +569,10 @@ class Medic(Player):
 
     def set_city(self, state, target):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
-           self.city.players.remove(self.name)
+           del self.city.players[self.name]
         self._city = target
         if target is not None:  # Do not attempt to set parameters while instantiating players
-            target.players.add(self.name)
+            target.players[self.name] = self
             for disease in state.diseases.values():
                 if not disease.is_active():
                     try:
