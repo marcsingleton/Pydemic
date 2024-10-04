@@ -32,15 +32,15 @@ class Player:
         return self._city
 
     @city.setter
-    def city(self, dest):
+    def city(self, target):
         raise AttributeError('Use set_city method to change city.')
 
-    def set_city(self, state, dest):
+    def set_city(self, state, target):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
             self.city.players.remove(self.name)
-        self._city = dest
-        if dest is not None:  # Do not attempt to set parameters while instantiating players
-            dest.players.add(self.name)
+        self._city = target
+        if target is not None:  # Do not attempt to set parameters while instantiating players
+            target.players.add(self.name)
 
     # Utility functions
     def add_card(self, card, player_deck):
@@ -567,16 +567,16 @@ class Medic(Player):
     def __init__(self, name):
         super().__init__(name, 'medic')
 
-    def set_city(self, state, target_city):
+    def set_city(self, state, target):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
            self.city.players.remove(self.name)
-        self._city = target_city
-        if target_city is not None:  # Do not attempt to set parameters while instantiating players
-            target_city.players.add(self.name)
+        self._city = target
+        if target is not None:  # Do not attempt to set parameters while instantiating players
+            target.players.add(self.name)
             for disease in state.diseases.values():
                 if not disease.is_active():
                     try:
-                        target_city.remove_disease(state, disease.color)
+                        target.remove_disease(state, disease.color)
                     except exceptions.PropertyError:
                         pass
 
