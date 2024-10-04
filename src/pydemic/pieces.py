@@ -148,7 +148,7 @@ class OutbreakTrack:
 
 
 class InfectionTrack:
-    def __init__(self, track=[2, 2, 2, 3, 3, 4, 4]):
+    def __init__(self, track):
         self.pos = 0
         self.track = track
         self.rate = self.track[self.pos]
