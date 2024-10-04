@@ -1,7 +1,6 @@
 """Definitions of player roles."""
 
 import pydemic.exceptions as exceptions
-import pydemic.shared as shared
 from pydemic.format import indent, prompt_prefix, as_color, cards_to_string
 
 
@@ -34,19 +33,17 @@ class Player:
 
     @city.setter
     def city(self, dest):
-        if dest not in shared.cities:
-            raise exceptions.PropertyError('Nonexistent city specified.')
+        raise AttributeError('Use set_city method to change city.')
 
-        if (
-            self._city is not None
-        ):  # Do not attempt to set parameters for newly instantiated players
-            shared.cities[self.city].players.remove(self.name)  # TODO: Mediator
+    def set_city(self, state, dest):
+        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+            self.city.players.remove(self.name)
         self._city = dest
         if dest is not None:  # Do not attempt to set parameters while instantiating players
-            shared.cities[dest].players.add(self.name)
+            dest.players.add(self.name)
 
     # Utility functions
-    def add_card(self, card):
+    def add_card(self, card, player_deck):
         self.hand[card.name] = card
         if len(self.hand) > self.hand_max:
             print()
@@ -60,7 +57,7 @@ class Player:
             args = input(f'{prompt_prefix}Enter a command to reduce your hand: ').split()
             if len(args) == 2 and args[0] == 'discard':
                 try:
-                    self.discard(args[1])
+                    self.discard(args[1], player_deck)
                     print('Action succeeded!')
                 except exceptions.DiscardError as error:
                     print('Discard failed:', error)
@@ -75,28 +72,28 @@ class Player:
     def can_share(self, card):
         if card not in self.hand:
             return False, 'Action failed: Player does not have the specified card.'
-        if card != self.city:
+        if card != self.city.name:
             return False, "Action failed: Specified card does not match player's current city."
         return True, 'Action succeeded!'
 
-    def discard(self, card):
+    def discard(self, card, player_deck):
         try:
-            shared.player_deck.discard(self.hand.pop(card))
+            player_deck.discard(self.hand.pop(card))
         except KeyError:
             raise exceptions.DiscardError(f'{card} is not in hand.')
 
-    def immunity(self, city, color):
+    def immunity(self, state, city, color):
         return False
 
     def reset(self):
         self.action_count = self.action_num
 
     def print_status(self, indent):
-        print(f'{indent}Location:', as_color(self.city, shared.cities[self.city].color))
+        print(f'{indent}Location:', as_color(self.city.name, self.city.color))
         print(f'{indent}Hand:', cards_to_string(self.hand.values()))
 
     # Player actions
-    def ground(self, *args):
+    def ground(self, state, *args):
         """Move to a neighbor of the current city.
 
         syntax: ground CITY
@@ -104,18 +101,18 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
-        if args[0] not in shared.cities[self.city].neighbors:
+        if args[0] not in self.city.neighbors:
             print('Action failed: Destination not a neighbor of the current city.')
             return
 
-        self.city = args[0]
+        self.set_city(state, state.cities[args[0]])
         self.action_count -= 1
         print('Action succeeded!')
 
-    def direct(self, *args):
+    def direct(self, state, *args):
         """Move directly to a city by discarding its city card.
 
         syntax: direct CITY_CARD
@@ -123,20 +120,20 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
         try:
-            self.discard(args[0])
+            self.discard(args[0], state.player_deck)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
-            self.city = args[0]
+            self.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
-    def charter(self, *args):
+    def charter(self, state, *args):
         """Move directly to a city by discarding the city card of the current city.
 
         syntax: charter CITY
@@ -144,20 +141,20 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
         try:
-            self.discard(self.city)
+            self.discard(self.city.name, state.player_deck)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
-            self.city = args[0]
+            self.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
-    def shuttle(self, *args):
+    def shuttle(self, state, *args):
         """Move between two cities with research stations.
 
         syntax: shuttle CITY
@@ -165,20 +162,20 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
-        if not shared.cities[self.city].station:
+        if not self.city.station:
             print('Action failed: Current city does not have research station.')
-        elif not shared.cities[args[0]].station:
+        elif not state.cities[args[0]].station:
             print('Action failed: Destination city does not have research station.')
         else:
-            self.city = args[0]
+            self.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
-    def station(self, *args):
+    def station(self, state, *args):
         """Place a research station in the current city by discarding its city card.
 
         syntax: station
@@ -188,7 +185,7 @@ class Player:
             return
 
         city = None
-        if shared.station_count == 0:
+        if state.station_count == 0:
             text = input(
                 f'{prompt_prefix}No research stations are available. '
                 f'Do you want to remove a research station from a city? (y/n) '
@@ -201,30 +198,30 @@ class Player:
                 if len(remove_args) != 1:
                     print('Action failed: Incorrect number of arguments')
                     return
-                if remove_args[0] not in shared.cities:
+                if remove_args[0] not in state.cities:
                     print('Action failed: Nonexistent city specified.')
                     return
-                city = shared.cities[remove_args[0]]
+                city = state.cities[remove_args[0]]
                 try:
-                    city.remove_station()
+                    city.remove_station(state)
                 except exceptions.StationRemoveError as error:
                     print('Action failed:', error)
                     return
 
         try:
-            self.discard(self.city)
-            shared.cities[self.city].add_station()
+            self.discard(self.city.name, state.player_deck)
+            self.city.add_station(state)
         except (exceptions.DiscardError, exceptions.StationAddError) as error:
             if isinstance(error, exceptions.StationAddError):
-                self.add_card(shared.player_deck.discard_pile.pop())
+                self.add_card(state.player_deck.discard_pile.pop(), state.player_deck)
             if city is not None:  # Return "borrowed station"
-                city.add_station()
+                city.add_station(state)
             print('Action failed:', error)
         else:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def treat(self, *args):
+    def treat(self, state, *args):
         """Remove one disease cube of the specified color from the current city.
 
         If the disease is cured, all disease cubes are removed.
@@ -234,20 +231,20 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.diseases:
+        if args[0] not in state.diseases:
             print('Action failed: Nonexistent disease specified.')
             return
 
-        city = shared.cities[self.city]
+        city = self.city
         try:
-            city.remove_disease(args[0])
+            city.remove_disease(state, args[0])
         except exceptions.PropertyError as error:
             print('Action failed:', error)
         else:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def share(self, *args):
+    def share(self, state, *args):
         """Exchange a specified city card between two players.
 
         syntax: share TARGET_PLAYER CITY_CARD
@@ -255,19 +252,20 @@ class Player:
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.players:
+        if args[0] not in state.players:
             print('Action failed: Nonexistent player specified.')
             return
         if args[0] == self.name:
             print('Action failed: Target player must not be self.')
-        if shared.players[args[0]].city != self.city:
+            return
+        if state.players[args[0]].city != self.city:
             print('Action failed: Target player not in same city.')
             return
-        if args[1] not in shared.cities:
+        if args[1] not in state.cities:
             print('Action failed: Specified card is not a city card.')
             return
 
-        target = shared.players[args[0]]
+        target = state.players[args[0]]
         card = args[1]
         if card in self.hand:
             giver, receiver = self, target
@@ -278,13 +276,13 @@ class Player:
             return
         can_share, msg = giver.can_share(card)
         if can_share:
-            receiver.add_card(giver.hand.pop(card))
+            receiver.add_card(giver.hand.pop(card), state.player_deck)
             self.action_count -= 1
             print(msg)
         else:
             print(msg)
 
-    def cure(self, *args):
+    def cure(self, state, *args):
         """Find a cure for the disease of the specified color.
 
         syntax: cure DISEASE_COLOR
@@ -292,10 +290,10 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.diseases:
+        if args[0] not in state.diseases:
             print('Action failed: Nonexistent disease specified.')
             return
-        if not shared.cities[self.city].station:
+        if not self.city.station:
             print('Action failed: Not in city with research station.')
             return
 
@@ -317,16 +315,16 @@ class Player:
                     print('Card not found.')
 
         try:
-            shared.diseases[args[0]].set_cured()
+            state.diseases[args[0]].set_cured()
         except exceptions.PropertyError as error:
             print('Action failed:', error)
         else:
             for card in cards:
-                self.discard(card)
+                self.discard(card, state.player_deck)
             self.action_count -= 1
             print('Action succeeded!')
 
-    def event(self, *args):
+    def event(self, state, *args):  # TODO: Remove docstring and argchecks
         """Play an event card.
 
         syntax: event EVENT_CARD
@@ -339,14 +337,14 @@ class Player:
             return
         card = self.hand[args[0]]
         try:
-            card.event()
+            card.event(state)
         except exceptions.EventError as error:
             print('Event failed:', error)
         else:
-            self.discard(args[0])
+            self.discard(args[0], state.player_deck)
             print('Event succeeded!')
 
-    def no_action(self, *args):
+    def no_action(self, state, *args):
         """Do nothing but use an action.
 
         syntax: pass
@@ -362,13 +360,13 @@ class ContingencyPlanner(Player):
         self.contingency_slot = None
 
     def print_status(self, indent):
-        print(f'{indent}Location:', as_color(self.city, shared.cities[self.city].color))
+        print(f'{indent}Location:', as_color(self.city.name, self.city.color))
         print(f'{indent}Hand:', cards_to_string(self.hand.values()))
         if self.contingency_slot:
             card = self.contingency_slot
             print(f'{indent}Contingency slot:', as_color(card.name, card.color))
 
-    def event(self, *args):
+    def event(self, state, *args):
         """Play an event card.
 
         This action will automatically detect an event card in the contingency slot.
@@ -387,23 +385,23 @@ class ContingencyPlanner(Player):
         if in_hand:
             card = self.hand[args[0]]
             try:
-                card.event()
+                card.event(state)
             except exceptions.EventError as error:
                 print('Event failed:', error)
             else:
-                self.discard(args[0])
+                self.discard(args[0], state.player_deck)
                 print('Event succeeded!')
         elif in_slot:
             card = self.contingency_slot
             try:
-                card.event()
+                card.event(state)
             except exceptions.EventError as error:
                 print('Event failed:', error)
             else:
                 self.contingency_slot = None  # Setting to None w/o discard removes from game
                 print('Event succeeded!')
 
-    def contingency(self, *args):
+    def contingency(self, state, *args):
         """Add a discarded event card to the player's contingency slot.
 
         syntax: contingency EVENT_CARD
@@ -416,7 +414,7 @@ class ContingencyPlanner(Player):
             return
 
         try:
-            self.contingency_slot = shared.player_deck.retrieve(args[0])
+            self.contingency_slot = state.player_deck.retrieve(args[0])
         except exceptions.PropertyError:
             print('Action failed: Event card not in discard pile.')
         else:
@@ -436,7 +434,7 @@ class Dispatcher(Player):
             'shuttle': self.make_parse('shuttle'),
         }
 
-    def airlift(self, *args):
+    def airlift(self, state, *args):
         """Move any player to the city of any other player.
 
         syntax: airlift TARGET_PLAYER DESTINATION_PLAYER
@@ -444,16 +442,17 @@ class Dispatcher(Player):
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.players or args[1] not in shared.players:
+        if args[0] not in state.players or args[1] not in state.players:
             print('Action failed: Nonexistent player specified.')
             return
         if args[0] == args[1]:
             print('Action failed: Target and destination players cannot be the same.')
             return
 
-        shared.players[args[0]].city = shared.players[args[1]].city
+        state.players[args[0]].set_city(state, state.players[args[1]].city)
+        print('Action succeeded!')
 
-    def ground_dispatch(self, args, target):
+    def ground_dispatch(self, state, args, target):
         """Move to a neighbor of the current city.
 
         Including a player as an optional second argument will move that player.
@@ -463,18 +462,18 @@ class Dispatcher(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
-        if args[0] not in shared.cities[target.city].neighbors:
+        if args[0] not in target.city.neighbors:
             print('Action failed: Destination not within one move.')
             return
 
-        target.city = args[0]
+        target.set_city(state, state.cities[args[0]])
         self.action_count -= 1
         print('Action succeeded!')
 
-    def direct_dispatch(self, args, target):
+    def direct_dispatch(self, state, args, target):
         """Move directly to a city by discarding its city card.
 
         Including a player as an optional second argument will move that player.
@@ -485,20 +484,20 @@ class Dispatcher(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
         try:
-            self.discard(args[0])
+            self.discard(args[0], state.player_deck)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
-            target.city = args[0]
+            target.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
-    def charter_dispatch(self, args, target):
+    def charter_dispatch(self, state, args, target):
         """Move directly to a city by discarding the city card of the current city.
 
         Including a player as an optional second argument will move that player.
@@ -509,20 +508,20 @@ class Dispatcher(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
         try:
-            self.discard(self.city)
+            self.discard(self.city.name, state.player_deck)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
-            target.city = args[0]
+            target.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
-    def shuttle_dispatch(self, args, target):
+    def shuttle_dispatch(self, state, args, target):
         """Move between two cities with research stations.
 
         Including a player as an optional second argument will move that player.
@@ -532,22 +531,22 @@ class Dispatcher(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
-        if not shared.cities[target.city].station:
+        if not target.city.station:
             print('Action failed: Current city does not have research station.')
-        elif not shared.cities[args[0]].station:
+        elif not state.cities[args[0]].station:
             print('Action failed: Destination city does not have research station.')
         else:
-            target.city = args[0]
+            target.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             print('Action succeeded!')
 
     def make_parse(self, action):
-        def f(args):
-            return self.parse(args, action)
+        def f(state, *args):
+            return self.parse(state, args, action)
 
         key = action + '_dispatch'
         docstring = self.__getattribute__(key).__doc__
@@ -555,46 +554,39 @@ class Dispatcher(Player):
 
         return f
 
-    def parse(self, args, action):
-        if args[-1] in shared.players:
+    def parse(self, state, args, action):
+        if args[-1] in state.players:
             key = action + '_dispatch'
-            self.__getattribute__(key)(args[:-1], shared.players[args[-1]])
+            self.__getattribute__(key)(state, args[:-1], state.players[args[-1]])
         else:
             key = action
-            self.__getattribute__(key)(args)
+            self.__getattribute__(key)(state, args)
 
 
 class Medic(Player):
     def __init__(self, name):
         super().__init__(name, 'medic')
 
-    @property
-    def city(self):  # Needed to redefine for subclassing the setter
-        return super().city
-
-    @city.setter
-    def city(self, dest):
-        # Do not attempt to set parameters for newly instantiated players
-        if self._city is not None:
-            shared.cities[self.city].players.remove(self.name)
-
-        self._city = dest
-        if dest is not None:  # Do not attempt to set parameters while instantiating players
-            shared.cities[dest].players.add(self.name)
-            for disease in shared.diseases.values():
+    def set_city(self, state, target_city):
+        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+           self.city.players.remove(self.name)
+        self._city = target_city
+        if target_city is not None:  # Do not attempt to set parameters while instantiating players
+            target_city.players.add(self.name)
+            for disease in state.diseases.values():
                 if not disease.is_active():
                     try:
-                        shared.cities[dest].remove_disease(disease.color)
+                        target_city.remove_disease(state, disease.color)
                     except exceptions.PropertyError:
                         pass
 
-    def immunity(self, city, color):
-        if city == self.city and not shared.diseases[color].is_active():
+    def immunity(self, state, city, color):
+        if self.city and city == self.city.name and not state.diseases[color].is_active():
             return True
         else:
             return False
 
-    def treat(self, *args):
+    def treat(self, state, *args):
         """Remove all disease cubes of the specified color from the current city.
 
         syntax: treat DISEASE_COLOR
@@ -602,16 +594,16 @@ class Medic(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in shared.diseases:
+        if args[0] not in state.diseases:
             print('Action failed: Nonexistent disease specified.')
             return
 
-        city = shared.cities[self.city]
+        city = self.city
         try:
             if city.cubes[args[0]] == 0:
                 raise exceptions.PropertyError(f'{city.name} is not infected with {args[0]}.')
             for _ in range(city.cubes[args[0]]):
-                city.remove_disease(args[0])
+                city.remove_disease(state, args[0])
         except exceptions.PropertyError as error:
             print('Action failed:', error)
         else:
@@ -633,7 +625,7 @@ class OperationsExpert(Player):
         super().reset()
         self.shuttle = False
 
-    def opex_shuttle(self, *args):
+    def opex_shuttle(self, state, *args):
         """Move to a city from a city with a research station by discarding any city card.
 
         syntax: opex_shuttle CITY CITY_CARD
@@ -644,15 +636,15 @@ class OperationsExpert(Player):
         if len(args) != 2:
             print('Action failed: Incorrect number of arguments.')
             return
-        if not shared.cities[self.city].station:
+        if not self.city.station:
             print('Action failed: Current city does not have research station.')
             return
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             print('Action failed: Nonexistent city specified.')
             return
 
         try:
-            self.discard(args[1])
+            self.discard(args[1], state.player_deck)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
@@ -660,7 +652,7 @@ class OperationsExpert(Player):
             self.shuttle = True
             print('Action succeeded!')
 
-    def station(self, *args):
+    def station(self, state, *args):
         """Place a research station in the current city without discarding its city card.
 
         syntax: station
@@ -670,7 +662,7 @@ class OperationsExpert(Player):
             return
 
         city = None
-        if shared.station_count == 0:
+        if state.station_count == 0:
             text = input(
                 f'{prompt_prefix}No research stations are available. '
                 f'Do you want to remove a research station from a city? (y/n) '
@@ -683,10 +675,10 @@ class OperationsExpert(Player):
                 if len(remove_args) != 1:
                     print('Action failed: Incorrect number of arguments')
                     return
-                if remove_args[0] not in shared.cities:
+                if remove_args[0] not in state.cities:
                     print('Action failed: Nonexistent city specified.')
                     return
-                city = shared.cities[remove_args[0]]
+                city = state.cities[remove_args[0]]
                 try:
                     city.remove_station()
                 except exceptions.StationRemoveError as error:
@@ -694,7 +686,7 @@ class OperationsExpert(Player):
                     return
 
         try:
-            shared.cities[self.city].add_station()
+            self.city.add_station()
         except exceptions.StationAddError as error:
             if city is not None:  # Return "borrowed station"
                 city.add_station()
@@ -708,9 +700,9 @@ class QuarantineSpecialist(Player):
     def __init__(self, name):
         super().__init__(name, 'quarantine specialist')
 
-    def immunity(self, city, color):
+    def immunity(self, state, city, color):
         # Check city is set to avoid KeyError during initialization
-        if self.city and (city == self.city or city in shared.cities[self.city].neighbors):
+        if self.city and (city == self.city.name or city in self.city.neighbors):
             return True
         else:
             return False

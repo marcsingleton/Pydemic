@@ -3,7 +3,6 @@
 from enum import Enum, auto
 
 import pydemic.exceptions as exceptions
-import pydemic.shared as shared
 from pydemic.format import as_color
 
 
@@ -13,75 +12,76 @@ class City:
         self.cubes = {color: 0 for color in colors}
         self.cube_max = cube_max
         self.name = name
-        self.neighbors = neighbors
-        self.players = set()
+        self.neighbors = neighbors  # TODO: Make neighbors a dict
+        self.players = set()  # TODO: Make players a dict
         self.station = False
 
-    def add_disease(self, color, n=1, verbose=True):
-        if self.immunity(color):
+    def add_disease(self, state, color, n=1, verbose=True):
+        if self.immunity(state, color):
             raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is immune.')
 
         delta = min(n, self.cube_max - self.cubes[color])
-        shared.diseases[color].remove(delta)
+        state.diseases[color].remove(delta)
         self.cubes[color] += delta
         if verbose:
             print(
-                f'{as_color(self.name, self.color)} was infected with {delta} {as_color(color, color)}.'
+                f'{as_color(self.name, self.color)} was infected '  # TODO: Add different text for exceeding max
+                f'with {delta} {as_color(color, color)}.'
             )
         if n > delta:
-            self.outbreak(color)
+            self.outbreak(state, color)
 
-    def outbreak(self, color):
-        if (self.name, color) not in shared.outbreak_track.resolved:
+    def outbreak(self, state, color):
+        if (self.name, color) not in state.outbreak_track.resolved:
             print(f'{as_color(self.name, self.color)} outbroke!')
-            shared.outbreak_track.resolved.add(
+            state.outbreak_track.resolved.add(
                 (self.name, color)
             )  # Append to resolve first to prevent infinite loop between adjacent cities
-            shared.outbreak_track.increment()
+            state.outbreak_track.increment()
             for neighbor in self.neighbors:
-                neighbor = shared.cities[neighbor]
+                neighbor = state.cities[neighbor]
                 try:
-                    neighbor.add_disease(color)
+                    neighbor.add_disease(state, color)
                 except exceptions.PropertyError:  # Catch immunity errors but print nothing
                     pass
 
-    def remove_disease(self, color):
+    def remove_disease(self, state, color):
         if self.cubes[color] == 0:
             raise exceptions.PropertyError(
                 f'{as_color(self.name, self.color)} is not infected with {as_color(color, color)}.'
             )
 
-        if shared.diseases[color].is_cured():
+        if state.diseases[color].is_cured():
             n = self.cubes[color]
             self.cubes[color] -= n
-            shared.diseases[color].add(n)
+            state.diseases[color].add(n)
         else:
             self.cubes[color] -= 1
-            shared.diseases[color].add(1)
+            state.diseases[color].add(1)
 
-    def add_station(self):
+    def add_station(self, state):
         if self.station:
             raise exceptions.StationAddError(
                 f'{as_color(self.name, self.color)} has a research station.'
             )
-        elif shared.station_count < 1:
+        elif state.station_count < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
-            shared.station_count -= 1
+            state.station_count -= 1
             self.station = True
 
-    def remove_station(self):
+    def remove_station(self, state):
         if not self.station:
             raise exceptions.StationRemoveError(
                 f'{as_color(self.name, self.color)} does not have a research station.'
             )
         else:
             self.station = False
-            shared.station_count += 1
+            state.station_count += 1
 
-    def immunity(self, color):
-        for player in shared.players.values():
-            if player.immunity(self.name, color):
+    def immunity(self, state, color):
+        for player in state.players.values():
+            if player.immunity(state, self.name, color):
                 return True
         return False
 

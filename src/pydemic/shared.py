@@ -1,12 +1,35 @@
 """Objects maintaining global shared state."""
 
-cities = {}
-diseases = {}
-players = {}
-station_count = 0
-draw_count = 0
-infect_count = 0
-player_deck = None
-infection_deck = None
-outbreak_track = None
-infection_track = None
+class GameState:
+    def __init__(
+            self,
+            cities,
+            diseases,
+            players,
+            player_order,
+            player_deck,
+            infection_deck,
+            outbreak_track,
+            infection_track,
+            station_count,
+            turn_count,
+            draw_count,
+            infect_count,
+        ):
+            self.cities = cities
+            self.diseases = diseases
+            self.players = players
+            self.player_order = player_order
+            self.player_deck = player_deck
+            self.infection_deck = infection_deck
+            self.outbreak_track = outbreak_track
+            self.infection_track = infection_track
+            self.station_count = station_count
+            self.turn_count = turn_count
+            self.draw_count = draw_count
+            self.infect_count = infect_count
+    
+    @property
+    def current_player(self):
+            turn = self.turn_count % len(self.players)
+            return self.players[self.player_order[turn]]

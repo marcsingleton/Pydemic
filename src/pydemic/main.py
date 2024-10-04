@@ -10,39 +10,39 @@ import pydemic.cards as cards
 import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
-import pydemic.shared as shared
 from pydemic.format import as_color, cards_to_string, indent, prompt_prefix
+from pydemic.shared import GameState
 from pydemic.version import __version__
 
 
 # FUNCTIONS
 # Generic actions
-def draw_infect(*args):
+def draw_infect(state, *args):
     """Draw a card from the infection deck.
 
     syntax: infect
     """
-    shared.infection_deck.draw()
-    shared.infect_count -= 1
+    state.infection_deck.draw(state)
+    state.infect_count -= 1
 
 
-def draw_player(*args):
+def draw_player(state, *args):
     """Draw a card from the player deck.
 
     syntax: draw
     """
-    card = shared.player_deck.draw()
-    shared.draw_count -= 1
+    card = state.player_deck.draw()
+    state.draw_count -= 1
     if card.type == 'epidemic':
         print('An epidemic occurred.')
-        epidemic()
-        shared.player_deck.discard(card)
+        epidemic(state)
+        state.player_deck.discard(card)
     else:
         print(f'{as_color(card.name, card.color)} was drawn.')
-        shared.current_player.add_card(card)
+        state.current_player.add_card(card, state.player_deck)
 
 
-def play_event(*args):
+def play_event(state, *args):
     """Play an event card.
 
     syntax: event PLAYER EVENT_CARD
@@ -50,14 +50,14 @@ def play_event(*args):
     if len(args) != 2:
         print('Event failed: Incorrect number of arguments')
         return
-    if args[0] not in shared.players:
+    if args[0] not in state.players:
         print('Event failed: Nonexistent player specified.')
         return
-    player = shared.players[args[0]]
-    player.event(args[1:])  # Slice to maintain as list
+    player = state.players[args[0]]
+    player.event(state, *args[1:])  # Slice to maintain as list
 
 
-def quit(*args):
+def quit(state, *args):
     """Quit the game.
 
     syntax: quit
@@ -72,7 +72,7 @@ def quit(*args):
         exit()
 
 
-def print_neighbors(*args):
+def print_neighbors(state, *args):
     """Display the neighbors of a given city.
 
     If the CITY argument is omitted, the city of the current player is used.
@@ -80,10 +80,10 @@ def print_neighbors(*args):
     syntax: neighbors [CITY]
     """
     if len(args) == 0:
-        city = shared.cities[shared.current_player.city]
+        city = state.current_player.city
     elif len(args) == 1:
         try:
-            city = shared.cities[args[0]]
+            city = state.cities[args[0]]
         except KeyError:
             print('Action failed: Nonexistent city specified.')
             return
@@ -92,12 +92,12 @@ def print_neighbors(*args):
         return
 
     print(f'The neighbors of {as_color(city.name, city.color)} are:')
-    for city in city.neighbors:
-        city = shared.cities[city]
-        print(f'{indent}{as_color(city.name, city.color)}')
+    for neighbor in city.neighbors:
+        neighbor = state.cities[neighbor]
+        print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
 
 
-def print_status(*args):
+def print_status(state, *args):
     """Display the current state of the game.
 
     syntax: status
@@ -107,20 +107,20 @@ def print_status(*args):
         return
 
     print()
-    print(f'-------------------- TURN {shared.turn_count} --------------------')
+    print(f'-------------------- TURN {state.turn_count} --------------------')
 
-    for disease in shared.diseases.values():
+    for disease in state.diseases.values():
         print(as_color(disease.color.upper(), disease.color))
         print(f'{indent}Status:', disease.status.name.lower())
         print(f'{indent}Cubes remaining:', disease.cubes)
     print()
 
-    for player in shared.players.values():
+    for player in state.players.values():
         print(player.name.upper(), f'({player.role.upper()})')
         player.print_status(indent)
     print()
 
-    for city in shared.cities.values():
+    for city in state.cities.values():
         header = False
         for color, cubes in city.cubes.items():
             if cubes > 0:
@@ -132,16 +132,16 @@ def print_status(*args):
             if not header:
                 print(as_color(city.name.upper(), city.color))
                 header = True
-            print(f'{indent}Research station: True')
+            print(f'{indent}Research station: True')  # TODO: Find better representation
     print()
 
-    print('Infection rate:', shared.infection_track.rate)
-    print('Outbreaks:', shared.outbreak_track.count)
-    print('Cards remaining:', len(shared.player_deck.draw_pile))
-    print('Infection discard:', cards_to_string(shared.infection_deck.discard_pile))
+    print('Infection rate:', state.infection_track.rate)  # TODO: Visually represent tracks
+    print('Outbreaks:', state.outbreak_track.count)
+    print('Cards remaining:', len(state.player_deck.draw_pile))
+    print('Infection discard:', cards_to_string(state.infection_deck.discard_pile))
     print()
 
-    print(f'Turn: {shared.current_player.name}')
+    print(f'Turn: {state.current_player.name}')
 
 
 # Flow control
@@ -340,67 +340,86 @@ def main():
     # Count unique disease colors
     colors = set([attrs.color for attrs in map.values()])
 
-    # Instantiate diseases
-    for color in colors:
-        shared.diseases[color] = pieces.Disease(color, cube_num)
-
-    # Instantiate trackers
-    shared.outbreak_track = pieces.OutbreakTrack(outbreak_max)
-    shared.infection_track = pieces.InfectionTrack(infection_seq)
-
     # Instantiate cities and associated cards
+    cities = {}
     city_cards = []
     infection_cards = []
-    shared.station_count = station_num
     for city, attrs in map.items():
-        shared.cities[city] = pieces.City(city, attrs.neighbors, attrs.color, colors)
+        cities[city] = pieces.City(city, attrs.neighbors, attrs.color, colors)
         city_cards.append(cards.CityCard(city, attrs.color, attrs.population))
         infection_cards.append(cards.InfectionCard(city, attrs.color))
-    shared.cities[start_city].add_station()  # Add research station to start city
 
-    # Instantiate decks
-    shared.player_deck = cards.PlayerDeck(city_cards + cards.event_cards)
-    shared.infection_deck = cards.InfectionDeck(infection_cards)
+    # Instantiate diseases
+    diseases = {}
+    for color in colors:
+        diseases[color] = pieces.Disease(color, cube_num)
 
     # Instantiate players
     role_list = list(roles.roles)
     shuffle(role_list)
+    
+    players = {}
     for player in player_names:
         role = role_list.pop()
-        shared.players[player] = roles.roles[role](player)
-        starting_cards = [shared.player_deck.draw() for _ in range(start_hand_num)]
-        for card in starting_cards:
-            shared.players[player].add_card(card)
+        players[player] = roles.roles[role](player)
+    player_order = player_names  # Use initial order of names until starting hand is dealt
+
+    # Instantiate decks
+    player_deck = cards.PlayerDeck(city_cards + cards.event_cards)
+    infection_deck = cards.InfectionDeck(infection_cards)
+
+    # Instantiate trackers
+    outbreak_track = pieces.OutbreakTrack(outbreak_max)
+    infection_track = pieces.InfectionTrack(infection_seq)
+
+    # Combine all pieces, cards, and players into state
+    state = GameState(
+        cities,
+        diseases,
+        players,
+        player_order,
+        player_deck,
+        infection_deck,
+        outbreak_track,
+        infection_track,
+        station_num,
+        turn_count=0,
+        draw_count=0,
+        infect_count=0
+        )
+    
+    # Add research station to start city
+    state.cities[start_city].add_station(state)
 
     # Infect cities
     for _ in range(3):
         for i in range(3, 0, -1):
-            shared.infection_deck.draw(i, verbose=False)
+            state.infection_deck.draw(state, i, verbose=False)
 
-    # Add epidemics
-    shared.player_deck.add_epidemics(epidemic_num)
+    # Set initial positions, hands, and order
+    for player in state.players.values():
+        player.set_city(state, state.cities[start_city])  # Set separately from instantiation so special abilities do not interfere with setup
+        starting_cards = [state.player_deck.draw() for _ in range(start_hand_num)]
+        for card in starting_cards:
+            player.add_card(card, state.player_deck)
+    state.player_order = turn_order(player_names, players)
 
-    # Set turns and initial positions
-    shared.turn_count = 0
-    player_names = turn_order(player_names)
-    for player in shared.players.values():
-        player.city = start_city  # Set separately from instantiation so special abilities do not interfere with setup
+    # Add epidemics to deck
+    state.player_deck.add_epidemics(epidemic_num)
 
     # PLAY
-    while True:
+    while True:  # TODO: Implement graceful win/lose exit
         # Turn setup
-        turn = shared.turn_count % player_num
-        shared.current_player = shared.players[player_names[turn]]
-        shared.draw_count = 2
-        shared.infect_count = shared.infection_track.rate
+        state.draw_count = 2
+        state.infect_count = state.infection_track.rate
         sleep(1)
-        print_status()
+        print_status(state)
 
         # Player actions
         print()
-        while shared.current_player.action_count > 0:
+        while state.current_player.action_count > 0:
             commands = {
-                **shared.current_player.actions,
+                **state.current_player.actions,
                 'neighbors': print_neighbors,
                 'event': play_event,
                 'status': print_status,
@@ -408,13 +427,13 @@ def main():
             }
             prompt = (
                 f'{prompt_prefix}Enter your next command '
-                f'({shared.current_player.action_count} action(s) remaining): '
+                f'({state.current_player.action_count} action(s) remaining): '
             )
-            interface(commands, prompt)
+            interface(commands, prompt, state)
 
         # Draw cards
         print()
-        while shared.draw_count > 0:
+        while state.draw_count > 0:
             commands = {
                 'draw': draw_player,
                 'event': play_event,
@@ -423,14 +442,14 @@ def main():
             }
             prompt = (
                 f'{prompt_prefix}Draw or play event card '
-                f'({shared.draw_count} draw(s) remaining): '
+                f'({state.draw_count} draw(s) remaining): '
             )
-            interface(commands, prompt)
-            shared.outbreak_track.reset()  # Reset outbreak after each draw
+            interface(commands, prompt, state)
+            state.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Infect cities
         print()
-        while shared.infect_count > 0:
+        while state.infect_count > 0:
             commands = {
                 'infect': draw_infect,
                 'event': play_event,
@@ -439,17 +458,17 @@ def main():
             }
             prompt = (
                 f'{prompt_prefix}Infect or play event card '
-                f'({shared.infect_count} infect(s) remaining): '
+                f'({state.infect_count} infect(s) remaining): '
             )
-            interface(commands, prompt)
-            shared.outbreak_track.reset()  # Reset outbreak after each draw
+            interface(commands, prompt, state)
+            state.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Turn cleanup
-        shared.current_player.reset()
-        shared.turn_count += 1
+        state.current_player.reset()
+        state.turn_count += 1
 
 
-def interface(commands, prompt):
+def interface(commands, prompt, state):
     args = input(prompt).lower().split()
     if len(args) == 0:
         return
@@ -484,15 +503,15 @@ def interface(commands, prompt):
             print('No currently available command exists with that name. Please try again.')
             return
         args = args[1:]
-        cmd(*args)
+        cmd(state, *args)
 
 
-def turn_order(player_names):
+def turn_order(player_names, players):
     max_pop = 0
     max_card = ''
     max_player = ''
     for name in player_names:
-        player = shared.players[name]
+        player = players[name]
         for card in player.hand.values():
             if isinstance(card, cards.CityCard) and card.population > max_pop:
                 max_pop = card.population
@@ -508,15 +527,15 @@ def turn_order(player_names):
     return player_names[idx:] + player_names[:idx]
 
 
-def epidemic():
+def epidemic(state):
     # Increase
-    shared.infection_track.increment()
+    state.infection_track.increment()
 
     # Infect
-    shared.infection_deck.infect()
+    state.infection_deck.infect(state)
 
     # Play Resilient Population event if available
-    for player in shared.players.values():
+    for player in state.players.values():
         in_hand = 'resilient_population' in player.hand
         if in_hand:  # TODO: Check contingency planner card
             text = input(
@@ -528,4 +547,4 @@ def epidemic():
                 player.discard('resilient_population')
 
     # Intensify
-    shared.infection_deck.intensify()
+    state.infection_deck.intensify()

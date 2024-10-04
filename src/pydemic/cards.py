@@ -4,7 +4,6 @@ import abc
 from random import shuffle
 
 import pydemic.exceptions as exceptions
-import pydemic.shared as shared
 from pydemic.format import as_color, cards_to_string, prompt_prefix
 
 
@@ -49,11 +48,11 @@ class Deck(abc.ABC):
 
 
 class InfectionDeck(Deck):
-    def draw(self, cubes=1, idx=-1, verbose=True):
+    def draw(self, state, cubes=1, idx=-1, verbose=True):
         card = self.draw_pile.pop(idx)
-        city = shared.cities[card.name]
+        city = state.cities[card.name]
         try:
-            city.add_disease(card.color, cubes, verbose=verbose)
+            city.add_disease(state, card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
             print(
                 f'{as_color(city.name, city.color)} was not infected with '
@@ -62,8 +61,8 @@ class InfectionDeck(Deck):
             )
         self.discard_pile.append(card)
 
-    def infect(self):
-        self.draw(cubes=3, idx=0)
+    def infect(self, state):
+        self.draw(state, cubes=3, idx=0)
 
     def intensify(self):
         shuffle(self.discard_pile)
@@ -111,21 +110,21 @@ class PlayerDeck(Deck):
             raise exceptions.PropertyError
 
 
-def air_lift():
+def air_lift(state):
     args = input(f'{prompt_prefix}Enter a player and a destination city: ').split()
     if len(args) != 2:
         raise exceptions.EventError('Incorrect number of arguments.')
-    if args[0] not in shared.players:
+    if args[0] not in state.players:
         raise exceptions.EventError('Nonexistent player specified.')
-    if args[1] not in shared.cities:
+    if args[1] not in state.cities:
         raise exceptions.EventError('Nonexistent city specified.')
 
-    shared.players[args[0]].city = args[1]
+    state.players[args[0]].set_city(state, args[1])
 
 
-def forecast():
-    top = shared.infection_deck.draw_pile[:-7:-1]  # Reverse so pop order reads left to right
-    bottom = shared.infection_deck.draw_pile[:-6]
+def forecast(state):
+    top = state.infection_deck.draw_pile[:-7:-1]  # Reverse so pop order reads left to right
+    bottom = state.infection_deck.draw_pile[:-6]
 
     print(cards_to_string(top))
     args = input(
@@ -141,51 +140,51 @@ def forecast():
         top = [top[int(i)] for i in args][::-1]  # Reverse so pop order is left to right
     except IndexError:
         raise exceptions.EventError('Missing card in arguments.')
-    shared.infection_deck.draw_pile = bottom + top
+    state.infection_deck.draw_pile = bottom + top
 
 
-def government_grant():
+def government_grant(state):
     args = input(
         f'{prompt_prefix}'
         'Enter one or two cities to place or transfer a research station, respectively: '
     ).split()
     if len(args) == 1:
-        if args[0] not in shared.cities:
+        if args[0] not in state.cities:
             raise exceptions.EventError('Nonexistent city specified.')
         try:
-            shared.cities[args[0]].add_station()
+            state.cities[args[0]].add_station(state)
         except exceptions.StationAddError as error:
             raise exceptions.EventError(error)
     elif len(args) == 2:
-        if args[0] not in shared.cities or args[1] not in shared.cities:
+        if args[0] not in state.cities or args[1] not in state.cities:
             raise exceptions.EventError('Nonexistent city specified.')
         try:
-            shared.cities[args[0]].remove_station()
-            shared.cities[args[1]].add_station()
+            state.cities[args[0]].remove_station(state)
+            state.cities[args[1]].add_station(state)
         except exceptions.StationRemoveError as error:
             raise exceptions.EventError(error)
         except exceptions.StationAddError as error:
-            shared.cities[args[0]].add_station()
+            state.cities[args[0]].add_station(state)
             raise exceptions.EventError(error)
     else:
         raise exceptions.EventError('Incorrect number of arguments.')
 
 
-def one_quiet_night():
-    shared.infect_count = 0
+def one_quiet_night(state):
+    state.infect_count = 0
 
 
-def resilient_population():
+def resilient_population(state):
     args = input(
         f'{prompt_prefix}Enter a city to remove from the infection deck discard pile: '
     ).split()
     if len(args) != 1:
         raise exceptions.EventError('Incorrect number of arguments.')
-    if args[0] not in shared.cities:
+    if args[0] not in state.cities:
         raise exceptions.EventError('Nonexistent city specified.')
 
     try:
-        shared.infection_deck.remove(args[0])
+        state.infection_deck.remove(args[0])
     except exceptions.PropertyError as error:
         raise exceptions.EventError(error)
 
