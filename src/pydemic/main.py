@@ -429,7 +429,7 @@ def main():
                 f'{prompt_prefix}Enter your next command '
                 f'({state.current_player.action_count} action(s) remaining): '
             )
-            interface(commands, prompt, state)
+            interface(state, commands, prompt)
 
         # Draw cards
         print()
@@ -444,7 +444,7 @@ def main():
                 f'{prompt_prefix}Draw or play event card '
                 f'({state.draw_count} draw(s) remaining): '
             )
-            interface(commands, prompt, state)
+            interface(state, commands, prompt)
             state.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Infect cities
@@ -460,7 +460,7 @@ def main():
                 f'{prompt_prefix}Infect or play event card '
                 f'({state.infect_count} infect(s) remaining): '
             )
-            interface(commands, prompt, state)
+            interface(state, commands, prompt)
             state.outbreak_track.reset()  # Reset outbreak after each draw
 
         # Turn cleanup
@@ -468,7 +468,7 @@ def main():
         state.turn_count += 1
 
 
-def interface(commands, prompt, state):
+def interface(state, commands, prompt):
     args = input(prompt).lower().split()
     if len(args) == 0:
         return
