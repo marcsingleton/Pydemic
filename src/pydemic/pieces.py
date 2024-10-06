@@ -81,7 +81,7 @@ class City:
 
     def immunity(self, state, color):
         for player in state.players.values():
-            if player.immunity(state, self.name, color):
+            if player.immunity(state, self, color):
                 return True
         return False
 

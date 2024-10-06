@@ -581,7 +581,7 @@ class Medic(Player):
                         pass
 
     def immunity(self, state, city, color):
-        if self.city and city == self.city.name and not state.diseases[color].is_active():
+        if self.city and city == self.city and not state.diseases[color].is_active():
             return True
         else:
             return False
@@ -702,7 +702,7 @@ class QuarantineSpecialist(Player):
 
     def immunity(self, state, city, color):
         # Check city is set to avoid KeyError during initialization
-        if self.city and (city == self.city.name or city in self.city.neighbors):
+        if self.city and (city == self.city or city in self.city.neighbors):
             return True
         else:
             return False
