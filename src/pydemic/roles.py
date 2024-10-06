@@ -81,7 +81,24 @@ class Player:
             state.player_deck.discard(self.hand.pop(card_name))
         except KeyError:
             raise exceptions.DiscardError(f'{card_name} is not in hand.')
+    
+    def event(self, state, card_name):
+        in_hand = card_name in self.hand
+        if not in_hand:
+            raise exceptions.EventError(f'{card_name} is not in hand.')
+        
+        card = self.hand[card_name]
+        if card.type != 'event':
+            raise exceptions.EventError(f'{card_name} is not an event card.')
+        card.event(state)
+        self.discard(state, card_name)
 
+    def has_event(self, card_name):
+        in_hand = card_name in self.hand
+        if in_hand:
+            return True
+        return False
+    
     def immunity(self, state, city, color):
         return False
 
@@ -324,26 +341,6 @@ class Player:
             self.action_count -= 1
             print('Action succeeded!')
 
-    def event(self, state, *args):  # TODO: Remove docstring and argchecks
-        """Play an event card.
-
-        syntax: event EVENT_CARD
-        """
-        if len(args) != 1:
-            print('Event failed: Incorrect number of arguments.')
-            return
-        if args[0] not in self.hand:
-            print('Event failed: Player does not have specified card.')
-            return
-        card = self.hand[args[0]]
-        try:
-            card.event(state)
-        except exceptions.EventError as error:
-            print('Event failed:', error)
-        else:
-            self.discard(args[0], state.player_deck)
-            print('Event succeeded!')
-
     def no_action(self, state, *args):
         """Do nothing but use an action.
 
@@ -358,6 +355,32 @@ class ContingencyPlanner(Player):
         super().__init__(name, 'contingency planner')
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_slot = None
+
+    def event(self, state, card_name):
+        in_hand = card_name in self.hand
+        in_slot = (self.contingency_slot is not None) and (card_name == self.contingency_slot.name)
+        if (not in_hand) and (not in_slot):
+            raise exceptions.EventError(f'{card_name} is not in hand.')
+
+        if in_hand:
+            card = self.hand[card_name]
+            if card.type != 'event':
+                raise exceptions.EventError(f'{card_name} is not an event card.')
+            card.event(state)
+            self.discard(state, card_name)
+        elif in_slot:
+            card = self.contingency_slot
+            if card.type != 'event':
+                raise exceptions.EventError(f'{card_name} is not an event card.')
+            card.event(state)
+            self.contingency_slot = None  # Setting to None w/o discard removes from game
+
+    def has_event(self, card_name):
+        in_hand = card_name in self.hand
+        in_slot = (self.contingency_slot is not None) and (card_name == self.contingency_slot.name)
+        if in_hand or in_slot:
+            return True
+        return False
 
     def print_status(self, indent):
         print(f'{indent}Location:', as_color(self.city.name, self.city.color))

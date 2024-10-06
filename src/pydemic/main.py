@@ -7,6 +7,7 @@ from sys import exit
 from time import sleep
 
 import pydemic.cards as cards
+import pydemic.exceptions as exceptions
 import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
@@ -45,16 +46,21 @@ def draw_player(state, *args):
 def play_event(state, *args):
     """Play an event card.
 
-    syntax: event PLAYER EVENT_CARD
+    syntax: event EVENT_CARD
     """
-    if len(args) != 2:
+    if len(args) != 1:
         print('Event failed: Incorrect number of arguments')
         return
-    if args[0] not in state.players:
-        print('Event failed: Nonexistent player specified.')
-        return
-    player = state.players[args[0]]
-    player.event(state, *args[1:])  # Slice to maintain as list
+    for player in state.players.values():
+        if player.has_event(args[0]):
+            try:
+                player.event(state, args[0])
+            except exceptions.EventError as error:
+                print('Event failed:', error)
+                return
+            print('Event succeeded!')
+            return
+    print('Event failed: No player has the specified card.')
 
 
 def quit(state, *args):
