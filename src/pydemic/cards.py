@@ -119,7 +119,7 @@ def air_lift(state):
     if args[1] not in state.cities:
         raise exceptions.EventError('Nonexistent city specified.')
 
-    state.players[args[0]].set_city(state, args[1])
+    state.players[args[0]].set_city(state, state.cities[args[1]])
 
 
 def forecast(state):
