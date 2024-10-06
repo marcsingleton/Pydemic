@@ -24,10 +24,17 @@ class City:
         state.diseases[color].remove(delta)
         self.cubes[color] += delta
         if verbose:
-            print(
-                f'{as_color(self.name, self.color)} was infected '  # TODO: Add different text for exceeding max
-                f'with {delta} {as_color(color, color)}.'
-            )
+            if delta == 0:
+                msg = (
+                    f'{as_color(self.name, self.color)} was infected '
+                    f'with {as_color(color, color)}, but no cubes were added.'
+                )
+            else:
+                msg = (
+                    f'{as_color(self.name, self.color)} was infected '
+                    f'with {delta} {as_color(color, color)}.'
+                )
+            print(msg)
         if n > delta:
             self.outbreak(state, color)
 
@@ -106,7 +113,7 @@ class Disease:
 
     def remove(self, n=1):
         if self.status == DiseaseState.ERADICATED:
-            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')
+            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')  # TODO: Remove colors in exceptions?
 
         if self.cubes >= n:
             self.cubes -= n
