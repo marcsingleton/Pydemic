@@ -69,18 +69,18 @@ class Player:
             else:
                 print('Command failed: Incorrect number or form of arguments.')
 
-    def can_share(self, card):
-        if card not in self.hand:
+    def can_share(self, card_name):
+        if card_name not in self.hand:
             return False, 'Action failed: Player does not have the specified card.'
-        if card != self.city.name:
+        if card_name != self.city.name:
             return False, "Action failed: Specified card does not match player's current city."
         return True, 'Action succeeded!'
 
-    def discard(self, state, card):
+    def discard(self, state, card_name):
         try:
-            state.player_deck.discard(self.hand.pop(card))
+            state.player_deck.discard(self.hand.pop(card_name))
         except KeyError:
-            raise exceptions.DiscardError(f'{card} is not in hand.')
+            raise exceptions.DiscardError(f'{card_name} is not in hand.')
 
     def immunity(self, state, city, color):
         return False
@@ -712,8 +712,8 @@ class Researcher(Player):
     def __init__(self, name):
         super().__init__(name, 'researcher')
 
-    def can_share(self, card):
-        if card not in self.hand:
+    def can_share(self, card_name):
+        if card_name not in self.hand:
             return False, 'Action failed: Player does not have the specified card.'
         return True, 'Action succeeded!'
 
