@@ -542,15 +542,13 @@ def epidemic(state):
 
     # Play Resilient Population event if available
     for player in state.players.values():
-        in_hand = 'resilient_population' in player.hand
-        if in_hand:  # TODO: Check contingency planner card
+        if player.has_event('resilient_population'):
             text = input(
                 f'{prompt_prefix}Resilient Population event card detected in hand. '
                 f'Play now? (y/n) '
             ).lower()
             if text == 'y' or text == 'yes':
-                player.hand['resilient_population'].event()
-                player.discard('resilient_population')
+                player.event(state, 'resilient_population')
 
     # Intensify
     state.infection_deck.intensify()
