@@ -43,7 +43,7 @@ class Player:
             target.players[self.name] = self
 
     # Utility functions
-    def add_card(self, card, player_deck):
+    def add_card(self, state, card):
         self.hand[card.name] = card
         if len(self.hand) > self.hand_max:
             print()
@@ -57,7 +57,7 @@ class Player:
             args = input(f'{prompt_prefix}Enter a command to reduce your hand: ').split()
             if len(args) == 2 and args[0] == 'discard':
                 try:
-                    self.discard(args[1], player_deck)
+                    self.discard(args[1], state.player_deck)
                     print('Action succeeded!')
                 except exceptions.DiscardError as error:
                     print('Discard failed:', error)
@@ -76,9 +76,9 @@ class Player:
             return False, "Action failed: Specified card does not match player's current city."
         return True, 'Action succeeded!'
 
-    def discard(self, card, player_deck):
+    def discard(self, state, card):
         try:
-            player_deck.discard(self.hand.pop(card))
+            state.player_deck.discard(self.hand.pop(card))
         except KeyError:
             raise exceptions.DiscardError(f'{card} is not in hand.')
 
@@ -213,7 +213,7 @@ class Player:
             self.city.add_station(state)
         except (exceptions.DiscardError, exceptions.StationAddError) as error:
             if isinstance(error, exceptions.StationAddError):
-                self.add_card(state.player_deck.discard_pile.pop(), state.player_deck)
+                self.add_card(state, state.player_deck.discard_pile.pop())
             if city is not None:  # Return "borrowed station"
                 city.add_station(state)
             print('Action failed:', error)
@@ -276,7 +276,7 @@ class Player:
             return
         can_share, msg = giver.can_share(card)
         if can_share:
-            receiver.add_card(giver.hand.pop(card), state.player_deck)
+            receiver.add_card(state, giver.hand.pop(card))
             self.action_count -= 1
             print(msg)
         else:

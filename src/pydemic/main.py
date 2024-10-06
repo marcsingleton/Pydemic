@@ -39,7 +39,7 @@ def draw_player(state, *args):
         state.player_deck.discard(card)
     else:
         print(f'{as_color(card.name, card.color)} was drawn.')
-        state.current_player.add_card(card, state.player_deck)
+        state.current_player.add_card(state, card)
 
 
 def play_event(state, *args):
@@ -401,7 +401,7 @@ def main():
         player.set_city(state, state.cities[start_city])  # Set separately from instantiation so special abilities do not interfere with setup
         starting_cards = [state.player_deck.draw() for _ in range(start_hand_num)]
         for card in starting_cards:
-            player.add_card(card, state.player_deck)
+            player.add_card(state, card)
     state.player_order = turn_order(player_names, players)
 
     # Add epidemics to deck
