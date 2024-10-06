@@ -69,10 +69,10 @@ class InfectionDeck(Deck):
         self.draw_pile += self.discard_pile
         self.discard_pile = []
 
-    def remove(self, city):
+    def remove(self, city_name):
         idx = False
         for i, card in enumerate(self.discard_pile):
-            if card.name == city:
+            if card.name == city_name:
                 idx = i
                 break
         if idx is not False:
