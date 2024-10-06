@@ -359,9 +359,9 @@ def main():
     shuffle(role_list)
     
     players = {}
-    for player in player_names:
+    for player_name in player_names:
         role = role_list.pop()
-        players[player] = roles.roles[role](player)
+        players[player_name] = roles.roles[role](player_name)
     player_order = player_names  # Use initial order of names until starting hand is dealt
 
     # Instantiate decks
