@@ -156,10 +156,10 @@ class OutbreakTrack:
 
 class InfectionTrack:
     def __init__(self, track):
-        self.pos = 0
+        self.position = 0
         self.track = track
-        self.rate = self.track[self.pos]
+        self.rate = self.track[self.position]
 
     def increment(self):
-        self.pos += 1
-        self.rate = self.track[self.pos]
+        self.position += 1
+        self.rate = self.track[self.position]
