@@ -146,7 +146,7 @@ def forecast(state):
 def government_grant(state):
     args = input(
         f'{prompt_prefix}'
-        'Enter one or two cities to place or transfer a research station, respectively: '
+        'Enter a city to place a research station: '
     ).split()
     if len(args) == 1:
         if args[0] not in state.cities:
@@ -154,17 +154,6 @@ def government_grant(state):
         try:
             state.cities[args[0]].add_station(state)
         except exceptions.StationAddError as error:
-            raise exceptions.EventError(error)
-    elif len(args) == 2:
-        if args[0] not in state.cities or args[1] not in state.cities:
-            raise exceptions.EventError('Nonexistent city specified.')
-        try:
-            state.cities[args[0]].remove_station(state)
-            state.cities[args[1]].add_station(state)
-        except exceptions.StationRemoveError as error:
-            raise exceptions.EventError(error)
-        except exceptions.StationAddError as error:
-            state.cities[args[0]].add_station(state)
             raise exceptions.EventError(error)
     else:
         raise exceptions.EventError('Incorrect number of arguments.')
