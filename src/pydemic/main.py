@@ -116,34 +116,46 @@ def print_status(state, *args):
     print(f'-------------------- TURN {state.turn_count} --------------------')
 
     for disease in state.diseases.values():
-        print(as_color(disease.color.upper(), disease.color))
-        print(f'{indent}Status:', disease.status.name.lower())
-        print(f'{indent}Cubes remaining:', disease.cubes)
+        color = disease.color
+        cube_string = disease.cubes * '▪'
+        cube_string = ' '.join([cube_string[i:i+5] for i in range(0, len(cube_string), 5)])
+        print(f'{as_color(color.upper(), color)} -- {disease.status.name.upper()}')
+        print(f'{indent}{as_color(cube_string, color)}')
     print()
 
     for player in state.players.values():
-        print(player.name.upper(), f'({player.role.upper()})')
+        print(f'{player.name.upper()} -- {player.role.upper()}')
         player.print_status(indent)
     print()
 
     for city in state.cities.values():
-        header = False
+        has_piece = city.station or any(city.cubes.values()) or city.players
+        if not has_piece:
+            continue
+        header = as_color(city.name.upper(), city.color)
+        if city.station:
+            header += ' ⌂'
+        print(header)
         for color, cubes in city.cubes.items():
             if cubes > 0:
-                if not header:  # Add header
-                    print(as_color(city.name.upper(), city.color))
-                    header = True
-                print(f'{indent}{as_color(color, color)}:', cubes)
-        if city.station:
-            if not header:
-                print(as_color(city.name.upper(), city.color))
-                header = True
-            print(f'{indent}Research station: True')  # TODO: Find better representation
+                print(f'{indent}{as_color(cubes * '▪', color)}')
+        for player_name, player in city.players.items():
+            print(f'{indent}▲ {player_name}')
     print()
 
-    print('Infection rate:', state.infection_track.rate)  # TODO: Visually represent tracks
-    print('Outbreaks:', state.outbreak_track.count)
-    print('Cards remaining:', len(state.player_deck.draw_pile))
+    track_prefix = 'Infection rate: '
+    print(track_prefix + '--'.join([str(value) for value in state.infection_track.track]))
+    print((len(track_prefix) + 3 * state.infection_track.position) * ' ' + '^')
+    print()
+
+    track_prefix = 'Outbreaks: '
+    print(track_prefix + '--'.join([str(value) for value in range(state.outbreak_track.max)]))
+    print((len(track_prefix) + 3 * state.outbreak_track.count) * ' ' + '^')
+    print()
+    
+    card_string = len(state.player_deck.draw_pile) * '❘'
+    card_string = ' '.join([card_string[i:i+5] for i in range(0, len(card_string), 5)])
+    print('Player deck:', card_string)
     print('Infection discard:', cards_to_string(state.infection_deck.discard_pile))
     print()
 
