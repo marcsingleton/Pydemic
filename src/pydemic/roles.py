@@ -57,7 +57,7 @@ class Player:
             args = input(f'{prompt_prefix}Enter a command to reduce your hand: ').split()
             if len(args) == 2 and args[0] == 'discard':
                 try:
-                    self.discard(args[1], state.player_deck)
+                    self.discard(state, args[1])
                     print('Action succeeded!')
                 except exceptions.DiscardError as error:
                     print('Discard failed:', error)
@@ -142,7 +142,7 @@ class Player:
             return
 
         try:
-            self.discard(args[0], state.player_deck)
+            self.discard(state, args[0])
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
@@ -163,7 +163,7 @@ class Player:
             return
 
         try:
-            self.discard(self.city.name, state.player_deck)
+            self.discard(state, self.city.name)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
@@ -226,7 +226,7 @@ class Player:
                     return
 
         try:
-            self.discard(self.city.name, state.player_deck)
+            self.discard(state, self.city.name)
             self.city.add_station(state)
         except (exceptions.DiscardError, exceptions.StationAddError) as error:
             if isinstance(error, exceptions.StationAddError):
@@ -337,7 +337,7 @@ class Player:
             print('Action failed:', error)
         else:
             for card in cards:
-                self.discard(card, state.player_deck)
+                self.discard(state, card)
             self.action_count -= 1
             print('Action succeeded!')
 
@@ -412,7 +412,7 @@ class ContingencyPlanner(Player):
             except exceptions.EventError as error:
                 print('Event failed:', error)
             else:
-                self.discard(args[0], state.player_deck)
+                self.discard(state, args[0])
                 print('Event succeeded!')
         elif in_slot:
             card = self.contingency_slot
@@ -512,7 +512,7 @@ class Dispatcher(Player):
             return
 
         try:
-            self.discard(args[0], state.player_deck)
+            self.discard(state, args[0])
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
@@ -536,7 +536,7 @@ class Dispatcher(Player):
             return
 
         try:
-            self.discard(self.city.name, state.player_deck)
+            self.discard(state, self.city.name)
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
@@ -667,7 +667,7 @@ class OperationsExpert(Player):
             return
 
         try:
-            self.discard(args[1], state.player_deck)
+            self.discard(state, args[1])
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
