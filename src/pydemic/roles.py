@@ -387,41 +387,6 @@ class ContingencyPlanner(Player):
             card = self.contingency_slot
             print(f'{indent}|{as_color(card.name, card.color)}|')
 
-    def event(self, state, *args):
-        """Play an event card.
-
-        This action will automatically detect an event card in the contingency slot.
-
-        syntax: event EVENT_CARD
-        """
-        if len(args) != 1:
-            print('Event failed: Incorrect number of arguments.')
-            return
-        in_hand = args[0] in self.hand
-        in_slot = (self.contingency_slot is not None) and (args[0] == self.contingency_slot.name)
-        if (not in_hand) and (not in_slot):
-            print('Event failed: Player does not have specified card.')
-            return
-
-        if in_hand:
-            card = self.hand[args[0]]
-            try:
-                card.event(state)
-            except exceptions.EventError as error:
-                print('Event failed:', error)
-            else:
-                self.discard(state, args[0])
-                print('Event succeeded!')
-        elif in_slot:
-            card = self.contingency_slot
-            try:
-                card.event(state)
-            except exceptions.EventError as error:
-                print('Event failed:', error)
-            else:
-                self.contingency_slot = None  # Setting to None w/o discard removes from game
-                print('Event succeeded!')
-
     def contingency(self, state, *args):
         """Add a discarded event card to the player's contingency slot.
 
