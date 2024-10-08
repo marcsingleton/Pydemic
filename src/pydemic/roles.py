@@ -106,8 +106,7 @@ class Player:
         self.action_count = self.action_num
 
     def print_status(self, indent):
-        print(f'{indent}Location:', as_color(self.city.name, self.city.color))
-        print(f'{indent}Hand:', cards_to_string(self.hand.values()))
+        print(f'{indent}{cards_to_string(self.hand.values())}')
 
     # Player actions
     def ground(self, state, *args):
@@ -383,11 +382,10 @@ class ContingencyPlanner(Player):
         return False
 
     def print_status(self, indent):
-        print(f'{indent}Location:', as_color(self.city.name, self.city.color))
-        print(f'{indent}Hand:', cards_to_string(self.hand.values()))
+        print(f'{indent}{cards_to_string(self.hand.values())}')
         if self.contingency_slot:
             card = self.contingency_slot
-            print(f'{indent}Contingency slot:', as_color(card.name, card.color))
+            print(f'{indent}|{as_color(card.name, card.color)}|')
 
     def event(self, state, *args):
         """Play an event card.
