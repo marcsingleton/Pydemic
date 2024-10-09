@@ -587,7 +587,9 @@ class Medic(Player):
         city = self.city
         try:
             if city.cubes[args[0]] == 0:
-                raise exceptions.PropertyError(f'{city.name} is not infected with {args[0]}.')
+                raise exceptions.PropertyError(
+                    f'{city.name} is not infected with {as_color(args[0], args[0])}.'
+                )
             for _ in range(city.cubes[args[0]]):
                 city.remove_disease(state, args[0])
         except exceptions.PropertyError as error:
