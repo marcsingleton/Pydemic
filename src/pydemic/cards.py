@@ -101,7 +101,7 @@ class PlayerDeck(Deck):
     def retrieve(self, card_name):
         idx = False
         for i, card in enumerate(self.discard_pile):
-            if card.name == card_name:
+            if hasattr(card, 'name') and card.name == card_name:  # Epidemic cards don't have names
                 idx = i
                 break
         if idx is not False:
@@ -163,7 +163,7 @@ def one_quiet_night(state):
     state.infect_count = 0
 
 
-def resilient_population(state):
+def resilient_population(state):  # TODO: Show discard pile
     args = input(
         f'{prompt_prefix}Enter a city to remove from the infection deck discard pile: '
     ).split()
