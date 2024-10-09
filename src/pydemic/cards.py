@@ -105,7 +105,7 @@ class PlayerDeck(Deck):
                 idx = i
                 break
         if idx is not False:
-            self.discard_pile.pop(idx)
+            return self.discard_pile.pop(idx)
         else:
             raise exceptions.PropertyError
 
