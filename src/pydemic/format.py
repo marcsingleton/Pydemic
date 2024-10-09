@@ -9,14 +9,13 @@ color_codes = {
     'yellow': '33',
     'black': '30',
     'white': '37',
-    None: '',
 }
 indent = 4 * ' '
 prompt_prefix = '>>> '
 
 
 def as_color(text, color, bold=False):
-    color_code = color_codes[color]
+    color_code = color_codes.get(color, '')
     weight = 1 if bold else 0
     string = f'\033[{weight};{color_code}m{text}\033[0;m'
     return string
