@@ -103,7 +103,7 @@ def print_neighbors(state, *args):
         print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
 
 
-def print_status(state, *args):
+def print_status(state, *args):  # TODO: Add way to examine player discard
     """Display the current state of the game.
 
     syntax: status
