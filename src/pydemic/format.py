@@ -4,20 +4,25 @@ import sys
 from time import sleep
 
 color_codes = {
-    'red': '31',
-    'blue': '34',
-    'yellow': '33',
-    'black': '30',
-    'white': '37',
+    'red': '160',
+    'blue': '75',
+    'yellow': '227',
+    'black': '244',
+    'light_blue': '116',
+    'purple': '141',
+    'orange': '214',
+    'light_green': '114',
+    'green': '36',
+    'brown': '137',
+    'white': '231',
 }
 indent = 4 * ' '
 prompt_prefix = '>>> '
 
 
-def as_color(text, color, bold=False):
+def as_color(text, color):
     color_code = color_codes.get(color, '')
-    weight = 1 if bold else 0
-    string = f'\033[{weight};{color_code}m{text}\033[0;m'
+    string = f'\033[38;5;{color_code}m{text}\033[0;m'
     return string
 
 

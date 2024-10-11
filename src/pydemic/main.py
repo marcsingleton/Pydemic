@@ -124,7 +124,7 @@ def print_status(state, *args):  # TODO: Add way to examine player discard
     print()
 
     for player in state.players.values():
-        print(f'{player.name.upper()} -- {player.role.upper()}')
+        print(f'{as_color(player.name.upper(), player.color)} -- {player.role.upper()}')
         player.print_status(indent)
     print()
 
@@ -140,7 +140,7 @@ def print_status(state, *args):  # TODO: Add way to examine player discard
             if cubes > 0:
                 print(f'{indent}{as_color(cubes * '▪', color)}')
         for player_name, player in city.players.items():
-            print(f'{indent}▲ {player_name}')
+            print(f'{indent}{as_color('▲', player.color)} {player_name}')
     print()
 
     track_prefix = 'Infection rate: '

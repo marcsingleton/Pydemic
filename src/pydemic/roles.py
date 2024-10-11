@@ -5,7 +5,7 @@ from pydemic.format import indent, prompt_prefix, as_color, cards_to_string
 
 
 class Player:
-    def __init__(self, name, role, hand_max=7):
+    def __init__(self, name, role, hand_max=7, color=None):
         self.actions = {
             'ground': self.ground,
             'direct': self.direct,
@@ -25,6 +25,7 @@ class Player:
         self.hand_max = hand_max
         self.name = name
         self.role = role
+        self.color = color
 
     # Property functions
     @property
@@ -351,7 +352,7 @@ class Player:
 
 class ContingencyPlanner(Player):
     def __init__(self, name):
-        super().__init__(name, 'contingency planner')
+        super().__init__(name, 'contingency planner', color='light_blue')
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_slot = None
 
@@ -410,7 +411,7 @@ class ContingencyPlanner(Player):
 
 class Dispatcher(Player):
     def __init__(self, name):
-        super().__init__(name, 'dispatcher')
+        super().__init__(name, 'dispatcher', color='purple')
         self.actions = {
             **self.actions,
             'airlift': self.airlift,
@@ -551,7 +552,7 @@ class Dispatcher(Player):
 
 class Medic(Player):
     def __init__(self, name):
-        super().__init__(name, 'medic')
+        super().__init__(name, 'medic', color='orange')
 
     def set_city(self, state, target):
         if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
@@ -601,7 +602,7 @@ class Medic(Player):
 
 class OperationsExpert(Player):
     def __init__(self, name):
-        super().__init__(name, 'operations expert')
+        super().__init__(name, 'operations expert', color='light_green')
         self.actions = {
             **self.actions,
             'opex_shuttle': self.opex_shuttle,
@@ -686,7 +687,7 @@ class OperationsExpert(Player):
 
 class QuarantineSpecialist(Player):
     def __init__(self, name):
-        super().__init__(name, 'quarantine specialist')
+        super().__init__(name, 'quarantine specialist', color='green')
 
     def immunity(self, state, city, color):
         # Check city is set to avoid KeyError during initialization
@@ -698,7 +699,7 @@ class QuarantineSpecialist(Player):
 
 class Researcher(Player):
     def __init__(self, name):
-        super().__init__(name, 'researcher')
+        super().__init__(name, 'researcher', color='brown')
 
     def can_share(self, card_name):
         if card_name not in self.hand:
@@ -708,7 +709,7 @@ class Researcher(Player):
 
 class Scientist(Player):
     def __init__(self, name):
-        super().__init__(name, 'scientist')
+        super().__init__(name, 'scientist', color='white')
         self.cure_num = 4
 
 
