@@ -113,7 +113,7 @@ class Disease:
 
     def remove(self, n=1):
         if self.status == DiseaseState.ERADICATED:
-            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')  # TODO: Remove colors in exceptions?
+            raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')
 
         if self.cubes >= n:
             self.cubes -= n
