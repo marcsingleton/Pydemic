@@ -98,8 +98,7 @@ def print_neighbors(state, *args):
         return
 
     print(f'The neighbors of {as_color(city.name, city.color)} are:')
-    for neighbor in city.neighbors:
-        neighbor = state.cities[neighbor]
+    for neighbor in city.neighbors.values():
         print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
 
 
@@ -362,10 +361,14 @@ def main():
     cities = {}
     city_cards = []
     infection_cards = []
-    for city, attrs in map.items():
-        cities[city] = pieces.City(city, attrs.neighbors, attrs.color, colors)
-        city_cards.append(cards.CityCard(city, attrs.color, attrs.population))
-        infection_cards.append(cards.InfectionCard(city, attrs.color))
+    for city_name, attrs in map.items():
+        cities[city_name] = pieces.City(city_name, attrs.color, colors)
+        city_cards.append(cards.CityCard(city_name, attrs.color, attrs.population))
+        infection_cards.append(cards.InfectionCard(city_name, attrs.color))
+    for city_name, attrs in map.items():
+        city = cities[city_name]
+        neighbors = {neighbor_name: cities[neighbor_name] for neighbor_name in attrs.neighbors}
+        city.neighbors = neighbors
 
     # Instantiate diseases
     diseases = {}

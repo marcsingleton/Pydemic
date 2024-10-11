@@ -56,7 +56,7 @@ _default = {'atlanta': [['chicago', 'miami', 'washington'], 'blue', 4715000],
 # fmt: on
 
 default = {}
-for city, attrs in _default.items():
-    default[city] = CityAttrs(*attrs)
+for city_name, attrs in _default.items():
+    default[city_name] = CityAttrs(*attrs)
 
 maps = {'default': default}

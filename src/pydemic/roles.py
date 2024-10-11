@@ -691,7 +691,7 @@ class QuarantineSpecialist(Player):
 
     def immunity(self, state, city, color):
         # Check city is set to avoid KeyError during initialization
-        if self.city and (city == self.city or city in self.city.neighbors):
+        if self.city and (city == self.city or city in self.city.neighbors.values()):
             return True
         else:
             return False

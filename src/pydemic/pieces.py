@@ -7,12 +7,12 @@ from pydemic.format import as_color
 
 
 class City:
-    def __init__(self, name, neighbors, color, colors, cube_max=3):
+    def __init__(self, name, color, colors, cube_max=3):
         self.color = color
         self.cubes = {color: 0 for color in colors}
         self.cube_max = cube_max
         self.name = name
-        self.neighbors = neighbors  # TODO: Make neighbors a dict
+        self.neighbors = {}
         self.players = {}
         self.station = False
 
@@ -45,8 +45,7 @@ class City:
                 (self.name, color)
             )  # Append to resolve first to prevent infinite loop between adjacent cities
             state.outbreak_track.increment()
-            for neighbor in self.neighbors:
-                neighbor = state.cities[neighbor]
+            for neighbor in self.neighbors.values():
                 try:
                     neighbor.add_disease(state, color)
                 except exceptions.PropertyError:  # Catch immunity errors but print nothing
