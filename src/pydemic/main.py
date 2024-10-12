@@ -1,5 +1,6 @@
 """A text-based implementation of the board game Pandemic."""
 
+import readline
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 from inspect import cleandoc
 from random import shuffle
@@ -164,6 +165,8 @@ def print_status(state, *args):  # TODO: Add way to examine player discard
 # Flow control
 def main():
     # CONSTANTS
+    readline.parse_and_bind('tab: menu-complete')
+    readline.set_completer(lambda x: None)
     player_min, player_max = 2, 4
     player_min_word, player_max_word = 'two', 'four'
     epidemic_min, epidemic_max = 4, 6
@@ -489,7 +492,20 @@ def main():
         state.turn_count += 1
 
 
+def make_completer(commands):
+    def completer(text, state):
+        matches = [command for command in commands if command.startswith(text)]
+        if state < len(matches):
+            return matches[state]   
+        else:
+            return None
+    return completer
+
+
 def interface(state, commands, prompt):
+    completer = make_completer(commands)
+    readline.set_completer(completer)
+
     args = input(prompt).lower().split()
     if len(args) == 0:
         return
@@ -525,6 +541,8 @@ def interface(state, commands, prompt):
             return
         args = args[1:]
         cmd(state, *args)
+    
+    readline.set_completer(lambda x: None)
 
 
 def turn_order(player_names, players):
