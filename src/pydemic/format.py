@@ -21,8 +21,11 @@ prompt_prefix = '>>> '
 
 
 def as_color(text, color):
-    color_code = color_codes.get(color, '')
-    string = f'\033[38;5;{color_code}m{text}\033[0;m'
+    color_code = color_codes.get(color, None)
+    if color_code is None:
+        string = text
+    else:
+        string = f'\033[38;5;{color_code}m{text}\033[0;m'
     return string
 
 
