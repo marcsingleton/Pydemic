@@ -510,39 +510,49 @@ def interface(state, commands, prompt):
     if len(args) == 0:
         return
     command = args[0]
+    args = args[1:]
     if command == 'help':
-        if len(args) == 1:
-            print(f'The available commands are: ')
-            for command, cmd in commands.items():
-                docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
-                docstring = cleandoc(docstring)
-                summary = docstring.split('\n')[0]
-                print(f'{indent}{command}: {summary}')
-        elif len(args) == 2:
-            command = args[1]
-            try:
-                cmd = commands[command]
-            except KeyError:
-                print(f'{command} is not a currently available command.')
-                return
-            docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
-            docstring = cleandoc(docstring)
-            print(docstring)
-        else:
-            print(
-                'Use "help" for an overview of all currently available commands '
-                'or "help COMMAND" for more information on a specific command.'
-            )
+        help(commands, *args)
     else:
         try:
             cmd = commands[command]
         except KeyError:
             print('No currently available command exists with that name. Please try again.')
             return
-        args = args[1:]
         cmd(state, *args)
     
     readline.set_completer(lambda x: None)
+
+
+def help(commands, *args):
+    """Display available commands or syntax for a specific command.
+    
+    syntax: help [COMMAND]
+    """
+    commands = commands.copy()
+    commands['help'] = help
+    if len(args) == 0:
+        print(f'The available commands are: ')
+        for command, cmd in commands.items():
+            docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
+            docstring = cleandoc(docstring)
+            summary = docstring.split('\n')[0]
+            print(f'{indent}{command}: {summary}')
+    elif len(args) == 1:
+        command = args[0]
+        try:
+            cmd = commands[command]
+        except KeyError:
+            print(f'{command} is not a currently available command.')
+            return
+        docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
+        docstring = cleandoc(docstring)
+        print(docstring)
+    else:
+        print(
+            'Use "help" for an overview of all currently available commands '
+            'or "help COMMAND" for more information on a specific command.'
+        )
 
 
 def turn_order(player_names, players):
