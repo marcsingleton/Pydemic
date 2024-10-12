@@ -18,7 +18,7 @@ from pydemic.version import __version__
 
 
 # FUNCTIONS
-# Generic actions
+# Generic commands
 def draw_infect(state, *args):
     """Draw a card from the infection deck.
 
@@ -103,7 +103,7 @@ def print_neighbors(state, *args):
         print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
 
 
-def print_status(state, *args):  # TODO: Add way to examine player discard
+def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional
     """Display the current state of the game.
 
     syntax: status
@@ -432,7 +432,7 @@ def main():
     state.player_deck.add_epidemics(epidemic_num)
 
     # PLAY
-    while True:  # TODO: Implement graceful win/lose exit
+    while True:  # TODO: Implement win condition
         # Turn setup
         state.draw_count = 2
         state.infect_count = state.infection_track.rate
@@ -584,6 +584,10 @@ def epidemic(state):
     state.infection_deck.infect(state)
 
     # Play Resilient Population event if available
+    # This isn't the most flexible approach, but Resilient Population is the only game element that
+    # has this behavior, so it's okay as a one-off. An event model where epidemic listeners
+    # register with an Epidemic object would generalize this code if multiple game elements needed
+    # to react to different parts of an epidemic.
     for player in state.players.values():
         if player.has_event('resilient_population'):
             text = input(

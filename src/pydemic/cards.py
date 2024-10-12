@@ -23,7 +23,7 @@ class CityCard(Card):
 
 class EventCard(Card):
     def __init__(self, event_name, event_func):
-        super().__init__('event')
+        super().__init__('event')  # TODO: Add color for events
         self.event = event_func
         self.name = event_name
 
