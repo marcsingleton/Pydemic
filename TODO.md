@@ -1,0 +1,14 @@
+- Saving and loading games
+  - Likely save and load to and from JSON
+  - All objects need to know which variables define their game state and how to instantiate from them
+  - Main loop needs to be re-entrant, so if it is restarted, it returns to the right turn phase
+    - Likely already is, but could have corner/edge cases, especially with display
+- Shortest path between cities using ground and shuttle actions
+  - Command during player action phase
+    - syntax: path START_CITY END_CITY
+  - Straightforward implementation of Dijkstra's algorithm, but would want an in-house implementation to not add external dependency
+    - Would also need to respect cities with research stations as having edges
+    - Probably too complex and unhelpful to incorporate player special abilities
+- Testing
+  - Cover player actions and interesting game states
+  - Need to extract argument parsing and game setup into separate functions to instantiate a testing environment easily
