@@ -144,10 +144,7 @@ def forecast(state):
 
 
 def government_grant(state):
-    args = input(
-        f'{prompt_prefix}'
-        'Enter a city to place a research station: '
-    ).split()
+    args = input(f'{prompt_prefix}' 'Enter a city to place a research station: ').split()
     if len(args) == 1:
         if args[0] not in state.cities:
             raise exceptions.EventError('Nonexistent city specified.')

@@ -103,7 +103,7 @@ def print_neighbors(state, *args):
         print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
 
 
-def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional
+def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional # fmt: skip
     """Display the current state of the game.
 
     syntax: status
@@ -118,7 +118,7 @@ def print_status(state, *args):  # TODO: Add way to examine player discard and m
     for disease in state.diseases.values():
         color = disease.color
         cube_string = disease.cubes * '▪'
-        cube_string = ' '.join([cube_string[i:i+5] for i in range(0, len(cube_string), 5)])
+        cube_string = ' '.join([cube_string[i : i + 5] for i in range(0, len(cube_string), 5)])
         print(f'{as_color(color.upper(), color)} -- {disease.status.name.upper()}')
         print(f'{indent}{as_color(cube_string, color)}')
     print()
@@ -152,9 +152,9 @@ def print_status(state, *args):  # TODO: Add way to examine player discard and m
     print(track_prefix + '--'.join([str(value) for value in range(state.outbreak_track.max)]))
     print((len(track_prefix) + 3 * state.outbreak_track.count) * ' ' + '^')
     print()
-    
+
     card_string = len(state.player_deck.draw_pile) * '❘'
-    card_string = ' '.join([card_string[i:i+5] for i in range(0, len(card_string), 5)])
+    card_string = ' '.join([card_string[i : i + 5] for i in range(0, len(card_string), 5)])
     print('Player deck:', card_string)
     print('Infection discard:', cards_to_string(state.infection_deck.discard_pile))
     print()
@@ -207,8 +207,16 @@ def main():
             f'must be between {epidemic_min_word} and {epidemic_max_word}'
         ),
     )
-    parser.add_argument('--map', default='default', help='the name of the map')
-    parser.add_argument('--start_city', default='atlanta', help='the name of the starting city')
+    parser.add_argument(
+        '--map',
+        default='default',
+        help='the name of the map',
+    )
+    parser.add_argument(
+        '--start_city',
+        default='atlanta',
+        help='the name of the starting city',
+    )
     parser.add_argument(
         '--outbreak_max',
         default=8,
@@ -218,14 +226,20 @@ def main():
     parser.add_argument(
         '--infection_seq',
         default='2,2,2,3,3,4,4',
-        help=(
-            'the sequence of the infection rate track; entries must be positive and increasing'
-        ),
+        help='the sequence of the infection rate track; entries must be positive and increasing',
     )
     parser.add_argument(
-        '--cube-num', default=24, type=int, help='the total number of cubes for each disease'
+        '--cube-num',
+        default=24,
+        type=int,
+        help='the total number of cubes for each disease',
     )
-    parser.add_argument('--station_num', default=6, type=int, help='the total number of stations')
+    parser.add_argument(
+        '--station_num',
+        default=6,
+        type=int,
+        help='the total number of stations',
+    )
     args = parser.parse_args()
 
     # Parameter checks
@@ -244,9 +258,7 @@ def main():
         if len(set(player_names)) != player_num:
             print('Argument player_names are not unique. Quitting...')
             exit(1)
-    elif player_num is not None and (
-        player_num < player_min or player_num > player_max
-    ):
+    elif player_num is not None and (player_num < player_min or player_num > player_max):
         print(
             f'Argument player_num must be between {player_min_word} and {player_max_word}. '
             f'Quitting...'
@@ -259,7 +271,7 @@ def main():
         print(
             f'Argument epidemic_num must be between '
             f'{epidemic_min_word} and {epidemic_max_word}. Quitting...'
-            )
+        )
         exit(1)
 
     # Get map settings
@@ -381,7 +393,7 @@ def main():
     # Instantiate players
     role_list = list(roles.roles)
     shuffle(role_list)
-    
+
     players = {}
     for player_name in player_names:
         role = role_list.pop()
@@ -409,9 +421,9 @@ def main():
         station_num,
         turn_count=0,
         draw_count=0,
-        infect_count=0
-        )
-    
+        infect_count=0,
+    )
+
     # Add research station to start city
     state.cities[start_city].add_station(state)
 
@@ -422,7 +434,7 @@ def main():
 
     # Set initial positions, hands, and order
     for player in state.players.values():
-        player.set_city(state, state.cities[start_city])  # Set separately from instantiation so special abilities do not interfere with setup
+        player.set_city(state, state.cities[start_city])  # Set separately from instantiation so special abilities do not interfere with setup # fmt: skip
         starting_cards = [state.player_deck.draw() for _ in range(start_hand_num)]
         for card in starting_cards:
             player.add_card(state, card)
@@ -496,9 +508,10 @@ def make_completer(commands):
     def completer(text, state):
         matches = [command for command in commands if command.startswith(text)]
         if state < len(matches):
-            return matches[state]   
+            return matches[state]
         else:
             return None
+
     return completer
 
 
@@ -520,13 +533,13 @@ def interface(state, commands, prompt):
             print('No currently available command exists with that name. Please try again.')
             return
         cmd(state, *args)
-    
+
     readline.set_completer(lambda x: None)
 
 
 def help(commands, *args):
     """Display available commands or syntax for a specific command.
-    
+
     syntax: help [COMMAND]
     """
     commands = commands.copy()

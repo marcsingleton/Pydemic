@@ -37,7 +37,7 @@ class Player:
         raise AttributeError('Use set_city method to change city.')
 
     def set_city(self, state, target):
-        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
+        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players # fmt: skip
             del self.city.players[self.name]
         self._city = target
         if target is not None:  # Do not attempt to set parameters while instantiating players
@@ -82,12 +82,12 @@ class Player:
             state.player_deck.discard(self.hand.pop(card_name))
         except KeyError:
             raise exceptions.DiscardError(f'{card_name} is not in hand.')
-    
+
     def event(self, state, card_name):
         in_hand = card_name in self.hand
         if not in_hand:
             raise exceptions.EventError(f'{card_name} is not in hand.')
-        
+
         card = self.hand[card_name]
         if card.type != 'event':
             raise exceptions.EventError(f'{card_name} is not an event card.')
@@ -99,7 +99,7 @@ class Player:
         if in_hand:
             return True
         return False
-    
+
     def immunity(self, state, city, color):
         return False
 
@@ -555,8 +555,8 @@ class Medic(Player):
         super().__init__(name, 'medic', color='orange')
 
     def set_city(self, state, target):
-        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players
-           del self.city.players[self.name]
+        if self._city is not None:  # Do not attempt to set parameters for newly instantiated players # fmt: skip
+            del self.city.players[self.name]
         self._city = target
         if target is not None:  # Do not attempt to set parameters while instantiating players
             target.players[self.name] = self
