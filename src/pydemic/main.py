@@ -12,7 +12,7 @@ import pydemic.exceptions as exceptions
 import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
-from pydemic.format import as_color, cards_to_string, indent, prompt_prefix
+from pydemic.display import as_color, cards_to_string, indent, prompt_prefix
 from pydemic.state import GameState
 from pydemic.version import __version__
 

@@ -3,7 +3,7 @@
 from enum import Enum, auto
 
 import pydemic.exceptions as exceptions
-from pydemic.format import as_color
+from pydemic.display import as_color
 
 
 class City:

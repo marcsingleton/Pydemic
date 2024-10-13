@@ -4,7 +4,7 @@ import abc
 from random import shuffle
 
 import pydemic.exceptions as exceptions
-from pydemic.format import as_color, cards_to_string, prompt_prefix
+from pydemic.display import as_color, cards_to_string, prompt_prefix
 
 
 class Card:

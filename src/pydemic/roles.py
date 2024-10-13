@@ -1,7 +1,7 @@
 """Definitions of player roles."""
 
 import pydemic.exceptions as exceptions
-from pydemic.format import indent, prompt_prefix, as_color, cards_to_string
+from pydemic.display import indent, prompt_prefix, as_color, cards_to_string
 
 
 class Player:
