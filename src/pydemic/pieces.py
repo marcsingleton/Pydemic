@@ -117,7 +117,9 @@ class DiseaseTrack:
         if self.cubes[color] >= n:
             self.cubes[color] -= n
         else:
-            raise exceptions.GameOver(f'Depleted {as_color(self.color, self.color)} disease cubes.')
+            raise exceptions.GameOverLose(
+                f'The disease track ran out of {as_color(self.color, self.color)} cubes.'
+            )
 
     def set_cured(self, color):
         if not self.is_active(color):
@@ -127,6 +129,9 @@ class DiseaseTrack:
             self.statuses[color] = DiseaseState.ERADICATED
         else:
             self.statuses[color] = DiseaseState.CURED
+
+        if all([status is not DiseaseState.ACTIVE for status in self.statuses]):
+            raise exceptions.GameOverWin
 
     def is_active(self, color):
         return self.statuses[color] is DiseaseState.ACTIVE
@@ -147,7 +152,7 @@ class OutbreakTrack:
     def increment(self):
         self.count += 1
         if self.count == self.max:
-            raise exceptions.GameOver('Maximum outbreaks reached.')
+            raise exceptions.GameOverLose('The outbreak track reached its max.')
 
     def reset(self):
         self.resolved.clear()

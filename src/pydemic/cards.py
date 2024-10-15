@@ -93,7 +93,7 @@ class PlayerDeck(Deck):
         try:
             return self.draw_pile.pop()
         except IndexError:
-            raise exceptions.GameOver('Player deck depleted.')
+            raise exceptions.GameOverLose('The player deck ran out of cards.')
 
     def discard(self, card):
         self.discard_pile.append(card)

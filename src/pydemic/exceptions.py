@@ -5,6 +5,14 @@ class GameOver(Exception):
     pass
 
 
+class GameOverLose(GameOver):
+    pass
+
+
+class GameOverWin(GameOver):
+    pass
+
+
 class DiscardError(Exception):
     pass
 
