@@ -15,6 +15,7 @@ color_codes = {
     'green': '36',
     'brown': '137',
     'white': '231',
+    'gold': '220',
 }
 indent = 4 * ' '
 prompt_prefix = '>>> '
