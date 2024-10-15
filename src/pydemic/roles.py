@@ -1,7 +1,7 @@
 """Definitions of player roles."""
 
 import pydemic.exceptions as exceptions
-from pydemic.display import indent, prompt_prefix, as_color, cards_to_string
+from pydemic.display import indent, prompt_prefix, style, cards_to_string
 
 
 class Player:
@@ -386,7 +386,7 @@ class ContingencyPlanner(Player):
         print(f'{indent}{cards_to_string(self.hand.values())}')
         if self.contingency_slot:
             card = self.contingency_slot
-            print(f'{indent}|{as_color(card.name, card.color)}|')
+            print(f'{indent}|{style(card.name, color=card.color)}|')
 
     def contingency(self, state, *args):
         """Add a discarded event card to the player's contingency slot.
@@ -589,7 +589,7 @@ class Medic(Player):
         try:
             if city.cubes[args[0]] == 0:
                 raise exceptions.PropertyError(
-                    f'{city.name} is not infected with {as_color(args[0], args[0])}.'
+                    f'{city.name} is not infected with {style(args[0], color=args[0])}.'
                 )
             for _ in range(city.cubes[args[0]]):
                 city.remove_disease(state, args[0])

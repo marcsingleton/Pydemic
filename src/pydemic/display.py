@@ -21,21 +21,19 @@ indent = 4 * ' '
 prompt_prefix = '>>> '
 
 
-def as_color(text, color):
+def style(text, *, color=None, bold=False, underline=False):
     color_code = color_codes.get(color, None)
-    if color_code is None:
-        string = text
-    else:
-        string = f'\033[38;5;{color_code}m{text}\033[0;m'
-    return string
-
-
-def as_underline(text):
-    return f'\033[4m{text}\033[0m'
+    if color_code is not None:
+        text = f'\033[38;5;{color_code}m{text}\033[0;m'
+    if bold:
+        text = f'\033[1m{text}\033[0m'
+    if underline:
+        text = f'\033[4m{text}\033[0m'
+    return text
 
 
 def cards_to_string(cards):
-    cards_string = ', '.join([as_color(card.name, card.color) for card in cards])
+    cards_string = ', '.join([style(card.name, color=card.color) for card in cards])
     return '[' + cards_string + ']'
 
 

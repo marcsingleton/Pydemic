@@ -4,7 +4,7 @@ import abc
 from random import shuffle
 
 import pydemic.exceptions as exceptions
-from pydemic.display import as_color, cards_to_string, prompt_prefix
+from pydemic.display import style, cards_to_string, prompt_prefix
 
 
 class Card:
@@ -56,8 +56,8 @@ class InfectionDeck(Deck):
             city.add_disease(state, card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
             print(
-                f'{as_color(city.name, city.color)} was not infected with '
-                f'{as_color(card.color, card.color)}:',
+                f'{style(city.name, color=city.color)} was not infected with '
+                f'{style(card.color, color=card.color)}:',
                 error,
             )
         self.discard_pile.append(card)

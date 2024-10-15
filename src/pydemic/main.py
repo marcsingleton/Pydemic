@@ -12,7 +12,7 @@ import pydemic.exceptions as exceptions
 import pydemic.maps as maps
 import pydemic.pieces as pieces
 import pydemic.roles as roles
-from pydemic.display import as_color, cards_to_string, indent, prompt_prefix
+from pydemic.display import style, cards_to_string, indent, prompt_prefix
 from pydemic.state import GameState
 from pydemic.version import __version__
 
@@ -40,7 +40,7 @@ def draw_player(state, *args):
         epidemic(state)
         state.player_deck.discard(card)
     else:
-        print(f'{as_color(card.name, card.color)} was drawn.')
+        print(f'{style(card.name, color=card.color)} was drawn.')
         state.current_player.add_card(state, card)
 
 
@@ -98,9 +98,9 @@ def print_neighbors(state, *args):
         print('Action failed: Incorrect number of arguments.')
         return
 
-    print(f'The neighbors of {as_color(city.name, city.color)} are:')
+    print(f'The neighbors of {style(city.name, color=city.color)} are:')
     for neighbor in city.neighbors.values():
-        print(f'{indent}{as_color(neighbor.name, neighbor.color)}')
+        print(f'{indent}{style(neighbor.name, color=neighbor.color)}')
 
 
 def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional # fmt: skip
@@ -117,16 +117,16 @@ def print_status(state, *args):  # TODO: Add way to examine player discard and m
 
     disease_track = state.disease_track
     for color in disease_track.colors:
-        header = f'{as_color(color.upper(), color)} ' 
+        header = f'{style(color.upper(), color=color)} '
         header += f'-- {disease_track.statuses[color].name.upper()}'
         print(header)
         line = disease_track.cubes[color] * '▪'
         line = ' '.join([line[i : i + 5] for i in range(0, len(line), 5)])
-        print(f'{indent}{as_color(line, color)}')
+        print(f'{indent}{style(line, color=color)}')
     print()
 
     for player in state.players.values():
-        print(f'{as_color(player.name.upper(), player.color)} -- {player.role.upper()}')
+        print(f'{style(player.name.upper(), color=player.color)} -- {player.role.upper()}')
         player.print_status(indent)
     print()
 
@@ -134,15 +134,15 @@ def print_status(state, *args):  # TODO: Add way to examine player discard and m
         has_piece = city.station or any(city.cubes.values()) or city.players
         if not has_piece:
             continue
-        header = as_color(city.name.upper(), city.color)
+        header = style(city.name.upper(), color=city.color)
         if city.station:
             header += ' ⌂'
         print(header)
         for color, cubes in city.cubes.items():
             if cubes > 0:
-                print(f'{indent}{as_color(cubes * '▪', color)}')
+                print(f'{indent}{style(cubes * '▪', color=color)}')
         for player_name, player in city.players.items():
-            print(f'{indent}{as_color('▲', player.color)} {player_name}')
+            print(f'{indent}{style('▲', color=player.color)} {player_name}')
     print()
 
     track_prefix = 'Infection rate: '
@@ -583,7 +583,7 @@ def turn_order(player_names, players):
     print()
     print(
         f'{max_player} has the card with the highest population: '
-        f'{as_color(max_card.name, max_card.color)} ({max_pop:,})'
+        f'{style(max_card.name, color=max_card.color)} ({max_pop:,})'
     )
     print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]
