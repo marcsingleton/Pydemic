@@ -115,12 +115,14 @@ def print_status(state, *args):  # TODO: Add way to examine player discard and m
     print()
     print(f'-------------------- TURN {state.turn_count} --------------------')
 
-    for disease in state.diseases.values():
-        color = disease.color
-        cube_string = disease.cubes * '▪'
-        cube_string = ' '.join([cube_string[i : i + 5] for i in range(0, len(cube_string), 5)])
-        print(f'{as_color(color.upper(), color)} -- {disease.status.name.upper()}')
-        print(f'{indent}{as_color(cube_string, color)}')
+    disease_track = state.disease_track
+    for color in disease_track.colors:
+        header = f'{as_color(color.upper(), color)} ' 
+        header += f'-- {disease_track.statuses[color].name.upper()}'
+        print(header)
+        line = disease_track.cubes[color] * '▪'
+        line = ' '.join([line[i : i + 5] for i in range(0, len(line), 5)])
+        print(f'{indent}{as_color(line, color)}')
     print()
 
     for player in state.players.values():
@@ -386,9 +388,7 @@ def main():
         city.neighbors = neighbors
 
     # Instantiate diseases
-    diseases = {}
-    for color in colors:
-        diseases[color] = pieces.Disease(color, cube_num)
+    disease_track = pieces.DiseaseTrack(colors, cube_num)
 
     # Instantiate players
     role_list = list(roles.roles)
@@ -411,7 +411,7 @@ def main():
     # Combine all pieces, cards, and players into state
     state = GameState(
         cities,
-        diseases,
+        disease_track,
         players,
         player_order,
         player_deck,
@@ -444,7 +444,7 @@ def main():
     state.player_deck.add_epidemics(epidemic_num)
 
     # PLAY
-    while True:  # TODO: Implement win condition
+    while True:
         # Turn setup
         state.draw_count = 2
         state.infect_count = state.infection_track.rate

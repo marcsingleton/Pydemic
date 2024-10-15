@@ -248,7 +248,7 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in state.diseases:
+        if args[0] not in state.disease_track.colors:
             print('Action failed: Nonexistent disease specified.')
             return
 
@@ -307,7 +307,7 @@ class Player:
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in state.diseases:
+        if args[0] not in state.disease_track.colors:
             print('Action failed: Nonexistent disease specified.')
             return
         if not self.city.station:
@@ -332,7 +332,7 @@ class Player:
                     print('Card not found.')
 
         try:
-            state.diseases[args[0]].set_cured()
+            state.disease_track.set_cured(args[0])
         except exceptions.PropertyError as error:
             print('Action failed:', error)
         else:
@@ -560,15 +560,15 @@ class Medic(Player):
         self._city = target
         if target is not None:  # Do not attempt to set parameters while instantiating players
             target.players[self.name] = self
-            for disease in state.diseases.values():
-                if not disease.is_active():
+            for color in state.disease_track.colors:
+                if not state.disease_track.is_active(color):
                     try:
-                        target.remove_disease(state, disease.color)
+                        target.remove_disease(state, color)
                     except exceptions.PropertyError:
                         pass
 
     def immunity(self, state, city, color):
-        if self.city and city == self.city and not state.diseases[color].is_active():
+        if self.city and city == self.city and not state.disease_track.is_active(color):
             return True
         else:
             return False
@@ -581,7 +581,7 @@ class Medic(Player):
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
             return
-        if args[0] not in state.diseases:
+        if args[0] not in state.disease_track.colors:
             print('Action failed: Nonexistent disease specified.')
             return
 

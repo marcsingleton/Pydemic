@@ -21,7 +21,7 @@ class City:
             raise exceptions.PropertyError(f'{as_color(self.name, self.color)} is immune.')
 
         delta = min(n, self.cube_max - self.cubes[color])
-        state.diseases[color].remove(delta)
+        state.disease_track.remove(color, delta)
         self.cubes[color] += delta
         if verbose:
             if delta == 0:
@@ -57,13 +57,13 @@ class City:
                 f'{as_color(self.name, self.color)} is not infected with {as_color(color, color)}.'
             )
 
-        if state.diseases[color].is_cured():
+        if state.disease_track.is_cured(color):
             n = self.cubes[color]
             self.cubes[color] -= n
-            state.diseases[color].add(n)
+            state.disease_track.add(color, n)
         else:
             self.cubes[color] -= 1
-            state.diseases[color].add(1)
+            state.disease_track.add(color, 1)
 
     def add_station(self, state):
         if self.station:
@@ -98,44 +98,44 @@ class DiseaseState(Enum):
     ERADICATED = auto()
 
 
-class Disease:
-    def __init__(self, color, cube_num=24):
-        self.color = color
-        self.cubes = cube_num
-        self.status = DiseaseState.ACTIVE
+class DiseaseTrack:
+    def __init__(self, colors, cube_num=24):
+        self.colors = sorted(set(colors))
+        self.cubes = {color: cube_num for color in colors}
+        self.statuses = {color: DiseaseState.ACTIVE for color in colors}
         self.cube_num = cube_num
 
-    def add(self, n=1):
-        self.cubes += n
-        if self.is_cured() and self.cubes == self.cube_num:
-            self.status = DiseaseState.ERADICATED
+    def add(self, color, n=1):
+        self.cubes[color] += n
+        if self.is_cured(color) and self.cubes[color] == self.cube_num:
+            self.statuses[color] = DiseaseState.ERADICATED
 
-    def remove(self, n=1):
-        if self.status == DiseaseState.ERADICATED:
+    def remove(self, color, n=1):
+        if self.statuses[color] is DiseaseState.ERADICATED:
             raise exceptions.PropertyError(f'{as_color(self.color, self.color)} is eradicated.')
 
-        if self.cubes >= n:
-            self.cubes -= n
+        if self.cubes[color] >= n:
+            self.cubes[color] -= n
         else:
             raise exceptions.GameOver(f'Depleted {as_color(self.color, self.color)} disease cubes.')
 
-    def set_cured(self):
-        if not self.is_active():
+    def set_cured(self, color):
+        if not self.is_active(color):
             raise exceptions.PropertyError(f'{as_color(self.color, self.color)} already cured.')
 
-        if self.cubes == self.cube_num:
-            self.status = DiseaseState.ERADICATED
+        if self.cubes[color] == self.cube_num:
+            self.statuses[color] = DiseaseState.ERADICATED
         else:
-            self.status = DiseaseState.CURED
+            self.statuses[color] = DiseaseState.CURED
 
-    def is_active(self):
-        return self.status is DiseaseState.ACTIVE
+    def is_active(self, color):
+        return self.statuses[color] is DiseaseState.ACTIVE
 
-    def is_cured(self):
-        return self.status is DiseaseState.CURED
+    def is_cured(self, color):
+        return self.statuses[color] is DiseaseState.CURED
 
-    def is_eradicated(self):
-        return self.status is DiseaseState.ERADICATED
+    def is_eradicated(self, color):
+        return self.statuses[color] is DiseaseState.ERADICATED
 
 
 class OutbreakTrack:

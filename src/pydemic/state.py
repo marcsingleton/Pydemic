@@ -5,7 +5,7 @@ class GameState:
     def __init__(
         self,
         cities,
-        diseases,
+        disease_track,
         players,
         player_order,
         player_deck,
@@ -18,7 +18,7 @@ class GameState:
         infect_count,
     ):
         self.cities = cities
-        self.diseases = diseases
+        self.disease_track = disease_track
         self.players = players
         self.player_order = player_order
         self.player_deck = player_deck
