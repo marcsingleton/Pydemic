@@ -386,7 +386,7 @@ class ContingencyPlanner(Player):
         print(f'{indent}{cards_to_string(self.hand.values())}')
         if self.contingency_slot:
             card = self.contingency_slot
-            print(f'{indent}|{style(card.name, color=card.color)}|')
+            print(f'{indent}|{card.display()}|')
 
     def contingency(self, state, *args):
         """Add a discarded event card to the player's contingency slot.

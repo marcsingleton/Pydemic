@@ -12,6 +12,9 @@ class Card:
         self.type = type
         self.color = None
 
+    def display(self):
+        return style(self.name, color=self.color)
+
 
 class CityCard(Card):
     def __init__(self, city, color, population):
@@ -27,6 +30,9 @@ class EventCard(Card):
         self.color = 'gold'
         self.event = event_func
         self.name = event_name
+
+    def display(self):
+        return style(self.name, color=self.color, bold=True)
 
 
 class InfectionCard(Card):
@@ -55,11 +61,7 @@ class InfectionDeck(Deck):
         try:
             city.add_disease(state, card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
-            print(
-                f'{style(city.name, color=city.color)} was not infected with '
-                f'{style(card.color, color=card.color)}:',
-                error,
-            )
+            print(f'{city.display()} was not infected with {card.display()}:', error)
         self.discard_pile.append(card)
 
     def infect(self, state):

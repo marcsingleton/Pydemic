@@ -33,7 +33,7 @@ def style(text, *, color=None, bold=False, underline=False):
 
 
 def cards_to_string(cards):
-    cards_string = ', '.join([style(card.name, color=card.color) for card in cards])
+    cards_string = ', '.join([card.display() for card in cards])
     return '[' + cards_string + ']'
 
 

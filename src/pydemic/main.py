@@ -40,7 +40,7 @@ def draw_player(state, *args):
         epidemic(state)
         state.player_deck.discard(card)
     else:
-        print(f'{style(card.name, color=card.color)} was drawn.')
+        print(f'{card.display()} was drawn.')
         state.current_player.add_card(state, card)
 
 
@@ -98,9 +98,9 @@ def print_neighbors(state, *args):
         print('Action failed: Incorrect number of arguments.')
         return
 
-    print(f'The neighbors of {style(city.name, color=city.color)} are:')
+    print(f'The neighbors of {city.display()} are:')
     for neighbor in city.neighbors.values():
-        print(f'{indent}{style(neighbor.name, color=neighbor.color)}')
+        print(f'{indent}{neighbor.display()}')
 
 
 def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional # fmt: skip
@@ -583,7 +583,7 @@ def turn_order(player_names, players):
     print()
     print(
         f'{max_player} has the card with the highest population: '
-        f'{style(max_card.name, color=max_card.color)} ({max_pop:,})'
+        f'{max_card.display()} ({max_pop:,})'
     )
     print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]

@@ -18,7 +18,7 @@ class City:
 
     def add_disease(self, state, color, n=1, verbose=True):
         if self.immunity(state, color):
-            raise exceptions.PropertyError(f'{style(self.name, color=self.color)} is immune.')
+            raise exceptions.PropertyError(f'{self.display()} is immune.')
 
         delta = min(n, self.cube_max - self.cubes[color])
         state.disease_track.remove(color, delta)
@@ -26,21 +26,18 @@ class City:
         if verbose:
             if delta == 0:
                 msg = (
-                    f'{style(self.name, color=self.color)} was infected '
-                    f'with {style(color, color=color)}, but no cubes were added.'
+                    f'{self.display()} was infected '
+                    f'with {self.display()}, but no cubes were added.'
                 )
             else:
-                msg = (
-                    f'{style(self.name, color=self.color)} was infected '
-                    f'with {delta} {style(color, color=color)}.'
-                )
+                msg = f'{self.display()} was infected with {delta} {style(color, color=color)}.'
             print(msg)
         if n > delta:
             self.outbreak(state, color)
 
     def outbreak(self, state, color):
         if (self.name, color) not in state.outbreak_track.resolved:
-            print(f'{style(self.name, color=self.color)} outbroke!')
+            print(f'{self.display()} outbroke!')
             state.outbreak_track.resolved.add(
                 (self.name, color)
             )  # Append to resolve first to prevent infinite loop between adjacent cities
@@ -54,8 +51,7 @@ class City:
     def remove_disease(self, state, color):
         if self.cubes[color] == 0:
             raise exceptions.PropertyError(
-                f'{style(self.name, color=self.color)} is not infected '
-                f'with {style(color, color=color)}.'
+                f'{self.display()} is not infected with {style(color, color=color)}.'
             )
 
         if state.disease_track.is_cured(color):
@@ -68,9 +64,7 @@ class City:
 
     def add_station(self, state):
         if self.station:
-            raise exceptions.StationAddError(
-                f'{style(self.name, color=self.color)} has a research station.'
-            )
+            raise exceptions.StationAddError(f'{self.display()} has a research station.')
         elif state.station_count < 1:
             raise exceptions.StationAddError('No research stations are available.')
         else:
@@ -80,7 +74,7 @@ class City:
     def remove_station(self, state):
         if not self.station:
             raise exceptions.StationRemoveError(
-                f'{style(self.name, color=self.color)} does not have a research station.'
+                f'{self.display()} does not have a research station.'
             )
         else:
             self.station = False
@@ -91,6 +85,9 @@ class City:
             if player.immunity(state, self, color):
                 return True
         return False
+
+    def display(self):
+        return style(self.name, color=self.color)
 
 
 class DiseaseState(Enum):
