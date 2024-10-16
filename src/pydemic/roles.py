@@ -444,7 +444,7 @@ class Dispatcher(Player):
 
         Including a player as an optional second argument will move that player.
 
-        syntax: ground_dispatch CITY [PLAYER]
+        syntax: ground CITY [PLAYER]
         """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
@@ -466,7 +466,7 @@ class Dispatcher(Player):
         Including a player as an optional second argument will move that player.
         The city card will, however, be discarded from your hand.
 
-        syntax: direct_dispatch CITY_CARD [PLAYER]
+        syntax: direct CITY_CARD [PLAYER]
         """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
@@ -490,7 +490,7 @@ class Dispatcher(Player):
         Including a player as an optional second argument will move that player.
         The city card will, however, be discarded from your hand.
 
-        syntax: charter_dispatch CITY [PLAYER]
+        syntax: charter CITY [PLAYER]
         """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
@@ -513,7 +513,7 @@ class Dispatcher(Player):
 
         Including a player as an optional second argument will move that player.
 
-        syntax: shuttle_dispatch CITY [PLAYER]
+        syntax: shuttle CITY [PLAYER]
         """
         if len(args) != 1:
             print('Action failed: Incorrect number of arguments.')
