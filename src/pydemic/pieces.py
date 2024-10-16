@@ -110,18 +110,18 @@ class DiseaseTrack:
 
     def remove(self, color, n=1):
         if self.statuses[color] is DiseaseState.ERADICATED:
-            raise exceptions.PropertyError(f'{style(self.color, color=self.color)} is eradicated.')
+            raise exceptions.PropertyError(f'{style(color, color=color)} is eradicated.')
 
         if self.cubes[color] >= n:
             self.cubes[color] -= n
         else:
             raise exceptions.GameOverLose(
-                f'The disease track ran out of {style(self.color, color=self.color)} cubes.'
+                f'The disease track ran out of {style(color, color=color)} cubes.'
             )
 
     def set_cured(self, color):
         if not self.is_active(color):
-            raise exceptions.PropertyError(f'{style(self.color, color=self.color)} already cured.')
+            raise exceptions.PropertyError(f'{style(color, color=color)} already cured.')
 
         if self.cubes[color] == self.cube_num:
             self.statuses[color] = DiseaseState.ERADICATED
