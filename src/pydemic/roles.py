@@ -672,16 +672,16 @@ class OperationsExpert(Player):
                     return
                 city = state.cities[remove_args[0]]
                 try:
-                    city.remove_station()
+                    city.remove_station(state)
                 except exceptions.StationRemoveError as error:
                     print('Action failed:', error)
                     return
 
         try:
-            self.city.add_station()
+            self.city.add_station(state)
         except exceptions.StationAddError as error:
             if city is not None:  # Return "borrowed station"
-                city.add_station()
+                city.add_station(state)
             print('Action failed:', error)
         else:
             self.action_count -= 1
