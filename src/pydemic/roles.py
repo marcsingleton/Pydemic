@@ -346,6 +346,9 @@ class Player:
 
         syntax: pass
         """
+        if len(args) != 0:
+            print('Action failed: Incorrect number of arguments.')
+            return
         self.action_count -= 1
         print('Action succeeded!')
 
