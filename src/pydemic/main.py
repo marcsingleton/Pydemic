@@ -103,65 +103,74 @@ def print_neighbors(state, *args):
         print(f'{indent}{neighbor.display()}')
 
 
-def print_status(state, *args):  # TODO: Add way to examine player discard and make infection discard optional # fmt: skip
+def print_status(state, *args):
     """Display the current state of the game.
 
-    syntax: status
+    syntax: status [player_discard|infection_discard]
     """
-    if len(args) != 0:
+    if len(args) == 0:
+        print()
+        print(f'-------------------- TURN {state.turn_count} --------------------')
+
+        disease_track = state.disease_track
+        for color in disease_track.colors:
+            header = f'{style(color.upper(), color=color)} '
+            header += f'-- {disease_track.statuses[color].name.upper()}'
+            print(header)
+            line = disease_track.cubes[color] * '▪'
+            line = ' '.join([line[i : i + 5] for i in range(0, len(line), 5)])
+            print(f'{indent}{style(line, color=color)}')
+        print()
+
+        for player in state.players.values():
+            print(f'{style(player.name.upper(), color=player.color)} -- {player.role.upper()}')
+            player.print_status(indent)
+        print()
+
+        for city in state.cities.values():
+            has_piece = city.station or any(city.cubes.values()) or city.players
+            if not has_piece:
+                continue
+            header = style(city.name.upper(), color=city.color)
+            if city.station:
+                header += ' ⌂'
+            print(header)
+            for color, cubes in city.cubes.items():
+                if cubes > 0:
+                    print(f'{indent}{style(cubes * '▪', color=color)}')
+            for player_name, player in city.players.items():
+                print(f'{indent}{style('▲', color=player.color)} {player_name}')
+        print()
+
+        track_prefix = 'Infection rate: '
+        print(track_prefix + '--'.join([str(value) for value in state.infection_track.track]))
+        print((len(track_prefix) + 3 * state.infection_track.position) * ' ' + '^')
+        print()
+
+        track_prefix = 'Outbreaks: '
+        print(track_prefix + '--'.join([str(value) for value in range(state.outbreak_track.max)]))
+        print((len(track_prefix) + 3 * state.outbreak_track.count) * ' ' + '^')
+        print()
+
+        card_string = len(state.player_deck.draw_pile) * '❘'
+        card_string = ' '.join([card_string[i : i + 5] for i in range(0, len(card_string), 5)])
+        print('Player deck:', card_string)
+        print()
+
+        print(f'Turn: {state.current_player.name}')
+    elif len(args) == 1:
+        if args[0] == 'player_discard':
+            print('PLAYER DISCARD')
+            for card in state.player_deck.discard_pile:
+                print(f'{indent}{card.display()}')
+        elif args[0] == 'infection_discard':
+            print('INFECTION DISCARD')
+            for card in state.infection_deck.discard_pile:
+                print(f'{indent}{card.display()}')
+        else:
+            print(f'Action failed: Argument is not "player_discard" or "infection_discard."')
+    else:
         print(f'Action failed: Incorrect number of arguments.')
-        return
-
-    print()
-    print(f'-------------------- TURN {state.turn_count} --------------------')
-
-    disease_track = state.disease_track
-    for color in disease_track.colors:
-        header = f'{style(color.upper(), color=color)} '
-        header += f'-- {disease_track.statuses[color].name.upper()}'
-        print(header)
-        line = disease_track.cubes[color] * '▪'
-        line = ' '.join([line[i : i + 5] for i in range(0, len(line), 5)])
-        print(f'{indent}{style(line, color=color)}')
-    print()
-
-    for player in state.players.values():
-        print(f'{style(player.name.upper(), color=player.color)} -- {player.role.upper()}')
-        player.print_status(indent)
-    print()
-
-    for city in state.cities.values():
-        has_piece = city.station or any(city.cubes.values()) or city.players
-        if not has_piece:
-            continue
-        header = style(city.name.upper(), color=city.color)
-        if city.station:
-            header += ' ⌂'
-        print(header)
-        for color, cubes in city.cubes.items():
-            if cubes > 0:
-                print(f'{indent}{style(cubes * '▪', color=color)}')
-        for player_name, player in city.players.items():
-            print(f'{indent}{style('▲', color=player.color)} {player_name}')
-    print()
-
-    track_prefix = 'Infection rate: '
-    print(track_prefix + '--'.join([str(value) for value in state.infection_track.track]))
-    print((len(track_prefix) + 3 * state.infection_track.position) * ' ' + '^')
-    print()
-
-    track_prefix = 'Outbreaks: '
-    print(track_prefix + '--'.join([str(value) for value in range(state.outbreak_track.max)]))
-    print((len(track_prefix) + 3 * state.outbreak_track.count) * ' ' + '^')
-    print()
-
-    card_string = len(state.player_deck.draw_pile) * '❘'
-    card_string = ' '.join([card_string[i : i + 5] for i in range(0, len(card_string), 5)])
-    print('Player deck:', card_string)
-    print('Infection discard:', cards_to_string(state.infection_deck.discard_pile))
-    print()
-
-    print(f'Turn: {state.current_player.name}')
 
 
 # Flow control
