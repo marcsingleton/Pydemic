@@ -4,7 +4,7 @@ import abc
 from random import shuffle
 
 import pydemic.exceptions as exceptions
-from pydemic.display import style, cards_to_string, prompt_prefix
+from pydemic.display import style, cards_to_string, indent, prompt_prefix
 
 
 class Card:
@@ -163,7 +163,10 @@ def one_quiet_night(state):
     state.infect_count = 0
 
 
-def resilient_population(state):  # TODO: Show discard pile
+def resilient_population(state):
+    print('PLAYER DISCARD')
+    for card in state.player_deck.discard_pile:
+        print(f'{indent}{card.display()}')
     args = input(
         f'{prompt_prefix}Enter a city to remove from the infection deck discard pile: '
     ).split()
