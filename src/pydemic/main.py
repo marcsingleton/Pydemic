@@ -513,7 +513,7 @@ def main():
         state.turn_count += 1
 
 
-def make_completer(commands):
+def make_completer(commands):  # TODO: Make completer context sensitive
     def completer(text, state):
         matches = [command for command in commands if command.startswith(text)]
         if state < len(matches):
