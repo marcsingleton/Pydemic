@@ -27,7 +27,7 @@ class City:
             if delta == 0:
                 msg = (
                     f'{self.display()} was infected '
-                    f'with {self.display()}, but no cubes were added.'
+                    f'with {style(color, color=color)}, but no cubes were added.'
                 )
             else:
                 msg = f'{self.display()} was infected with {delta} {style(color, color=color)}.'
