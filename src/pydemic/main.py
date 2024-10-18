@@ -143,12 +143,14 @@ def print_status(state, *args):
         print()
 
         track_prefix = 'Infection rate: '
-        print(track_prefix + '--'.join([str(value) for value in state.infection_track.track]))
+        track_string = '--'.join([str(value) for value in state.infection_track.track])
+        print(track_prefix + track_string)
         print((len(track_prefix) + 3 * state.infection_track.position) * ' ' + '^')
         print()
 
         track_prefix = 'Outbreaks: '
-        print(track_prefix + '--'.join([str(value) for value in range(state.outbreak_track.max)]))
+        track_string = '--'.join([str(value) for value in range(state.outbreak_track.max)]) + '--X'
+        print(track_prefix + track_string)
         print((len(track_prefix) + 3 * state.outbreak_track.count) * ' ' + '^')
         print()
 
