@@ -392,7 +392,7 @@ def main():
     for city_name, attrs in map.items():
         cities[city_name] = pieces.City(city_name, attrs.color, colors)
         city_cards.append(cards.CityCard(city_name, attrs.color, attrs.population))
-        infection_cards.append(cards.InfectionCard(city_name, attrs.color))
+        infection_cards.append(cards.Card('infection', city_name, attrs.color))
     for city_name, attrs in map.items():
         city = cities[city_name]
         neighbors = {neighbor_name: cities[neighbor_name] for neighbor_name in attrs.neighbors}

@@ -8,38 +8,28 @@ from pydemic.display import style, cards_to_string, indent, prompt_prefix
 
 
 class Card:
-    def __init__(self, type):
+    def __init__(self, type, name=None, color=None):
         self.type = type
-        self.color = None
+        self.name = name
+        self.color = color
 
     def display(self):
         return style(self.name, color=self.color)
 
 
 class CityCard(Card):
-    def __init__(self, city, color, population):
-        super().__init__('city')
-        self.color = color
-        self.name = city
+    def __init__(self, city_name, color, population):
+        super().__init__('city', city_name, color)
         self.population = population
 
 
 class EventCard(Card):
     def __init__(self, event_name, event_func):
-        super().__init__('event')
-        self.color = 'gold'
+        super().__init__('event', event_name, 'gold')
         self.event = event_func
-        self.name = event_name
 
     def display(self):
         return style(self.name, color=self.color, bold=True)
-
-
-class InfectionCard(Card):
-    def __init__(self, city, color):
-        super().__init__('infection')
-        self.color = color
-        self.name = city
 
 
 class Deck(abc.ABC):
@@ -91,7 +81,7 @@ class PlayerDeck(Deck):
     def add_epidemics(self, epidemic_num):
         subdecks = [self.draw_pile[i::epidemic_num] for i in range(epidemic_num)]
         for deck in subdecks:
-            deck.append(Card('epidemic'))
+            deck.append(Card('epidemic', 'epidemic', 'lime'))
             shuffle(deck)
         self.draw_pile = [card for subdeck in subdecks for card in subdeck]
 
@@ -107,7 +97,7 @@ class PlayerDeck(Deck):
     def retrieve(self, card_name):
         idx = False
         for i, card in enumerate(self.discard_pile):
-            if hasattr(card, 'name') and card.name == card_name:  # Epidemic cards don't have names
+            if card.name == card_name:
                 idx = i
                 break
         if idx is not False:
