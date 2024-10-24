@@ -1,7 +1,7 @@
 """A text-based implementation of the board game Pandemic."""
 
 import readline
-from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
+from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, Namespace
 from inspect import cleandoc
 from random import shuffle
 from sys import exit
@@ -17,7 +17,6 @@ from pydemic.state import GameState
 from pydemic.version import __version__
 
 
-# FUNCTIONS
 # Generic commands
 def draw_infect(state, *args):
     """Draw a card from the infection deck.
@@ -177,16 +176,54 @@ def print_status(state, *args):
 
 # Flow control
 def main():
-    # CONSTANTS
     readline.parse_and_bind('tab: menu-complete')
     readline.set_completer(lambda x: None)
+
     player_min, player_max = 2, 4
     player_min_word, player_max_word = 'two', 'four'
     epidemic_min, epidemic_max = 4, 6
     epidemic_min_word, epidemic_max_word = 'four', 'six'
 
-    # PARSING
-    # Add arguments
+    args = parse_args(
+        player_min_word,
+        player_max_word,
+        epidemic_min_word,
+        epidemic_max_word,
+    )
+
+    args = check_args(
+        args,
+        player_min,
+        player_max,
+        player_min_word,
+        player_max_word,
+        epidemic_min,
+        epidemic_max,
+        epidemic_min_word,
+        epidemic_max_word,
+    )
+
+    state = initialize(
+        args,
+        player_min,
+        player_max,
+        player_min_word,
+        player_max_word,
+        epidemic_min,
+        epidemic_max,
+        epidemic_min_word,
+        epidemic_max_word,
+    )
+
+    game_loop(state)
+
+
+def parse_args(
+    player_min_word,
+    player_max_word,
+    epidemic_min_word,
+    epidemic_max_word,
+):
     parser = ArgumentParser(
         prog='pydemic',
         description='A text-based implementation of the board game Pandemic.',
@@ -254,24 +291,40 @@ def main():
         help='the total number of stations',
     )
     args = parser.parse_args()
+    return args
 
-    # Parameter checks
+
+def check_args(
+    args,
+    player_min,
+    player_max,
+    player_min_word,
+    player_max_word,
+    epidemic_min,
+    epidemic_max,
+    epidemic_min_word,
+    epidemic_max_word,
+):
+    new_args = Namespace()
+
     # Get player settings
-    player_num = args.player_num
-    player_names = args.player_names
-    if player_names is not None:
-        player_names = player_names.strip(',').split(',')
-        player_num = len(player_names)
-        if player_num < player_min or player_num > player_max:
+    new_args.player_num = args.player_num
+    new_args.player_names = args.player_names
+    if new_args.player_names is not None:
+        new_args.player_names = new_args.player_names.strip(',').split(',')
+        new_args.player_num = len(new_args.player_names)
+        if new_args.player_num < player_min or new_args.player_num > player_max:
             print(
                 f'The number of entries in argument player_names is not between '
                 f'{player_min_word} and {player_max_word}. Quitting...'
             )
             exit(1)
-        if len(set(player_names)) != player_num:
+        if len(set(new_args.player_names)) != new_args.player_num:
             print('Argument player_names are not unique. Quitting...')
             exit(1)
-    elif player_num is not None and (player_num < player_min or player_num > player_max):
+    elif new_args.player_num is not None and (
+        new_args.player_num < player_min or new_args.player_num > player_max
+    ):
         print(
             f'Argument player_num must be between {player_min_word} and {player_max_word}. '
             f'Quitting...'
@@ -279,8 +332,10 @@ def main():
         exit(1)
 
     # Get epidemic settings
-    epidemic_num = args.epidemic_num
-    if epidemic_num is not None and (epidemic_num < epidemic_min or epidemic_num > epidemic_max):
+    new_args.epidemic_num = args.epidemic_num
+    if new_args.epidemic_num is not None and (
+        new_args.epidemic_num < epidemic_min or new_args.epidemic_num > epidemic_max
+    ):
         print(
             f'Argument epidemic_num must be between '
             f'{epidemic_min_word} and {epidemic_max_word}. Quitting...'
@@ -291,17 +346,17 @@ def main():
     if args.map not in maps.maps:
         print(f'Argument map {args.map} is not in library. Quitting...')
         exit(1)
-    map = maps.maps[args.map]
-    if args.start_city not in map:
+    new_args.map = maps.maps[args.map]
+    if args.start_city not in new_args.map:
         print(f'Argument start_city {args.start_city} not in map {args.map}. Quitting...')
         exit(1)
-    start_city = args.start_city
+    new_args.start_city = args.start_city
 
     # Get outbreak and infection track settings
     if args.outbreak_max < 0:
         print(f'Argument outbreak_max must be non-negative. Quitting...')
-    outbreak_max = args.outbreak_max
-    infection_seq = []
+    new_args.outbreak_max = args.outbreak_max
+    new_args.infection_seq = []
     for entry in args.infection_seq.split(','):
         try:
             value = int(entry)
@@ -311,26 +366,41 @@ def main():
         if value <= 0:
             print('Non-positive entry found in argument infection_seq. Quitting...')
             exit(1)
-        infection_seq.append(value)
+        new_args.infection_seq.append(value)
 
     # Get cube and station number settings
     if args.cube_num < 1:
         print('Argument cube_num must be positive. Quitting')
         exit(1)
-    cube_num = args.cube_num
+    new_args.cube_num = args.cube_num
     if args.station_num < 1:
         print('Argument station_num must be positive. Quitting...')
         exit(1)
-    station_num = args.station_num
+    new_args.station_num = args.station_num
 
-    # INITIALIZATION
+    return new_args
+
+
+def initialize(
+    args,
+    player_min,
+    player_max,
+    player_min_word,
+    player_max_word,
+    epidemic_min,
+    epidemic_max,
+    epidemic_min_word,
+    epidemic_max_word,
+    verbose=True,
+):
     # Print greeting
-    print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
+    if verbose:
+        print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
 
     # player_num and player_names dialog(s)
-    if player_num is None:
+    if args.player_num is None:
         print()
-        while not player_num:
+        while not args.player_num:
             text = input(
                 f'{prompt_prefix}Enter a number between {player_min_word} and {player_max_word} '
                 f'for the number of players: '
@@ -346,24 +416,24 @@ def main():
                     f'Please try again.'
                 )
                 continue
-            player_num = value
-    if player_names is None:
+            args.player_num = value
+    if args.player_names is None:
         print()
         i = 1
-        player_names = []
-        while i < player_num + 1:
+        args.player_names = []
+        while i < args.player_num + 1:
             text = input(f"{prompt_prefix}Enter player {i}'s name: ")
-            if text in player_names:
+            if text in args.player_names:
                 print('Name is not unique. Please try again.')
             else:
-                player_names.append(text)
+                args.player_names.append(text)
                 i += 1
-    start_hand_num = 6 - player_num
+    start_hand_num = 6 - args.player_num
 
     # epidemic_num dialog
-    if epidemic_num is None:
+    if args.epidemic_num is None:
         print()
-        while not epidemic_num:
+        while not args.epidemic_num:
             text = input(
                 f'{prompt_prefix}'
                 f'Enter a number between {epidemic_min_word} and {epidemic_max_word} '
@@ -380,44 +450,44 @@ def main():
                     f'{epidemic_min_word} and {epidemic_max_word}. Please try again.'
                 )
                 continue
-            epidemic_num = value
+            args.epidemic_num = value
 
     # Count unique disease colors
-    colors = set([attrs.color for attrs in map.values()])
+    colors = set([attrs.color for attrs in args.map.values()])
 
     # Instantiate cities and associated cards
     cities = {}
     city_cards = []
     infection_cards = []
-    for city_name, attrs in map.items():
+    for city_name, attrs in args.map.items():
         cities[city_name] = pieces.City(city_name, attrs.color, colors)
         city_cards.append(cards.CityCard(city_name, attrs.color, attrs.population))
         infection_cards.append(cards.Card('infection', city_name, attrs.color))
-    for city_name, attrs in map.items():
+    for city_name, attrs in args.map.items():
         city = cities[city_name]
         neighbors = {neighbor_name: cities[neighbor_name] for neighbor_name in attrs.neighbors}
         city.neighbors = neighbors
 
     # Instantiate diseases
-    disease_track = pieces.DiseaseTrack(colors, cube_num)
+    disease_track = pieces.DiseaseTrack(colors, args.cube_num)
 
     # Instantiate players
     role_list = list(roles.roles)
     shuffle(role_list)
 
     players = {}
-    for player_name in player_names:
+    for player_name in args.player_names:
         role = role_list.pop()
         players[player_name] = roles.roles[role](player_name)
-    player_order = player_names  # Use initial order of names until starting hand is dealt
+    player_order = args.player_names  # Use initial order of names until starting hand is dealt
 
     # Instantiate decks
     player_deck = cards.PlayerDeck(city_cards + cards.event_cards)
     infection_deck = cards.InfectionDeck(infection_cards)
 
     # Instantiate trackers
-    outbreak_track = pieces.OutbreakTrack(outbreak_max)
-    infection_track = pieces.InfectionTrack(infection_seq)
+    outbreak_track = pieces.OutbreakTrack(args.outbreak_max)
+    infection_track = pieces.InfectionTrack(args.infection_seq)
 
     # Combine all pieces, cards, and players into state
     state = GameState(
@@ -429,14 +499,14 @@ def main():
         infection_deck,
         outbreak_track,
         infection_track,
-        station_num,
+        args.station_num,
         turn_count=0,
         draw_count=0,
         infect_count=0,
     )
 
     # Add research station to start city
-    state.cities[start_city].add_station(state)
+    state.cities[args.start_city].add_station(state)
 
     # Infect cities
     for _ in range(3):
@@ -445,16 +515,40 @@ def main():
 
     # Set initial positions, hands, and order
     for player in state.players.values():
-        player.set_city(state, state.cities[start_city])  # Set separately from instantiation so special abilities do not interfere with setup # fmt: skip
+        player.set_city(state, state.cities[args.start_city])  # Set separately from instantiation so special abilities do not interfere with setup # fmt: skip
         starting_cards = [state.player_deck.draw() for _ in range(start_hand_num)]
         for card in starting_cards:
             player.add_card(state, card)
-    state.player_order = turn_order(player_names, players)
+    state.player_order = get_player_order(args.player_names, players)
 
     # Add epidemics to deck
-    state.player_deck.add_epidemics(epidemic_num)
+    state.player_deck.add_epidemics(args.epidemic_num)
 
-    # PLAY
+    return state
+
+
+def get_player_order(player_names, players):
+    max_pop = 0
+    max_card = ''
+    max_player = ''
+    for name in player_names:
+        player = players[name]
+        for card in player.hand.values():
+            if isinstance(card, cards.CityCard) and card.population > max_pop:
+                max_pop = card.population
+                max_card = card
+                max_player = player.name
+    idx = player_names.index(max_player)
+    print()
+    print(
+        f'{max_player} has the card with the highest population: '
+        f'{max_card.display()} ({max_pop:,})'
+    )
+    print(f'{max_player} will start the turn order.')
+    return player_names[idx:] + player_names[:idx]
+
+
+def game_loop(state):
     while True:
         # Turn setup
         state.draw_count = 2
@@ -515,6 +609,32 @@ def main():
         state.turn_count += 1
 
 
+def epidemic(state):
+    # Increase
+    state.infection_track.increment()
+
+    # Infect
+    state.infection_deck.infect(state)
+
+    # Play Resilient Population event if available
+    # This isn't the most flexible approach, but Resilient Population is the only game element that
+    # has this behavior, so it's okay as a one-off. An event model where epidemic listeners
+    # register with an Epidemic object would generalize this code if multiple game elements needed
+    # to react to different parts of an epidemic.
+    for player in state.players.values():
+        if player.has_event('resilient_population'):
+            text = input(
+                f'{prompt_prefix}Resilient Population event card detected in hand. '
+                f'Play now? (y/n) '
+            ).lower()
+            if text == 'y' or text == 'yes':
+                player.event(state, 'resilient_population')
+
+    # Intensify
+    state.infection_deck.intensify()
+
+
+# Interface
 def make_completer(commands):  # TODO: Make completer context sensitive
     def completer(text, state):
         matches = [command for command in commands if command.startswith(text)]
@@ -577,49 +697,3 @@ def help(commands, *args):
             'Use "help" for an overview of all currently available commands '
             'or "help COMMAND" for more information on a specific command.'
         )
-
-
-def turn_order(player_names, players):
-    max_pop = 0
-    max_card = ''
-    max_player = ''
-    for name in player_names:
-        player = players[name]
-        for card in player.hand.values():
-            if isinstance(card, cards.CityCard) and card.population > max_pop:
-                max_pop = card.population
-                max_card = card
-                max_player = player.name
-    idx = player_names.index(max_player)
-    print()
-    print(
-        f'{max_player} has the card with the highest population: '
-        f'{max_card.display()} ({max_pop:,})'
-    )
-    print(f'{max_player} will start the turn order.')
-    return player_names[idx:] + player_names[:idx]
-
-
-def epidemic(state):
-    # Increase
-    state.infection_track.increment()
-
-    # Infect
-    state.infection_deck.infect(state)
-
-    # Play Resilient Population event if available
-    # This isn't the most flexible approach, but Resilient Population is the only game element that
-    # has this behavior, so it's okay as a one-off. An event model where epidemic listeners
-    # register with an Epidemic object would generalize this code if multiple game elements needed
-    # to react to different parts of an epidemic.
-    for player in state.players.values():
-        if player.has_event('resilient_population'):
-            text = input(
-                f'{prompt_prefix}Resilient Population event card detected in hand. '
-                f'Play now? (y/n) '
-            ).lower()
-            if text == 'y' or text == 'yes':
-                player.event(state, 'resilient_population')
-
-    # Intensify
-    state.infection_deck.intensify()
