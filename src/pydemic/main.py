@@ -8,6 +8,7 @@ from sys import exit
 from time import sleep
 
 import pydemic.cards as cards
+import pydemic.constants as constants
 import pydemic.exceptions as exceptions
 import pydemic.maps as maps
 import pydemic.pieces as pieces
@@ -179,10 +180,10 @@ def main():
     readline.parse_and_bind('tab: menu-complete')
     readline.set_completer(lambda x: None)
 
-    player_min, player_max = 2, 4
-    player_min_word, player_max_word = 'two', 'four'
-    epidemic_min, epidemic_max = 4, 6
-    epidemic_min_word, epidemic_max_word = 'four', 'six'
+    player_min, player_max = constants.player_min, constants.player_max
+    player_min_word, player_max_word = constants.player_min_word, constants.player_max_word
+    epidemic_min, epidemic_max = constants.epidemic_min, constants.epidemic_max
+    epidemic_min_word, epidemic_max_word = constants.epidemic_min_word, constants.epidemic_max_word
 
     args = parse_args(
         player_min_word,
