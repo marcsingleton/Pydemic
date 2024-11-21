@@ -193,7 +193,7 @@ def main():
         constants.station_num,
     )
 
-    args = check_args(
+    check_args(
         args,
         constants.player_min,
         constants.player_max,
@@ -317,25 +317,21 @@ def check_args(
     epidemic_min_word,
     epidemic_max_word,
 ):
-    new_args = Namespace()
-
     # Get player settings
-    new_args.player_num = args.player_num
-    new_args.player_names = args.player_names
-    if new_args.player_names is not None:
-        new_args.player_names = new_args.player_names.strip(',').split(',')
-        new_args.player_num = len(new_args.player_names)
-        if new_args.player_num < player_min or new_args.player_num > player_max:
+    if args.player_names is not None:
+        args.player_names = args.player_names.strip(',').split(',')
+        args.player_num = len(args.player_names)
+        if args.player_num < player_min or args.player_num > player_max:
             print(
                 f'The number of entries in argument player_names is not between '
                 f'{player_min_word} and {player_max_word}. Quitting...'
             )
             exit(1)
-        if len(set(new_args.player_names)) != new_args.player_num:
+        if len(set(args.player_names)) != args.player_num:
             print('Argument player_names are not unique. Quitting...')
             exit(1)
-    elif new_args.player_num is not None and (
-        new_args.player_num < player_min or new_args.player_num > player_max
+    elif args.player_num is not None and (
+        args.player_num < player_min or args.player_num > player_max
     ):
         print(
             f'Argument player_num must be between {player_min_word} and {player_max_word}. '
@@ -344,9 +340,8 @@ def check_args(
         exit(1)
 
     # Get epidemic settings
-    new_args.epidemic_num = args.epidemic_num
-    if new_args.epidemic_num is not None and (
-        new_args.epidemic_num < epidemic_min or new_args.epidemic_num > epidemic_max
+    if args.epidemic_num is not None and (
+        args.epidemic_num < epidemic_min or args.epidemic_num > epidemic_max
     ):
         print(
             f'Argument epidemic_num must be between '
@@ -358,17 +353,15 @@ def check_args(
     if args.map not in maps.maps:
         print(f'Argument map {args.map} is not in library. Quitting...')
         exit(1)
-    new_args.map = maps.maps[args.map]
-    if args.start_city not in new_args.map:
+    args.map = maps.maps[args.map]
+    if args.start_city not in args.map:
         print(f'Argument start_city {args.start_city} not in map {args.map}. Quitting...')
         exit(1)
-    new_args.start_city = args.start_city
 
     # Get outbreak and infection track settings
     if args.outbreak_max < 0:
         print(f'Argument outbreak_max must be non-negative. Quitting...')
-    new_args.outbreak_max = args.outbreak_max
-    new_args.infection_seq = []
+    infection_seq = []
     for entry in args.infection_seq.split(','):
         try:
             value = int(entry)
@@ -378,19 +371,16 @@ def check_args(
         if value <= 0:
             print('Non-positive entry found in argument infection_seq. Quitting...')
             exit(1)
-        new_args.infection_seq.append(value)
+        infection_seq.append(value)
+    args.infection_seq = infection_seq
 
     # Get cube and station number settings
     if args.cube_num < 1:
         print('Argument cube_num must be positive. Quitting')
         exit(1)
-    new_args.cube_num = args.cube_num
     if args.station_num < 1:
         print('Argument station_num must be positive. Quitting...')
         exit(1)
-    new_args.station_num = args.station_num
-
-    return new_args
 
 
 def dialog_args(
