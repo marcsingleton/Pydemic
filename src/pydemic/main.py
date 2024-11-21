@@ -205,7 +205,7 @@ def main():
         constants.epidemic_max_word,
     )
 
-    state = initialize(
+    state = initialize_state(
         args,
         constants.player_min,
         constants.player_max,
@@ -216,6 +216,8 @@ def main():
         constants.epidemic_min_word,
         constants.epidemic_max_word,
     )
+
+    initialize_game(state, args)
 
     game_loop(state)
 
@@ -389,7 +391,7 @@ def check_args(
     return new_args
 
 
-def initialize(
+def initialize_state(
     args,
     player_min,
     player_max,
@@ -436,7 +438,6 @@ def initialize(
             else:
                 args.player_names.append(text)
                 i += 1
-    start_hand_num = 6 - args.player_num
 
     # epidemic_num dialog
     if args.epidemic_num is None:
@@ -513,6 +514,10 @@ def initialize(
         infect_count=0,
     )
 
+    return state
+
+
+def initialize_game(state, args):
     # Add research station to start city
     state.cities[args.start_city].add_station(state)
 
@@ -522,17 +527,16 @@ def initialize(
             state.infection_deck.draw(state, i, verbose=False)
 
     # Set initial positions, hands, and order
+    start_hand_num = 6 - args.player_num
     for player in state.players.values():
         player.set_city(state, state.cities[args.start_city])  # Set separately from instantiation so special abilities do not interfere with setup # fmt: skip
         starting_cards = [state.player_deck.draw() for _ in range(start_hand_num)]
         for card in starting_cards:
             player.add_card(state, card)
-    state.player_order = get_player_order(args.player_names, players)
+    state.player_order = get_player_order(args.player_names, state.players)
 
     # Add epidemics to deck
     state.player_deck.add_epidemics(args.epidemic_num)
-
-    return state
 
 
 def get_player_order(player_names, players):
