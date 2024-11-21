@@ -205,7 +205,7 @@ def main():
         constants.epidemic_max_word,
     )
 
-    state = initialize_state(
+    dialog_args(
         args,
         constants.player_min,
         constants.player_max,
@@ -215,7 +215,9 @@ def main():
         constants.epidemic_max,
         constants.epidemic_min_word,
         constants.epidemic_max_word,
-    )
+    ) 
+
+    state = initialize_state(args)
 
     initialize_game(state, args)
 
@@ -391,7 +393,7 @@ def check_args(
     return new_args
 
 
-def initialize_state(
+def dialog_args(
     args,
     player_min,
     player_max,
@@ -401,11 +403,9 @@ def initialize_state(
     epidemic_max,
     epidemic_min_word,
     epidemic_max_word,
-    verbose=True,
 ):
     # Print greeting
-    if verbose:
-        print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
+    print(f'Welcome to Pydemic {__version__}! Are you ready to save humanity?')
 
     # player_num and player_names dialog(s)
     if args.player_num is None:
@@ -461,6 +461,8 @@ def initialize_state(
                 continue
             args.epidemic_num = value
 
+
+def initialize_state(args):
     # Count unique disease colors
     colors = set([attrs.color for attrs in args.map.values()])
 
