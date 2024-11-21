@@ -180,40 +180,41 @@ def main():
     readline.parse_and_bind('tab: menu-complete')
     readline.set_completer(lambda x: None)
 
-    player_min, player_max = constants.player_min, constants.player_max
-    player_min_word, player_max_word = constants.player_min_word, constants.player_max_word
-    epidemic_min, epidemic_max = constants.epidemic_min, constants.epidemic_max
-    epidemic_min_word, epidemic_max_word = constants.epidemic_min_word, constants.epidemic_max_word
-
     args = parse_args(
-        player_min_word,
-        player_max_word,
-        epidemic_min_word,
-        epidemic_max_word,
+        constants.player_min_word,
+        constants.player_max_word,
+        constants.epidemic_min_word,
+        constants.epidemic_max_word,
+        constants.default_map,
+        constants.start_city,
+        constants.outbreak_max,
+        constants.infection_seq,
+        constants.cube_num,
+        constants.station_num,
     )
 
     args = check_args(
         args,
-        player_min,
-        player_max,
-        player_min_word,
-        player_max_word,
-        epidemic_min,
-        epidemic_max,
-        epidemic_min_word,
-        epidemic_max_word,
+        constants.player_min,
+        constants.player_max,
+        constants.player_min_word,
+        constants.player_max_word,
+        constants.epidemic_min,
+        constants.epidemic_max,
+        constants.epidemic_min_word,
+        constants.epidemic_max_word,
     )
 
     state = initialize(
         args,
-        player_min,
-        player_max,
-        player_min_word,
-        player_max_word,
-        epidemic_min,
-        epidemic_max,
-        epidemic_min_word,
-        epidemic_max_word,
+        constants.player_min,
+        constants.player_max,
+        constants.player_min_word,
+        constants.player_max_word,
+        constants.epidemic_min,
+        constants.epidemic_max,
+        constants.epidemic_min_word,
+        constants.epidemic_max_word,
     )
 
     game_loop(state)
@@ -224,6 +225,12 @@ def parse_args(
     player_max_word,
     epidemic_min_word,
     epidemic_max_word,
+    default_map,
+    start_city,
+    outbreak_max,
+    infection_seq,
+    cube_num,
+    station_num,
 ):
     parser = ArgumentParser(
         prog='pydemic',
@@ -260,34 +267,34 @@ def parse_args(
     )
     parser.add_argument(
         '--map',
-        default='default',
+        default=default_map,
         help='the name of the map',
     )
     parser.add_argument(
         '--start_city',
-        default='atlanta',
+        default=start_city,
         help='the name of the starting city',
     )
     parser.add_argument(
         '--outbreak_max',
-        default=8,
+        default=outbreak_max,
         type=int,
         help='the maximum number of outbreaks before game over',
     )
     parser.add_argument(
         '--infection_seq',
-        default='2,2,2,3,3,4,4',
+        default=infection_seq,
         help='the sequence of the infection rate track; entries must be positive and increasing',
     )
     parser.add_argument(
         '--cube-num',
-        default=24,
+        default=cube_num,
         type=int,
         help='the total number of cubes for each disease',
     )
     parser.add_argument(
         '--station_num',
-        default=6,
+        default=station_num,
         type=int,
         help='the total number of stations',
     )
