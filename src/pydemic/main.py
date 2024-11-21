@@ -473,16 +473,16 @@ def initialize_state(args, role_map=None):
     disease_track = pieces.DiseaseTrack(colors, args.cube_num)
 
     # Instantiate players
-    if role_map:
-        role_list = [role_map[player_name] for player_name in args.player_names]
-        role_list = reversed(role_list)  # Reverse b/c pop removes from end in next block
-    else:
-        role_list = list(roles.roles)
-        shuffle(role_list)
+    role_map = {} if role_map is None else role_map
+    unassigned_players = list(set(args.player_names) - set(role_map.keys()))
+    unassigned_roles = list(set(roles.roles) - set(role_map.values()))
+    shuffle(unassigned_roles)
 
     players = {}
-    for player_name in args.player_names:
-        role = role_list.pop()
+    for player_name, role_name in role_map.items():
+        players[player_name] = roles.roles[role_name](player_name)
+    for player_name in unassigned_players:
+        role = unassigned_roles.pop()
         players[player_name] = roles.roles[role](player_name)
     player_order = args.player_names  # Use initial order of names until starting hand is dealt
 
