@@ -452,7 +452,7 @@ def dialog_args(
             args.epidemic_num = value
 
 
-def initialize_state(args):
+def initialize_state(args, role_map=None):
     # Count unique disease colors
     colors = set([attrs.color for attrs in args.map.values()])
 
@@ -473,8 +473,12 @@ def initialize_state(args):
     disease_track = pieces.DiseaseTrack(colors, args.cube_num)
 
     # Instantiate players
-    role_list = list(roles.roles)
-    shuffle(role_list)
+    if role_map:
+        role_list = [role_map[player_name] for player_name in args.player_names]
+        role_list = reversed(role_list)  # Reverse b/c pop removes from end in next block
+    else:
+        role_list = list(roles.roles)
+        shuffle(role_list)
 
     players = {}
     for player_name in args.player_names:
