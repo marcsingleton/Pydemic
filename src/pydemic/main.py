@@ -1,6 +1,7 @@
 """A text-based implementation of the board game Pandemic."""
 
 import readline
+import sys
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter, Namespace
 from inspect import cleandoc
 from random import shuffle
@@ -15,7 +16,6 @@ import pydemic.pieces as pieces
 import pydemic.roles as roles
 from pydemic.display import style, indent, prompt_prefix
 from pydemic.state import GameState
-from pydemic.version import __version__
 
 
 # Generic commands
@@ -181,6 +181,7 @@ def main():
     readline.set_completer(lambda x: None)
 
     args = parse_args(
+        sys.argv[1:],
         constants.player_min_word,
         constants.player_max_word,
         constants.epidemic_min_word,
@@ -225,6 +226,7 @@ def main():
 
 
 def parse_args(
+    args,
     player_min_word,
     player_max_word,
     epidemic_min_word,
@@ -302,8 +304,8 @@ def parse_args(
         type=int,
         help='the total number of stations',
     )
-    args = parser.parse_args()
-    return args
+
+    return parser.parse_args(args)
 
 
 def check_args(
