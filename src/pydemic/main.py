@@ -215,7 +215,7 @@ def main():
         constants.epidemic_max,
         constants.epidemic_min_word,
         constants.epidemic_max_word,
-    ) 
+    )
 
     state = initialize_state(args)
 
