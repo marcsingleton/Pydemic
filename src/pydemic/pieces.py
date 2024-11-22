@@ -36,17 +36,16 @@ class City:
             self.outbreak(state, color)
 
     def outbreak(self, state, color):
-        if (self.name, color) not in state.outbreak_track.resolved:
-            print(f'{self.display()} outbroke!')
-            state.outbreak_track.resolved.add(
-                (self.name, color)
-            )  # Append to resolve first to prevent infinite loop between adjacent cities
-            state.outbreak_track.increment()
-            for neighbor in self.neighbors.values():
-                try:
-                    neighbor.add_disease(state, color)
-                except exceptions.PropertyError:  # Catch immunity errors but print nothing
-                    pass
+        if (self.name, color) in state.outbreak_track.resolved:
+            return
+        print(f'{self.display()} outbroke!')
+        state.outbreak_track.resolved.add((self.name, color))
+        state.outbreak_track.increment()
+        for neighbor in self.neighbors.values():
+            try:
+                neighbor.add_disease(state, color)
+            except exceptions.PropertyError:  # Catch immunity errors but print nothing
+                pass
 
     def remove_disease(self, state, color):
         if self.cubes[color] == 0:
