@@ -127,7 +127,7 @@ class DiseaseTrack:
         else:
             self.statuses[color] = DiseaseState.CURED
 
-        if all([status is not DiseaseState.ACTIVE for status in self.statuses]):
+        if all([status is not DiseaseState.ACTIVE for status in self.statuses.values()]):
             raise exceptions.GameOverWin
 
     def is_active(self, color):
