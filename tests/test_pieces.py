@@ -8,6 +8,7 @@ import pydemic.exceptions as exceptions
 from .utils import default_init
 
 
+# City tests
 def test_add_disease_simple():
     state = default_init()
     city = state.cities['atlanta']
@@ -32,7 +33,7 @@ def test_add_disease_outbreak():
     assert state.outbreak_track.count == 1
 
 
-def test_add_disease_chain_outbreak():
+def test_add_disease_outbreak_chain():
     state = default_init()
     city_1 = state.cities['atlanta']
     city_2 = state.cities['washington']
@@ -55,13 +56,31 @@ def test_add_disease_chain_outbreak():
     assert state.outbreak_track.count == 2
 
 
-def test_add_disease_game_over_lose():
+def test_add_disease_outbreak_max():
+    state = default_init()
+    city = state.cities['atlanta']
+    color = 'blue'
+    city.add_disease(state, color, city.cube_max)
+    track_cube_num = state.disease_track.cubes[color]
+    state.outbreak_track.count = state.outbreak_track.max - 1
+    with pytest.raises(exceptions.GameOverLose):
+        city.add_disease(state, color, 1)
+    assert city.cubes[color] == city.cube_max
+    for neighbor in city.neighbors.values():
+        assert neighbor.cubes[color] == 0
+    assert state.disease_track.cubes[color] == track_cube_num
+    assert state.outbreak_track.count == state.outbreak_track.max
+
+
+def test_add_disease_no_cubes():
     state = default_init()
     city = state.cities['atlanta']
     color = 'blue'
     state.disease_track.cubes[color] = 0
     with pytest.raises(exceptions.GameOverLose):
         city.add_disease(state, color, 1)
+    assert city.cubes[color] == 0
+    assert state.disease_track.cubes[color] == 0
 
 
 def test_add_disease_immune():
