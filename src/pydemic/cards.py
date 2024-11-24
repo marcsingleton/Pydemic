@@ -45,8 +45,8 @@ class Deck(abc.ABC):
 
 
 class InfectionDeck(Deck):
-    def draw(self, state, cubes=1, idx=-1, verbose=True):
-        card = self.draw_pile.pop(idx)
+    def draw(self, state, cubes=1, verbose=True):
+        card = self.draw_pile.pop()
         city = state.cities[card.name]
         try:
             city.add_disease(state, card.color, cubes, verbose=verbose)
@@ -141,7 +141,7 @@ def forecast(state):
 
 
 def government_grant(state):
-    args = input(f'{prompt_prefix}' 'Enter a city to place a research station: ').split()
+    args = input(f'{prompt_prefix}Enter a city to place a research station: ').split()
     if len(args) == 1:
         if args[0] not in state.cities:
             raise exceptions.EventError('Nonexistent city specified.')
