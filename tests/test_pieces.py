@@ -14,10 +14,9 @@ def test_add_disease_simple():
     state = default_init()
     city = state.cities['atlanta']
     color = 'blue'
-    track_cube_num = state.disease_track.cubes[color]
     city.add_disease(state, color, 1)
     assert city.cubes[color] == 1
-    assert state.disease_track.cubes[color] == track_cube_num - 1
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num - 1
 
 
 def test_add_disease_outbreak():
@@ -90,11 +89,10 @@ def test_add_disease_immune():
     player = state.players['A']
     color = 'blue'
     player.set_city(state, city)
-    track_cube_num = state.disease_track.cubes[color]
     with pytest.raises(exceptions.PropertyError):
         city.add_disease(state, color, 1)
     assert city.cubes[color] == 0
-    assert state.disease_track.cubes[color] == track_cube_num
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num
 
 
 def test_add_station_to_city_without():
@@ -170,9 +168,8 @@ def test_add_eradicated():
 def test_remove_simple():
     state = default_init()
     color = 'blue'
-    track_cube_num = state.disease_track.cubes[color]
     state.disease_track.remove(color, 1)
-    assert state.disease_track.cubes[color] == track_cube_num - 1
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num - 1
 
 
 def test_remove_eradicated():
