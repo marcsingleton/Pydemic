@@ -5,6 +5,7 @@ from itertools import chain
 import pytest
 
 import pydemic.exceptions as exceptions
+import pydemic.pieces as pieces
 from .utils import default_init
 
 
@@ -144,3 +145,72 @@ def test_remove_station_from_city_without():
         city.remove_station(state)
     assert not city.station
     assert state.station_count == station_count
+
+
+# DiseaseTrack tests
+def test_add_simple():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.remove(color, 1)
+    state.disease_track.add(color, 1)
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num
+    assert state.disease_track.statuses[color] is pieces.DiseaseState.ACTIVE
+
+
+def test_add_eradicated():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.remove(color, 1)
+    state.disease_track.set_cured(color)
+    state.disease_track.add(color, 1)
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num
+    assert state.disease_track.statuses[color] is pieces.DiseaseState.ERADICATED
+
+
+def test_remove_simple():
+    state = default_init()
+    color = 'blue'
+    track_cube_num = state.disease_track.cubes[color]
+    state.disease_track.remove(color, 1)
+    assert state.disease_track.cubes[color] == track_cube_num - 1
+
+
+def test_remove_eradicated():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.set_cured(color)
+    with pytest.raises(exceptions.PropertyError):
+        state.disease_track.remove(color, 1)
+    assert state.disease_track.cubes[color] == state.disease_track.cube_num
+
+
+def test_set_cured_simple():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.remove(color, 1)
+    state.disease_track.set_cured(color)
+    assert state.disease_track.statuses[color] is pieces.DiseaseState.CURED
+
+
+def test_set_cured_twice():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.remove(color, 1)
+    state.disease_track.set_cured(color)
+    with pytest.raises(exceptions.PropertyError):
+        state.disease_track.set_cured(color)
+    assert state.disease_track.statuses[color] is pieces.DiseaseState.CURED
+
+
+def test_set_cured_eradicated():
+    state = default_init()
+    color = 'blue'
+    state.disease_track.set_cured(color)
+    assert state.disease_track.statuses[color] is pieces.DiseaseState.ERADICATED
+
+
+def test_set_cured_all():
+    state = default_init()
+    with pytest.raises(exceptions.GameOverWin):
+        for color in state.disease_track.colors:
+            state.disease_track.set_cured(color)
