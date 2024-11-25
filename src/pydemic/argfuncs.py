@@ -142,11 +142,19 @@ def check_args(
         print(f'Argument start_city {args.start_city} not in map {args.map}. Quitting...')
         exit(1)
 
-    # Get outbreak and infection track settings
+    # Get outbreak settings
     if args.outbreak_max < 0:
         print(f'Argument outbreak_max must be non-negative. Quitting...')
+        exit(1)
+
+    # Get infection_seq settings
+    args.infection_seq = args.infection_seq.strip(',').split(',')
+    if not args.infection_seq:
+        print('Argument infection_seq is empty. Quitting...')
+        exit(1)
+
     infection_seq = []
-    for entry in args.infection_seq.split(','):
+    for entry in args.infection_seq:
         try:
             value = int(entry)
         except ValueError:
@@ -155,13 +163,18 @@ def check_args(
         if value <= 0:
             print('Non-positive entry found in argument infection_seq. Quitting...')
             exit(1)
+        if infection_seq and value < infection_seq[-1]:
+            print('Argument infection_seq is not monotonic. Quitting...')
+            exit(1)
         infection_seq.append(value)
     args.infection_seq = infection_seq
 
-    # Get cube and station number settings
+    # Get cube number settings
     if args.cube_num < 1:
         print('Argument cube_num must be positive. Quitting')
         exit(1)
+
+    # Get station number settings
     if args.station_num < 1:
         print('Argument station_num must be positive. Quitting...')
         exit(1)
