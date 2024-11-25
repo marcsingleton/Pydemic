@@ -2,6 +2,7 @@
 
 from argparse import ArgumentParser, ArgumentDefaultsHelpFormatter
 
+import pydemic.constants as constants
 import pydemic.maps as maps
 from pydemic.display import prompt_prefix
 from pydemic.version import __version__
@@ -151,6 +152,12 @@ def check_args(
     args.infection_seq = args.infection_seq.strip(',').split(',')
     if not args.infection_seq:
         print('Argument infection_seq is empty. Quitting...')
+        exit(1)
+    if len(args.infection_seq) < constants.epidemic_max + 1:
+        print(
+            f'Length of argument infection_seq is not one greater than '
+            f'{epidemic_max_word}, the maximum number of epidemics. Quitting...'
+        )
         exit(1)
 
     infection_seq = []

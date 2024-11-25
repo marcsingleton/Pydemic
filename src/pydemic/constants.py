@@ -8,6 +8,6 @@ epidemic_min_word, epidemic_max_word = 'four', 'six'
 default_map = 'default'
 start_city = 'atlanta'
 outbreak_max = 8
-infection_seq = '2,2,2,3,3,4,4'
+infection_seq = '2,2,2,3,3,4,4'  # Length must be one more than epidemic_max
 cube_num = 24
 station_num = 6
