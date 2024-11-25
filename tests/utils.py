@@ -5,7 +5,7 @@ import pydemic.main as main
 import pydemic.constants as constants
 
 
-def default_init(player_names='A,B,C,D', epidemic_num='4', role_map=None):
+def default_init(player_names='A,B,C,D', epidemic_num=str(constants.epidemic_min), role_map=None):
     # fmt: off
     args = [
         '--player_names', player_names,
