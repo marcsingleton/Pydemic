@@ -9,6 +9,5 @@
   - Straightforward implementation of Dijkstra's algorithm, but would want an in-house implementation to not add external dependency
     - Would also need to respect cities with research stations as having edges
     - Probably too complex and unhelpful to incorporate player special abilities
-- Testing
-  - Cover player actions and interesting game states
-  - Need to extract argument parsing and game setup into separate functions to instantiate a testing environment easily
+- Command-specific completions
+  - Each possible action would need a completion function that the main one would call
