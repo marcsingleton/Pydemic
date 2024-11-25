@@ -85,6 +85,21 @@ def test_infection_seq_default():
     assert args.infection_seq == infection_seq
 
 
+def test_infection_seq_short():
+    infection_seq = list(range(1, constants.epidemic_max + 1))
+    args = ['--infection_seq', ','.join([str(value) for value in infection_seq])]
+    args = parse_args(args)
+    with pytest.raises(SystemExit):
+        check_args(args)
+
+
+def test_infection_seq_long():
+    infection_seq = list(range(1, constants.epidemic_max + 2))
+    args = ['--infection_seq', ','.join([str(value) for value in infection_seq])]
+    args = parse_args(args)
+    check_args(args)
+
+
 def test_infection_seq_empty():
     args = ['--infection_seq', ',,,']
     args = parse_args(args)
@@ -93,21 +108,26 @@ def test_infection_seq_empty():
 
 
 def test_infection_seq_nonpositive():
-    args = ['--infection_seq', '0,1,2']
+    infection_seq = list(range(constants.epidemic_max + 1))
+    args = ['--infection_seq', ','.join([str(value) for value in infection_seq])]
     args = parse_args(args)
     with pytest.raises(SystemExit):
         check_args(args)
 
 
 def test_infection_seq_nonmonotonic():
-    args = ['--infection_seq', '1,2,1']
+    infection_seq = list(range(1, constants.epidemic_max + 2))
+    infection_seq[-1] = infection_seq[0]
+    args = ['--infection_seq', ','.join([str(value) for value in infection_seq])]
     args = parse_args(args)
     with pytest.raises(SystemExit):
         check_args(args)
 
 
 def test_infection_seq_nonnumeric():
-    args = ['--infection_seq', '1,b,3']
+    infection_seq = list(range(1, constants.epidemic_max + 2))
+    infection_seq[0] = 'A'
+    args = ['--infection_seq', ','.join([str(value) for value in infection_seq])]
     args = parse_args(args)
     with pytest.raises(SystemExit):
         check_args(args)
