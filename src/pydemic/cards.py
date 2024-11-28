@@ -7,6 +7,7 @@ import pydemic.exceptions as exceptions
 from pydemic.display import style, cards_to_string, indent, prompt_prefix
 
 
+# Cards and Decks
 class Card:
     def __init__(self, type, name=None, color=None):
         self.type = type
@@ -67,14 +68,9 @@ class InfectionDeck(Deck):
         self.discard_pile = []
 
     def remove(self, city_name):
-        idx = False
-        for i, card in enumerate(self.discard_pile):
-            if card.name == city_name:
-                idx = i
-                break
-        if idx is not False:
-            del self.discard_pile[idx]
-        else:
+        try:
+            pop_by_name(self.discard_pile, city_name)
+        except KeyError:
             raise exceptions.PropertyError('City not in discard pile.')
 
 
@@ -96,17 +92,26 @@ class PlayerDeck(Deck):
         self.discard_pile.append(card)
 
     def retrieve(self, card_name):
-        idx = False
-        for i, card in enumerate(self.discard_pile):
-            if card.name == card_name:
-                idx = i
-                break
-        if idx is not False:
-            return self.discard_pile.pop(idx)
-        else:
+        try:
+            card = pop_by_name(self.discard_pile, card_name)
+        except KeyError:
             raise exceptions.PropertyError
+        return card
 
 
+def pop_by_name(pile, card_name):
+    idx = False
+    for i, card in enumerate(pile):
+        if card.name == card_name:
+            idx = i
+            break
+    if idx is not False:
+        return pile.pop(idx)
+    else:
+        raise KeyError
+
+
+# Events
 def air_lift(state):
     args = input(f'{prompt_prefix}Enter a player and a destination city: ').split()
     if len(args) != 2:
