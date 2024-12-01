@@ -4,7 +4,7 @@ import pydemic.cards as cards
 from .utils import default_init
 
 
-# Generic action tests
+# Generic player tests
 def test_ground_success():
     state = default_init()
     player = state.players['A']
@@ -548,12 +548,68 @@ def test_shuttle_dispatch_fail_no_station_both():
     assert player_1.action_count == action_count
 
 
-def test_treat_medic():
+# Medic tests
+def test_treat_medic_success():
     state = default_init(role_map={'A': 'medic'})
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
     player.set_city(state, city)
     city.add_disease(state, color, 3)
+    action_count = player.action_count
     player.treat(state, color)
     assert city.cubes[color] == 0
+    assert player.action_count == action_count - 1
+
+
+def test_treat_medic_fail():
+    state = default_init(role_map={'A': 'medic'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    player.set_city(state, city)
+    action_count = player.action_count
+    player.treat(state, color)
+    assert city.cubes[color] == 0
+    assert player.action_count == action_count
+
+
+def test_medic_auto_treat():
+    state = default_init(role_map={'A': 'medic'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    city.add_disease(state, color, 3)
+    state.disease_track.set_cured(color)
+    action_count = player.action_count
+    player.set_city(state, city)
+    assert city.cubes[color] == 0
+    assert player.action_count == action_count
+
+
+def test_medic_immune():
+    state = default_init(role_map={'A': 'medic'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    player.set_city(state, city)
+    state.disease_track.set_cured(color)
+    assert player.immunity(state, city, color)
+
+
+def test_medic_not_immune_not_cured():
+    state = default_init(role_map={'A': 'medic'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    player.set_city(state, city)
+    assert not player.immunity(state, city, color)
+
+
+def test_medic_not_immune_not_in_city():
+    state = default_init(role_map={'A': 'medic'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    state.disease_track.set_cured(color)
+    assert not player.immunity(state, city, color)
