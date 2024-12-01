@@ -163,8 +163,8 @@ def one_quiet_night(state):
 
 
 def resilient_population(state):
-    print('PLAYER DISCARD')
-    for card in state.player_deck.discard_pile:
+    print('INFECTION DISCARD')
+    for card in state.infection_deck.discard_pile:
         print(f'{indent}{card.display()}')
     args = input(
         f'{prompt_prefix}Enter a city to remove from the infection deck discard pile: '
