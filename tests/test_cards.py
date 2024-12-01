@@ -19,7 +19,7 @@ def test_infection_deck_draw_simple():
 
 
 def test_infection_deck_draw_immune():
-    state = default_init(role_map={'A': 'quarantine specialist'})
+    state = default_init(role_map={'A': 'quarantine_specialist'})
     top_card = state.infection_deck.draw_pile[-1]
     city = state.cities[top_card.name]
     color = top_card.color

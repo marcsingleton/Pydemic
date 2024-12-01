@@ -329,7 +329,7 @@ def test_pass():
 
 # Contingency planner tests
 def test_contingency_success():
-    state = default_init(role_map={'A': 'contingency planner'})
+    state = default_init(role_map={'A': 'contingency_planner'})
     player = state.players['A']
     card = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
     state.player_deck.discard(card)
@@ -341,7 +341,7 @@ def test_contingency_success():
 
 
 def test_contingency_fail_occupied():
-    state = default_init(role_map={'A': 'contingency planner'})
+    state = default_init(role_map={'A': 'contingency_planner'})
     player = state.players['A']
     card_1 = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
     card_2 = cards.pop_by_name(state.player_deck.draw_pile, 'government_grant')
@@ -357,7 +357,7 @@ def test_contingency_fail_occupied():
 
 
 def test_contingency_no_card():
-    state = default_init(role_map={'A': 'contingency planner'})
+    state = default_init(role_map={'A': 'contingency_planner'})
     player = state.players['A']
     card = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
     action_count = player.action_count

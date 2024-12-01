@@ -84,7 +84,7 @@ def test_add_disease_no_cubes():
 
 
 def test_add_disease_immune():
-    state = default_init(role_map={'A': 'quarantine specialist'})
+    state = default_init(role_map={'A': 'quarantine_specialist'})
     city = state.cities['atlanta']
     player = state.players['A']
     color = 'blue'

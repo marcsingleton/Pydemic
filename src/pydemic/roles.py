@@ -355,7 +355,7 @@ class Player:
 
 class ContingencyPlanner(Player):
     def __init__(self, name):
-        super().__init__(name, 'contingency planner', color='light_blue')
+        super().__init__(name, 'contingency_planner', color='light_blue')
         self.actions = {**self.actions, 'contingency': self.contingency}
         self.contingency_slot = None
 
@@ -605,7 +605,7 @@ class Medic(Player):
 
 class OperationsExpert(Player):
     def __init__(self, name):
-        super().__init__(name, 'operations expert', color='light_green')
+        super().__init__(name, 'operations_expert', color='light_green')
         self.actions = {
             **self.actions,
             'opex_shuttle': self.opex_shuttle,
@@ -690,7 +690,7 @@ class OperationsExpert(Player):
 
 class QuarantineSpecialist(Player):
     def __init__(self, name):
-        super().__init__(name, 'quarantine specialist', color='green')
+        super().__init__(name, 'quarantine_specialist', color='green')
 
     def immunity(self, state, city, color):
         # Check city is set to avoid KeyError during initialization
@@ -717,11 +717,11 @@ class Scientist(Player):
 
 
 roles = {
-    'contingency planner': ContingencyPlanner,
+    'contingency_planner': ContingencyPlanner,
     'dispatcher': Dispatcher,
     'medic': Medic,
-    'operations expert': OperationsExpert,
-    'quarantine specialist': QuarantineSpecialist,
+    'operations_expert': OperationsExpert,
+    'quarantine_specialist': QuarantineSpecialist,
     'researcher': Researcher,
     'scientist': Scientist,
 }
