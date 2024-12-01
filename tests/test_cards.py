@@ -2,6 +2,7 @@
 
 import pytest
 
+import pydemic.cards as cards
 import pydemic.exceptions as exceptions
 from .utils import default_init
 
@@ -97,16 +98,47 @@ def test_player_deck_retrieve_twice():
 
 # Event tests
 def test_airlift():
-    pass
+    state = default_init()
+    city_name_1 = 'atlanta'
+    city_name_2 = 'london'
+    city_1 = state.cities[city_name_1]
+    city_2 = state.cities[city_name_2]
+    cards.input = lambda x: f'A {city_name_2}'
+    player = state.players['A']
+    player.set_city(state, city_1)
+    cards.air_lift(state)
+    assert player.city is city_2
 
 
 def test_forecast():
-    pass
+    state = default_init()
+    order = [5, 1, 4, 0, 3, 2]
+    cards.input = lambda x: ''.join([str(idx) for idx in order])
+    old_top = state.infection_deck.draw_pile[-1:-7:-1]
+    cards.forecast(state)
+    new_top = state.infection_deck.draw_pile[-1:-7:-1]
+    for idx, card in zip(order, new_top):
+        assert card is old_top[idx]
 
 
 def test_government_grant():
-    pass
+    state = default_init()
+    city_name = 'atlanta'
+    city = state.cities[city_name]
+    cards.input = lambda x: city_name
+    cards.government_grant(state)
+    assert city.station
+
+
+def test_one_quiet_night():
+    state = default_init()
+    assert state.infect_count == 0
 
 
 def test_resilient_population():
-    pass
+    state = default_init()
+    state.infection_deck.draw(state)
+    card = state.infection_deck.discard_pile[0]
+    cards.input = lambda x: card.name
+    cards.resilient_population(state)
+    assert card not in state.infection_deck.discard_pile
