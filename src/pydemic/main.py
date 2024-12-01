@@ -121,7 +121,8 @@ def print_status(state, *args):
             print(f'{indent}{style(line, color=color)}')
         print()
 
-        for player in state.players.values():
+        for player_name in state.player_order:
+            player = state.players[player_name]
             print(f'{style(player.name.upper(), color=player.color)} -- {player.role.upper()}')
             player.print_status(indent)
         print()
