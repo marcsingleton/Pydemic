@@ -327,6 +327,46 @@ def test_pass():
     assert player.action_count == action_count - 1
 
 
+# Contingency planner tests
+def test_contingency_success():
+    state = default_init(role_map={'A': 'contingency planner'})
+    player = state.players['A']
+    card = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
+    state.player_deck.discard(card)
+    action_count = player.action_count
+    player.contingency(state, card.name)
+    assert player.contingency_slot is card
+    assert player.action_count == action_count - 1
+    assert card not in state.player_deck.discard_pile
+
+
+def test_contingency_fail_occupied():
+    state = default_init(role_map={'A': 'contingency planner'})
+    player = state.players['A']
+    card_1 = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
+    card_2 = cards.pop_by_name(state.player_deck.draw_pile, 'government_grant')
+    state.player_deck.discard(card_1)
+    state.player_deck.discard(card_2)
+    player.contingency(state, card_1.name)
+    action_count = player.action_count
+    player.contingency(state, card_2.name)
+    assert player.contingency_slot is card_1
+    assert player.action_count == action_count
+    assert card_1 not in state.player_deck.discard_pile
+    assert card_2 in state.player_deck.discard_pile
+
+
+def test_contingency_no_card():
+    state = default_init(role_map={'A': 'contingency planner'})
+    player = state.players['A']
+    card = cards.pop_by_name(state.player_deck.draw_pile, 'one_quiet_night')
+    action_count = player.action_count
+    player.contingency(state, card.name)
+    assert player.contingency_slot is None
+    assert player.action_count == action_count
+    assert card not in state.player_deck.discard_pile
+
+
 def test_treat_medic():
     state = default_init(role_map={'A': 'medic'})
     player = state.players['A']
