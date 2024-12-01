@@ -99,11 +99,9 @@ def test_player_deck_retrieve_twice():
 # Event tests
 def test_airlift():
     state = default_init()
-    city_name_1 = 'atlanta'
-    city_name_2 = 'london'
-    city_1 = state.cities[city_name_1]
-    city_2 = state.cities[city_name_2]
-    cards.input = lambda x: f'A {city_name_2}'
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    cards.input = lambda x: f'A {city_2.name}'
     player = state.players['A']
     player.set_city(state, city_1)
     cards.air_lift(state)
@@ -123,9 +121,8 @@ def test_forecast():
 
 def test_government_grant():
     state = default_init()
-    city_name = 'atlanta'
-    city = state.cities[city_name]
-    cards.input = lambda x: city_name
+    city = state.cities['atlanta']
+    cards.input = lambda x: city.name
     cards.government_grant(state)
     assert city.station
 
