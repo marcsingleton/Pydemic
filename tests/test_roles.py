@@ -129,7 +129,7 @@ def test_shuttle_fail_no_station_target():
     assert player.action_count == action_count
 
 
-def test_shuttle_fail_no_station_target():
+def test_shuttle_fail_no_station_both():
     state = default_init()
     player = state.players['A']
     city_1 = state.cities['atlanta']
@@ -365,6 +365,187 @@ def test_contingency_no_card():
     assert player.contingency_slot is None
     assert player.action_count == action_count
     assert card not in state.player_deck.discard_pile
+
+
+# Dispatcher tests
+def test_airlift_success():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    player_3 = state.players['C']
+    player_1.set_city(state, state.cities['atlanta'])
+    player_2.set_city(state, state.cities['london'])
+    player_3.set_city(state, state.cities['tokyo'])
+    action_count = player_1.action_count
+    player_1.airlift(state, player_2.name, player_3.name)
+    assert player_2.city is player_3.city
+    assert player_1.action_count == action_count - 1
+
+
+def test_ground_dispatch_success():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['washington']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    action_count = player_1.action_count
+    player_1.actions['ground'](state, city_2.name, player_2.name)
+    assert player_2.city is city_2
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count - 1
+
+
+def test_ground_dispatch_fail():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    action_count = player_1.action_count
+    player_1.actions['ground'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
+
+
+def test_direct_dispatch_success():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_2.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.actions['direct'](state, city_2.name, player_2.name)
+    assert player_2.city is city_2
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count - 1
+    assert card not in player_1.hand.values()
+    
+
+def test_direct_dispatch_fail():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_1.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.actions['direct'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
+    assert card in player_1.hand.values()
+
+
+def test_charter_dispatch_success():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_1.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.actions['charter'](state, city_2.name, player_2.name)
+    assert player_2.city is city_2
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count - 1
+    assert card not in player_1.hand.values()
+
+
+def test_charter_dispatch_fail():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_2.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.actions['charter'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
+    assert card in player_1.hand.values()
+
+
+def test_shuttle_dispatch_success():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    city_1.add_station(state)
+    city_2.add_station(state)
+    action_count = player_1.action_count
+    player_1.actions['shuttle'](state, city_2.name, player_2.name)
+    assert player_2.city is city_2
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count - 1
+
+
+def test_shuttle_dispatch_fail_no_station_current():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    city_2.add_station(state)
+    action_count = player_1.action_count
+    player_1.actions['shuttle'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
+
+
+def test_shuttle_dispatch_fail_no_station_target():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    city_1.add_station(state)
+    action_count = player_1.action_count
+    player_1.actions['shuttle'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
+
+
+def test_shuttle_dispatch_fail_no_station_both():
+    state = default_init(role_map={'A': 'dispatcher'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    action_count = player_1.action_count
+    player_1.actions['shuttle'](state, city_2.name, player_2.name)
+    assert player_2.city is city_1
+    assert player_1.city is city_1
+    assert player_1.action_count == action_count
 
 
 def test_treat_medic():
