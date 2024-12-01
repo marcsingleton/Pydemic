@@ -431,7 +431,7 @@ def interface(state, commands, prompt):
     completer = make_completer(commands)
     readline.set_completer(completer)
 
-    args = input(prompt).lower().split()
+    args = input(prompt).lower().strip().split()
     if len(args) == 0:
         return
     command = args[0]
