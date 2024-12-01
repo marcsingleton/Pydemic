@@ -611,18 +611,18 @@ class OperationsExpert(Player):
             'opex_shuttle': self.opex_shuttle,
             'station': self.station,
         }
-        self.shuttle = False
+        self.shuttle_action = True
 
     def reset(self):
         super().reset()
-        self.shuttle = False
+        self.shuttle_action = True
 
     def opex_shuttle(self, state, *args):
         """Move to a city from a city with a research station by discarding any city card.
 
         syntax: opex_shuttle CITY CITY_CARD
         """
-        if self.shuttle:
+        if not self.shuttle_action:
             print('Action failed: Special move already used this turn.')
             return
         if len(args) != 2:
@@ -641,7 +641,7 @@ class OperationsExpert(Player):
             print('Action failed:', error)
         else:
             self.action_count -= 1
-            self.shuttle = True
+            self.shuttle_action = False
             print('Action succeeded!')
 
     def station(self, state, *args):
