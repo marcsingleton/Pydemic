@@ -440,6 +440,7 @@ class Dispatcher(Player):
             return
 
         state.players[args[0]].set_city(state, state.players[args[1]].city)
+        self.action_count -= 1
         print('Action succeeded!')
 
     def ground_dispatch(self, state, args, target):
