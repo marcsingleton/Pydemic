@@ -104,7 +104,7 @@ def test_airlift():
     cards.input = lambda x: f'A {city_2.name}'
     player = state.players['A']
     player.set_city(state, city_1)
-    cards.air_lift(state)
+    cards.airlift(state)
     assert player.city is city_2
 
 

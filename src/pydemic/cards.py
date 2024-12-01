@@ -112,7 +112,7 @@ def pop_by_name(pile, card_name):
 
 
 # Events
-def air_lift(state):
+def airlift(state):
     args = input(f'{prompt_prefix}Enter a player and a destination city: ').split()
     if len(args) != 2:
         raise exceptions.EventError('Incorrect number of arguments.')
@@ -181,7 +181,7 @@ def resilient_population(state):
 
 
 events = {
-    'air_lift': air_lift,
+    'airlift': airlift,
     'forecast': forecast,
     'government_grant': government_grant,
     'one_quiet_night': one_quiet_night,
