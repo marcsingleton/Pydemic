@@ -641,6 +641,7 @@ class OperationsExpert(Player):
         except exceptions.DiscardError as error:
             print('Action failed:', error)
         else:
+            self.set_city(state, state.cities[args[0]])
             self.action_count -= 1
             self.shuttle_action = False
             print('Action succeeded!')
