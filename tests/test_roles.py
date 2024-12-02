@@ -587,17 +587,18 @@ def test_medic_auto_treat():
     assert player.action_count == action_count
 
 
-def test_medic_immune():
+def test_medic_immunity():
     state = default_init(role_map={'A': 'medic'})
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
     player.set_city(state, city)
+    assert not player.immunity(state, city, color)
     state.disease_track.set_cured(color)
     assert player.immunity(state, city, color)
 
 
-def test_medic_not_immune_not_cured():
+def test_medic_not_immunity_not_cured():
     state = default_init(role_map={'A': 'medic'})
     player = state.players['A']
     city = state.cities['atlanta']
@@ -606,7 +607,7 @@ def test_medic_not_immune_not_cured():
     assert not player.immunity(state, city, color)
 
 
-def test_medic_not_immune_not_in_city():
+def test_medic_not_immunity_not_in_city():
     state = default_init(role_map={'A': 'medic'})
     player = state.players['A']
     city = state.cities['atlanta']
