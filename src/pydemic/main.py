@@ -416,9 +416,13 @@ def epidemic(state):
 
 
 # Interface
-def make_completer(commands):  # TODO: Make completer context sensitive
+def make_completer(commands):
     def completer(text, state):
-        matches = [command for command in commands if command.startswith(text)]
+        args = readline.get_line_buffer().split()
+        if len(args) == 0:
+            matches = [command for command in commands if command.startswith(text)]
+        else:
+            matches = []
         if state < len(matches):
             return matches[state]
         else:
