@@ -613,3 +613,95 @@ def test_medic_not_immune_not_in_city():
     color = 'blue'
     state.disease_track.set_cured(color)
     assert not player.immunity(state, city, color)
+
+
+# Operations expert tests
+def test_opex_shuttle_success():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    city_3 = state.cities['tokyo']
+    player.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_3.name)
+    player.add_card(state, card)
+    city_1.add_station(state)
+    action_count = player.action_count
+    player.opex_shuttle(state, city_2.name, card.name)
+    assert player.city is city_2
+    assert card not in player.hand
+    assert player.action_count == action_count - 1
+
+
+def test_opex_shuttle_fail_no_station_current():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    city_3 = state.cities['tokyo']
+    player.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_3.name)
+    player.add_card(state, card)
+    action_count = player.action_count
+    player.opex_shuttle(state, city_2.name, card.name)
+    assert player.city is city_1
+    assert card in player.hand.values()
+    assert player.action_count == action_count
+
+
+def test_opex_shuttle_fail_no_card():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    city_3 = state.cities['tokyo']
+    player.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_3.name)
+    action_count = player.action_count
+    player.opex_shuttle(state, city_2.name, card.name)
+    assert player.city is city_1
+    assert player.action_count == action_count
+
+
+def test_opex_shuttle_fail_twice():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    city_3 = state.cities['tokyo']
+    player.set_city(state, city_1)
+    card_A = cards.pop_by_name(state.player_deck.draw_pile, city_3.name)
+    card_B = cards.pop_by_name(state.player_deck.draw_pile, city_1.name)
+    player.add_card(state, card_A)
+    player.add_card(state, card_B)
+    city_1.add_station(state)
+    city_2.add_station(state)
+    player.opex_shuttle(state, city_2.name, card_A.name)
+    action_count = player.action_count
+    player.opex_shuttle(state, city_3.name, card_B.name)
+    assert player.city is city_2
+    assert card_B in player.hand.values()
+    assert player.action_count == action_count
+
+
+def test_opex_station_success():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    player.set_city(state, city)
+    action_count = player.action_count
+    player.station(state)
+    assert city.station
+    assert player.action_count == action_count - 1
+
+
+def test_opex_station_fail_has_station():
+    state = default_init(role_map={'A': 'operations_expert'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    player.set_city(state, city)
+    city.add_station(state)
+    action_count = player.action_count
+    player.station(state)
+    assert city.station
+    assert player.action_count == action_count
