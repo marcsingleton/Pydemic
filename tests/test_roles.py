@@ -233,7 +233,7 @@ def test_share_fail_wrong_card():
     city_1 = state.cities['atlanta']
     city_2 = state.cities['london']
     player_1.set_city(state, city_1)
-    player_2.set_city(state, city_2)
+    player_2.set_city(state, city_1)
     card = cards.pop_by_name(state.player_deck.draw_pile, city_2.name)
     player_1.add_card(state, card)
     action_count = player_1.action_count
@@ -721,3 +721,54 @@ def test_quarantine_specialist_immunity():
         for color in state.disease_track.colors:
             assert player.immunity(state, neighbor, color)
 
+
+# Researcher tests
+def test_researcher_share_success():
+    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city)
+    player_2.set_city(state, city)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_2.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.share(state, player_2.name, card.name)
+    assert card not in player_1.hand.values()
+    assert card in player_2.hand.values()
+    assert player_1.action_count == action_count - 1
+
+
+def test_researcher_share_fail_wrong_player():
+    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_1)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_2.name)
+    player_2.add_card(state, card)
+    action_count = player_1.action_count
+    player_2.share(state, player_2.name, city_1.name)
+    assert card not in player_1.hand.values()
+    assert card in player_2.hand.values()
+    assert player_1.action_count == action_count
+
+
+def test_share_fail_wrong_city():
+    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+    player_1 = state.players['A']
+    player_2 = state.players['B']
+    city_1 = state.cities['atlanta']
+    city_2 = state.cities['london']
+    player_1.set_city(state, city_1)
+    player_2.set_city(state, city_2)
+    card = cards.pop_by_name(state.player_deck.draw_pile, city_1.name)
+    player_1.add_card(state, card)
+    action_count = player_1.action_count
+    player_1.share(state, player_2.name, city_1.name)
+    assert card in player_1.hand.values()
+    assert card not in player_2.hand.values()
+    assert player_1.action_count == action_count
