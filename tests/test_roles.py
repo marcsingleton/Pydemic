@@ -772,3 +772,44 @@ def test_share_fail_wrong_city():
     assert card in player_1.hand.values()
     assert card not in player_2.hand.values()
     assert player_1.action_count == action_count
+
+
+# Scientist tests
+def test_scientist_cure_success():
+    state = default_init(role_map={'A': 'scientist'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    player.set_city(state, city)
+    cure_cards = []
+    for card_name in ['atlanta', 'washington', 'chicago', 'new_york']:
+        card = cards.pop_by_name(state.player_deck.draw_pile, card_name)
+        cure_cards.append(card)
+        player.add_card(state, card)
+    city.add_station(state)
+    action_count = player.action_count
+    player.cure(state, color)
+    assert not state.disease_track.is_active(color)
+    for card in cure_cards:
+        assert card not in player.hand.values()
+    assert player.action_count == action_count - 1
+
+
+def test_scientist_cure_fail_insufficient_cards():
+    state = default_init(role_map={'A': 'scientist'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    color = 'blue'
+    player.set_city(state, city)
+    cure_cards = []
+    for card_name in ['atlanta', 'washington', 'chicago']:
+        card = cards.pop_by_name(state.player_deck.draw_pile, card_name)
+        cure_cards.append(card)
+        player.add_card(state, card)
+    city.add_station(state)
+    action_count = player.action_count
+    player.cure(state, color)
+    assert state.disease_track.is_active(color)
+    for card in cure_cards:
+        assert card in player.hand.values()
+    assert player.action_count == action_count
