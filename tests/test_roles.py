@@ -705,3 +705,18 @@ def test_opex_station_fail_has_station():
     player.station(state)
     assert city.station
     assert player.action_count == action_count
+
+
+# Quarantine specialist tests
+def test_quarantine_specialist_immunity():
+    state = default_init(role_map={'A': 'quarantine_specialist'})
+    player = state.players['A']
+    city = state.cities['atlanta']
+    for neighbor in city.neighbors.values():
+        for color in state.disease_track.colors:
+            assert not player.immunity(state, neighbor, color)
+    player.set_city(state, city)
+    for neighbor in city.neighbors.values():
+        for color in state.disease_track.colors:
+            assert player.immunity(state, neighbor, color)
+
