@@ -252,8 +252,12 @@ def initialize_state(args, role_map=None):
     shuffle(unassigned_roles)
 
     players = {}
-    for player_name, role_name in role_map.items():
-        players[player_name] = roles.roles[role_name](player_name)
+    for player_name, role in role_map.items():
+        if isinstance(role, str):
+            role = roles.roles[role]
+        elif not issubclass(role, roles.Player):
+            raise RuntimeError(f'Object {role} is not a valid Player subclass.')
+        players[player_name] = role(player_name)
     for player_name in unassigned_players:
         role = unassigned_roles.pop()
         players[player_name] = roles.roles[role](player_name)
