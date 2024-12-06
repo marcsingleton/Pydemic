@@ -42,9 +42,9 @@ def test_direct_success():
     action_count = player.action_count
     player.direct(state, city_2.name)
     assert player.city is city_2
-    assert player.action_count == action_count - 1
     assert card not in player.hand.values()
-    
+    assert player.action_count == action_count - 1
+
 
 def test_direct_fail():
     state = default_init()
@@ -57,8 +57,8 @@ def test_direct_fail():
     action_count = player.action_count
     player.direct(state, city_2.name)
     assert player.city is city_1
-    assert player.action_count == action_count
     assert card in player.hand.values()
+    assert player.action_count == action_count
 
 
 def test_charter_success():
@@ -72,8 +72,8 @@ def test_charter_success():
     action_count = player.action_count
     player.charter(state, city_2.name)
     assert player.city is city_2
-    assert player.action_count == action_count - 1
     assert card not in player.hand.values()
+    assert player.action_count == action_count - 1
 
 
 def test_charter_fail():
@@ -87,8 +87,8 @@ def test_charter_fail():
     action_count = player.action_count
     player.charter(state, city_2.name)
     assert player.city is city_1
-    assert player.action_count == action_count
     assert card in player.hand.values()
+    assert player.action_count == action_count
 
 
 def test_shuttle_success():
@@ -183,8 +183,8 @@ def test_station_fail_has_station():
     action_count = player.action_count
     player.station(state)
     assert city.station
-    assert player.action_count == action_count
     assert card in player.hand.values()
+    assert player.action_count == action_count
 
 
 def test_treat_success():
@@ -340,8 +340,8 @@ def test_contingency_success():
     action_count = player.action_count
     player.contingency(state, card.name)
     assert player.contingency_slot is card
-    assert player.action_count == action_count - 1
     assert card not in state.player_deck.discard_pile
+    assert player.action_count == action_count - 1
 
 
 def test_contingency_fail_occupied():
@@ -355,9 +355,9 @@ def test_contingency_fail_occupied():
     action_count = player.action_count
     player.contingency(state, card_2.name)
     assert player.contingency_slot is card_1
-    assert player.action_count == action_count
     assert card_1 not in state.player_deck.discard_pile
     assert card_2 in state.player_deck.discard_pile
+    assert player.action_count == action_count
 
 
 def test_contingency_no_card():
@@ -367,8 +367,8 @@ def test_contingency_no_card():
     action_count = player.action_count
     player.contingency(state, card.name)
     assert player.contingency_slot is None
-    assert player.action_count == action_count
     assert card not in state.player_deck.discard_pile
+    assert player.action_count == action_count
 
 
 # Dispatcher tests
@@ -430,9 +430,9 @@ def test_direct_dispatch_success():
     player_1.actions['direct'](state, city_2.name, player_2.name)
     assert player_2.city is city_2
     assert player_1.city is city_1
-    assert player_1.action_count == action_count - 1
     assert card not in player_1.hand.values()
-    
+    assert player_1.action_count == action_count - 1
+
 
 def test_direct_dispatch_fail():
     state = default_init(role_map={'A': 'dispatcher'})
@@ -448,8 +448,8 @@ def test_direct_dispatch_fail():
     player_1.actions['direct'](state, city_2.name, player_2.name)
     assert player_2.city is city_1
     assert player_1.city is city_1
-    assert player_1.action_count == action_count
     assert card in player_1.hand.values()
+    assert player_1.action_count == action_count
 
 
 def test_charter_dispatch_success():
@@ -466,8 +466,8 @@ def test_charter_dispatch_success():
     player_1.actions['charter'](state, city_2.name, player_2.name)
     assert player_2.city is city_2
     assert player_1.city is city_1
-    assert player_1.action_count == action_count - 1
     assert card not in player_1.hand.values()
+    assert player_1.action_count == action_count - 1
 
 
 def test_charter_dispatch_fail():
@@ -484,8 +484,8 @@ def test_charter_dispatch_fail():
     player_1.actions['charter'](state, city_2.name, player_2.name)
     assert player_2.city is city_1
     assert player_1.city is city_1
-    assert player_1.action_count == action_count
     assert card in player_1.hand.values()
+    assert player_1.action_count == action_count
 
 
 def test_shuttle_dispatch_success():
