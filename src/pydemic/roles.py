@@ -5,7 +5,7 @@ from pydemic.display import indent, prompt_prefix, style, cards_to_string
 
 
 class Player:
-    def __init__(self, name, role, hand_max=7, color=None):
+    def __init__(self, name, role='base', hand_max=7, color=None):
         self.actions = {
             'ground': self.ground,
             'direct': self.direct,

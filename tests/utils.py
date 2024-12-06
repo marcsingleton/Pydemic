@@ -1,11 +1,19 @@
 """Common utilities for testing."""
 
 import pydemic.argfuncs as argfuncs
-import pydemic.main as main
 import pydemic.constants as constants
+import pydemic.main as main
+import pydemic.roles as roles
 
 
-def default_init(player_names='A,B,C,D', epidemic_num=str(constants.epidemic_min), role_map=None):
+def default_init(
+    player_names='A,B,C,D',
+    epidemic_num=str(constants.epidemic_min),
+    role_map=None,
+):
+    names = player_names.strip().strip(',').split(',')
+    if role_map is None:
+        role_map = {name: roles.Player for name in names}
     # fmt: off
     args = [
         '--player_names', player_names,
