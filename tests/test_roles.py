@@ -3,6 +3,7 @@
 import pytest
 
 import pydemic.cards as cards
+import pydemic.roles as roles
 from .utils import default_init
 
 
@@ -144,7 +145,7 @@ def test_shuttle_fail_no_station_both():
 
 
 def test_station_success():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     city = state.cities['atlanta']
     player.set_city(state, city)
@@ -158,7 +159,7 @@ def test_station_success():
 
 
 def test_station_fail_wrong_card():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     city_1 = state.cities['atlanta']
     city_2 = state.cities['london']
@@ -173,7 +174,7 @@ def test_station_fail_wrong_card():
 
 
 def test_station_fail_has_station():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     city = state.cities['atlanta']
     player.set_city(state, city)
@@ -188,7 +189,7 @@ def test_station_fail_has_station():
 
 
 def test_treat_success():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
@@ -201,7 +202,7 @@ def test_treat_success():
 
 
 def test_treat_fail():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
@@ -213,7 +214,7 @@ def test_treat_fail():
 
 
 def test_share_success():
-    state = default_init(role_map={'A': 'medic', 'B': 'scientist'})
+    state = default_init()
     player_1 = state.players['A']
     player_2 = state.players['B']
     city = state.cities['atlanta']
@@ -229,7 +230,7 @@ def test_share_success():
 
 
 def test_share_fail_wrong_card():
-    state = default_init(role_map={'A': 'medic', 'B': 'scientist'})
+    state = default_init()
     player_1 = state.players['A']
     player_2 = state.players['B']
     city_1 = state.cities['atlanta']
@@ -246,7 +247,7 @@ def test_share_fail_wrong_card():
 
 
 def test_share_fail_wrong_city():
-    state = default_init(role_map={'A': 'medic', 'B': 'scientist'})
+    state = default_init()
     player_1 = state.players['A']
     player_2 = state.players['B']
     city_1 = state.cities['atlanta']
@@ -262,9 +263,9 @@ def test_share_fail_wrong_city():
     assert player_1.action_count == action_count
 
 
-@pytest.mark.parametrize('role_name', ['researcher', 'scientist'])
-def test_cure_success(role_name):
-    state = default_init(role_map={'A': role_name})
+@pytest.mark.parametrize('role', [roles.Player, 'scientist'])
+def test_cure_success(role):
+    state = default_init(role_map={'A': role})
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
@@ -283,9 +284,9 @@ def test_cure_success(role_name):
     assert player.action_count == action_count - 1
 
 
-@pytest.mark.parametrize('role_name', ['researcher', 'scientist'])
-def test_cure_fail_no_station(role_name):
-    state = default_init(role_map={'A': role_name})
+@pytest.mark.parametrize('role', [roles.Player, 'scientist'])
+def test_cure_fail_no_station(role):
+    state = default_init(role_map={'A': role})
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
@@ -302,9 +303,9 @@ def test_cure_fail_no_station(role_name):
     assert player.action_count == action_count
 
 
-@pytest.mark.parametrize('role_name', ['researcher', 'scientist'])
-def test_cure_fail_insufficient_cards(role_name):
-    state = default_init(role_map={'A': role_name})
+@pytest.mark.parametrize('role', [roles.Player, 'scientist'])
+def test_cure_fail_insufficient_cards(role):
+    state = default_init(role_map={'A': role})
     player = state.players['A']
     city = state.cities['atlanta']
     color = 'blue'
@@ -324,7 +325,7 @@ def test_cure_fail_insufficient_cards(role_name):
 
 
 def test_pass():
-    state = default_init(role_map={'A': 'researcher'})
+    state = default_init()
     player = state.players['A']
     action_count = player.action_count
     player.no_action(state)
@@ -728,7 +729,7 @@ def test_quarantine_specialist_immunity():
 
 # Researcher tests
 def test_researcher_share_success():
-    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+    state = default_init(role_map={'A': 'researcher', 'B': roles.Player})
     player_1 = state.players['A']
     player_2 = state.players['B']
     city = state.cities['atlanta']
@@ -745,7 +746,7 @@ def test_researcher_share_success():
 
 
 def test_researcher_share_fail_wrong_player():
-    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+    state = default_init(role_map={'A': 'researcher', 'B': roles.Player})
     player_1 = state.players['A']
     player_2 = state.players['B']
     city_1 = state.cities['atlanta']
@@ -761,8 +762,8 @@ def test_researcher_share_fail_wrong_player():
     assert player_1.action_count == action_count
 
 
-def test_share_fail_wrong_city():
-    state = default_init(role_map={'A': 'researcher', 'B': 'scientist'})
+def test_researcher_share_fail_wrong_city():
+    state = default_init(role_map={'A': 'researcher', 'B': roles.Player})
     player_1 = state.players['A']
     player_2 = state.players['B']
     city_1 = state.cities['atlanta']
