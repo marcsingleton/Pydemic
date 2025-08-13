@@ -11,12 +11,6 @@ Pydemic was developed with Python 3.12.3, but to my knowledge, it doesn't use an
 Text is colored using ANSI escape sequences for 8-bit colors, so a compatible terminal emulator is required to properly display the output. Pydemic also uses Python's [readline interface](https://docs.python.org/3/library/readline.html) for command completion, which is only supported on Unix-like operating systems. Windows users should install WSL.
 
 ## Installation
-First, clone (or download the repo directly) with:
-
-```
-git clone https://github.com/marcsingleton/Pydemic.git
-```
-
 I recommend installing into a virtual environment. To create one and activate it, use:
 
 ```
@@ -27,10 +21,12 @@ source $VENV_PATH/bin/activate
 
 where `VENV_PATH` is the path to the Pydemic installation.
 
-Finally, to install, run:
+Then install using:
 
 ```
-pip install /path/to/Pydemic
+git clone https://github.com/marcsingleton/Pydemic.git
+cd Pydemic
+pip install .
 ```
 
 where the path is to the previously downloaded repo.
