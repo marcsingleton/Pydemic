@@ -100,15 +100,10 @@ class PlayerDeck(Deck):
 
 
 def pop_by_name(pile, card_name):
-    idx = False
     for i, card in enumerate(pile):
         if card.name == card_name:
-            idx = i
-            break
-    if idx is not False:
-        return pile.pop(idx)
-    else:
-        raise KeyError
+            return pile.pop(i)
+    raise KeyError
 
 
 # Events
