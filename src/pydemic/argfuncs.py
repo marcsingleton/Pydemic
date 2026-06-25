@@ -49,10 +49,7 @@ def parse_args(
         '--epidemic_num',
         default=None,
         type=int,
-        help=(
-            f'the number of epidemics; '
-            f'must be between {epidemic_min_word} and {epidemic_max_word}'
-        ),
+        help=f'the number of epidemics; must be between {epidemic_min_word} and {epidemic_max_word}',
     )
     parser.add_argument(
         '--map',
@@ -145,7 +142,7 @@ def check_args(
 
     # Get outbreak settings
     if args.outbreak_max < 0:
-        print(f'Argument outbreak_max must be non-negative. Quitting...')
+        print('Argument outbreak_max must be non-negative. Quitting...')
         exit(1)
 
     # Get infection_seq settings

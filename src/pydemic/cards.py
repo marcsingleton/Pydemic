@@ -53,8 +53,7 @@ class InfectionDeck(Deck):
             city.add_disease(state, card.color, cubes, verbose=verbose)
         except exceptions.PropertyError as error:
             print(
-                f'{city.display()} was not infected '
-                f'with {style(card.color, color=card.color)}:',
+                f'{city.display()} was not infected with {style(card.color, color=card.color)}:',
                 error,
             )
         self.discard_pile.append(card)

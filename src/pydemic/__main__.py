@@ -12,6 +12,6 @@ except exceptions.GameOverLose as error:
     print('GAME OVER')
     print(f'{indent}{error}')
     print(f'{indent}Better luck next time!')
-except KeyboardInterrupt as error:
+except KeyboardInterrupt:
     print()  # Start new line in case shell doesn't
     exit()

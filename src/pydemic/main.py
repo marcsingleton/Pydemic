@@ -69,7 +69,7 @@ def quit(state, *args):
     syntax: quit
     """
     if len(args) != 0:
-        print(f'Action failed: Incorrect number of arguments.')
+        print('Action failed: Incorrect number of arguments.')
         return
 
     text = input(f'{prompt_prefix}Are you sure you want to quit? (y/n) ').lower()
@@ -137,9 +137,9 @@ def print_status(state, *args):
             print(header)
             for color, cubes in city.cubes.items():
                 if cubes > 0:
-                    print(f'{indent}{style(cubes * '▪', color=color)}')
+                    print(f'{indent}{style(cubes * "▪", color=color)}')
             for player_name, player in city.players.items():
-                print(f'{indent}{style('▲', color=player.color)} {player_name}')
+                print(f'{indent}{style("▲", color=player.color)} {player_name}')
         print()
 
         track_prefix = 'Infection rate: '
@@ -170,9 +170,9 @@ def print_status(state, *args):
             for card in state.infection_deck.discard_pile:
                 print(f'{indent}{card.display()}')
         else:
-            print(f'Action failed: Argument is not "player_discard" or "infection_discard."')
+            print('Action failed: Argument is not "player_discard" or "infection_discard."')
     else:
-        print(f'Action failed: Incorrect number of arguments.')
+        print('Action failed: Incorrect number of arguments.')
 
 
 # Flow control
@@ -326,8 +326,7 @@ def get_player_order(player_names, players):
     idx = player_names.index(max_player)
     print()
     print(
-        f'{max_player} has the card with the highest population: '
-        f'{max_card.display()} ({max_pop:,})'
+        f'{max_player} has the card with the highest population: {max_card.display()} ({max_pop:,})'
     )
     print(f'{max_player} will start the turn order.')
     return player_names[idx:] + player_names[:idx]
@@ -367,8 +366,7 @@ def game_loop(state):
                 'quit': quit,
             }
             prompt = (
-                f'{prompt_prefix}Draw or play event card '
-                f'({state.draw_count} draw(s) remaining): '
+                f'{prompt_prefix}Draw or play event card ({state.draw_count} draw(s) remaining): '
             )
             interface(state, commands, prompt)
             state.outbreak_track.reset()  # Reset outbreak after each draw
@@ -408,10 +406,10 @@ def epidemic(state):
     # to react to different parts of an epidemic.
     for player in state.players.values():
         if player.has_event('resilient_population'):
-            text = input(
-                f'{prompt_prefix}Resilient Population event card detected in hand. '
-                f'Play now? (y/n) '
-            ).lower()
+            prompt = (
+                f'{prompt_prefix}Resilient Population event card detected in hand. Play now? (y/n) '
+            )
+            text = input(prompt).lower()
             if text == 'y' or text == 'yes':
                 player.event(state, 'resilient_population')
 
@@ -465,7 +463,7 @@ def help(commands, *args):
     commands = commands.copy()
     commands['help'] = help
     if len(args) == 0:
-        print(f'The available commands are: ')
+        print('The available commands are: ')
         for command, cmd in commands.items():
             docstring = cmd.__doc__ if cmd.__doc__ else 'NO HELP FOUND'
             docstring = cleandoc(docstring)
