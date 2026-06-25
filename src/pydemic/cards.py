@@ -60,7 +60,7 @@ class InfectionDeck(Deck):
         self.discard_pile.append(card)
 
     def infect(self, state):
-        self.draw(state, cubes=3, idx=0)
+        self.draw(state, cubes=3)
 
     def intensify(self):
         shuffle(self.discard_pile)
